@@ -1,0 +1,13 @@
+---
+title: Mapping Voteshare Margin
+author: R package build
+date: '2022-09-12'
+slug: []
+categories: []
+tags: []
+---
+
+Welcome to my first blog!
+
+
+
