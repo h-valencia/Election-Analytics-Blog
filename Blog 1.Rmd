@@ -1,0 +1,191 @@
+---
+title: "Analysis 1 - Sept. 15"
+output: html_document
+date: '2022-09-13'
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+library(tidyverse)
+```
+
+```{r}
+
+# Load data
+popvote_df <- read_csv("house nationwide vote and seat share by party 1948-2020.csv")
+
+colnames(popvote_df)
+head(popvote_df[c("year", "winner_party", "winning_vote_margin")])
+
+#Subsetting data (filter, select)
+popvote_df %>%
+  filter(year == 2018) %>%
+  select(D_seats, D_majorvote_pct, winner_party)
+
+# Formatting data to wide or long (spread, gather)
+popvote_df %>%
+  select(year, winner_party, winning_vote_margin) %>%
+  filter(year %in% c(1948, 1952, 1956))
+
+popvote_wide_df <- popvote_df %>%
+  select(year, winner_party, winning_vote_margin) %>%
+  spread(key = winner_party, value = winning_vote_margin)
+  head(popvote_wide_df, 3)
+
+# Modify data
+popvote_wide_df <- popvote_wide_df %>%
+  mutate(winner = case_when(D != "NA" ~ "Democrat", TRUE ~ "Republican"))
+
+popvote_wide_df %>%
+  group_by(winner) %>%
+  summarise(races = n())
+```
+
+
+```{r}
+## make map of vote share by state and CD
+
+# start with 114th congress - 2014 election
+# required packages
+
+require(tidyverse)
+require(ggplot2)
+require(sf)
+
+# load geographic data
+get_congress_map <- function(cong=114) {
+  tmp_file <- tempfile()
+  tmp_dir <- tempdir()
+  zp <- sprintf("https://cdmaps.polisci.ucla.edu/shp/districts114.zip",cong)
+  download.file(zp, tmp_file)
+  unzip(zipfile = tmp_file, exdir = tmp_dir)
+  fpath <- paste(tmp_dir, sprintf("districtShapes/districts114.shp",cong), sep = "/")
+  st_read(fpath)
+}
+
+# load 114th congress
+cd114 <- get_congress_map(114)
+```
+
+```{r}
+
+# select specific state
+cd114_nj <- cd114 %>%
+  filter(STATENAME=="New Jersey") %>%
+  mutate(DISTRICT = as.character(DISTRICT))%>%
+  select(DISTRICT)
+
+# add data to plot - 2014 GOP party seat share
+# reload election data - h from previous exercise
+h <- read_csv("house party vote share by district 1948-2020.csv")
+
+# filter for 2014 election and state
+R_nj_2014 <- h %>%
+  filter(raceYear == 2014, State == "New Jersey") %>%
+  select(raceYear, State, district_num, RepVotesMajorPercent, DemVotesMajorPercent) %>%
+  # summarize party vote share by district
+  group_by(district_num) %>%
+  summarise(Rep_votes_pct = RepVotesMajorPercent) %>%
+  # rename district variable name to match shapefile
+  rename(DISTRICT = district_num)
+
+# before joining dfs, check classes of variable to be merged on
+class(R_nj_2014$DISTRICT)
+class(cd114_nj$DISTRICT)
+
+# change class
+cd114_nj$DISTRICT <- as.numeric(cd114_nj$DISTRICT)
+
+# join election returns with shapefiles
+cd114_nj <- cd114_nj %>% left_join(R_nj_2014, by="DISTRICT")
+cd114_nj
+
+# time to map!
+ggplot() +
+  geom_sf(data=cd114_nj,aes(fill=Rep_votes_pct),inherit.aes=FALSE,alpha=0.9) +
+  scale_fill_gradient(low = "white", high = "black", limits=c(10,80)) +
+  theme_void() +
+  theme(axis.title.x=element_blank(),
+        axis.text.x=element_blank(),
+        axis.ticks.x=element_blank(),
+        axis.title.y=element_blank(),
+        axis.text.y=element_blank(),
+        axis.ticks.y=element_blank())
+
+```
+
+```{r}
+## make map of GOP vote share by state (national) - 2014
+# use h dataset from earlier
+# house_party_vote_share_by_district_1948_2020 <-
+# read_csv("house party vote share by district 1948-2020.csv")
+# h <- house_party_vote_share_by_district_1948_2020
+# filter for relevant variables
+R_2014 <- h %>%
+  filter(raceYear == 2014) %>%
+  select(raceYear, State, district_num, district_id, RepVotes, DemVotes) %>%
+  # summarize party vote share by state
+  group_by(State) %>%
+  # mutate Rep vote margin by state %>%
+  mutate(R_votemargin_st = (sum(RepVotes))/
+  sum(RepVotes + DemVotes),
+  D_votemargin_st = (sum(DemVotes))/
+  
+  sum(RepVotes + DemVotes)) %>%
+  
+  rename(state = State)
+
+
+# load usmap
+# install.packages('plot_usmap')
+library(usmap)
+states_map <- usmap::us_map()
+unique(states_map$abbr)
+
+# plot
+plot_usmap(data = R_2014, regions = "states", values = "R_votemargin_st") +
+scale_fill_gradient(low = "white", high = "red", name = "GOP two-party voteshare margin") +
+theme_void()
+```
+
+```{r}
+
+## map across all election years
+# filter for relevant variables
+R_all <- h %>%
+  select(raceYear, State, district_num, district_id, RepVotes, DemVotes) %>%
+  # summarize party vote share by state
+  group_by(State) %>%
+  # mutate Rep vote margin by state %>%
+  mutate(R_votemargin_st = (sum(RepVotes))/
+  sum(RepVotes + DemVotes),
+  D_votemargin_st = (sum(DemVotes))/
+  sum(RepVotes + DemVotes)) %>%
+  rename(state = State)
+
+# plot
+plot_usmap(data = R_all, regions = "states", values = "R_votemargin_st") +
+  facet_wrap(facets = raceYear ~.) +
+  scale_fill_gradient(low = "white", high = "red", name = "GOP two-party voteshare margin") +
+  theme_void()
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
