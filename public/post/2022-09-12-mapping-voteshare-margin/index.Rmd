@@ -9,7 +9,7 @@ summary: "From now until November 3, I will be updating this weekly blog series 
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(echo = FALSE)
 
 # load libraries
 
