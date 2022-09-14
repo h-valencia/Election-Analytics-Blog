@@ -1,5 +1,5 @@
 ---
-title: Mapping Voteshare Margin
+title: Using Voteshare Margin and Seat Share to Analyze Gerrymandering 
 author: R package build
 date: '2022-09-12'
 slug: []
@@ -44,7 +44,7 @@ Below are two maps plotting the GOP vote share margin in 2010 and 2012.
 
 <br>
 
-```{r VoteShareMap}
+```{r VoteShareMap, include=FALSE}
 
 ## make map of GOP vote share by state (national) - 2010
 # use h dataset from earlier
@@ -109,7 +109,7 @@ One of the main takeaways from comparing these two maps is that the GOP vote sha
 
 Below are two maps plotting the GOP seat share in 2010 and 2012.
 
-```{r SeatShare}
+```{r SeatShare, include=FALSE}
 
 # making a map of GOP seat share by state (national) - 2010 to 2014
 

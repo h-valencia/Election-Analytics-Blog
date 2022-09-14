@@ -296,11 +296,11 @@ ggplotly(ss12_r) %>%
 
 
 ```{r}
-plot_usmap(data = R_2010, regions = "states", values = "R_votemargin_st") +
+plot_usmap(data = R_2012, regions = "states", values = "R_votemargin_st") +
 scale_fill_gradient(low = "white", high = "firebrick", name = "Voteshare Margin") +
 theme_void()
 #ss
-plot_usmap(data = seat10, regions = "states", values = "RepSeatShare") +
+plot_usmap(data = seat12, regions = "states", values = "RepSeatShare") +
 scale_fill_gradient(low = "white", high = "firebrick", name = "GOP Seat Share") +
 theme_void()
 ```
