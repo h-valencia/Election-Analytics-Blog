@@ -8,6 +8,16 @@ tags: []
 summary: "From now until November 3, I will be updating this weekly blog series with my **2022 US midterm election prediction model**. In this first blog, I'll be comparing the voteshare margin by party to the seat share by party in each state to hopefully explore the effects of gerrymandering."
 ---
 
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+# load libraries
+
+library(tidyverse)
+library(usmap)
+library(plotly)
+```
+
 *This blog is part of a series related to Gov 1347: Election Analytics, a course at [Harvard University](https://www.harvard.edu/) taught by Professor [Ryan D. Enos](http://ryandenos.com/)*.
 
 <br>
@@ -26,11 +36,160 @@ In states with these arguably unfair districts, the share of House seats that en
 
 <br>
 
-Every 10 years when Census numbers are released, the districts are redrawn. This took place in 2011, following the 2010 midterm election, at a time when Democrats held power in Congress and in the White House. Republicans worked to redistrict the map in a way that would give them more power in the following elections. In order to assess whether their gerrymandering efforts were successful, I have analyzed both vote share margin by party and seat share by party across the country to see how the two compare. I chose to look specifically at 2010 and 2012, since the 2010 election used the old districts and the 2012 election was the first election with the new districts. In a state where gerrymandering was used, we would expect to see a party's seat share be greater than the vote share margin; where the popular vote percentage does not translate into House seats.
+Every 10 years when Census numbers are released, the districts are redrawn. This took place in 2011, following the 2010 midterm election when President Obama led the Democratic Party in the White House. Republicans worked to redistrict the map in a way that would give them more power in the following elections. In order to assess whether their gerrymandering efforts were successful, I have analyzed both vote share margin by party and seat share by party across the country to see how the two compare. I chose to look specifically at 2010 and 2012, since the 2010 election used the old districts and the 2012 election was the first election with the new districts. In a state where gerrymandering was used, we would expect to see a party's seat share be greater than the vote share margin; where the popular vote percentage does not translate into House seats.
+
+<br>
+
+Below are two maps plotting the GOP vote share margin in 2010 and 2012.
+
+<br>
+
+```{r VoteShareMap}
+
+## make map of GOP vote share by state (national) - 2010
+# use h dataset from earlier
+# filter for relevant variables
+h <- read_csv("house party vote share by district 1948-2020.csv")
+R_2010 <- h %>%
+  filter(raceYear == 2010) %>%
+  select(raceYear, State, district_num, district_id, RepVotes, DemVotes) %>%
+  # summarize party vote share by state
+  group_by(State) %>%
+  # mutate Rep vote margin by state %>%
+  mutate(R_votemargin_st = (sum(RepVotes))/sum(RepVotes + DemVotes),
+         D_votemargin_st = (sum(DemVotes))/sum(RepVotes + DemVotes)) %>%
+  rename(state = State) %>%
+  mutate_at(vars(R_votemargin_st, D_votemargin_st), ~ round(., 4))
+
+# repeat for 2012 (after redistricting)
+R_2012 <- h %>%
+  filter(raceYear == 2012) %>%
+  select(raceYear, State, district_num, district_id, RepVotes, DemVotes) %>%
+  # summarize party vote share by state
+  group_by(State) %>%
+  # mutate Rep vote margin by state %>%
+  mutate(R_votemargin_st = (sum(RepVotes))/sum(RepVotes + DemVotes),
+         D_votemargin_st = (sum(DemVotes))/sum(RepVotes + DemVotes)) %>%
+  rename(state = State) %>%
+  mutate_at(vars(R_votemargin_st, D_votemargin_st), ~ round(., 4))
+
+# load usmap
+# install.packages('plot_usmap')
+states_map <- usmap::us_map()
+unique(states_map$abbr)
+
+# plot 2010
+vm2010 <- plot_usmap(data = R_2010, regions = "states", values = "R_votemargin_st") +
+scale_fill_gradient(low = "white", high = "firebrick", name = "Voteshare Margin") +
+theme_void()
+
+# plot 2012
+vm2012 <- plot_usmap(data = R_2012, regions = "states", values = "R_votemargin_st") +
+scale_fill_gradient(low = "white", high = "firebrick", name = "Voteshare Margin") +
+theme_void() 
+
+# make interactive
+ggplotly(vm2010) %>% 
+  layout(xaxis = list(showline = FALSE),
+         yaxis = list(showline = FALSE),
+         title = "GOP Two-Party Vote Share Margin 2010")
+
+ggplotly(vm2012) %>% 
+  layout(xaxis = list(showline = FALSE),
+         yaxis = list(showline = FALSE),
+         title = "GOP Two-Party Vote Share Margin 2012")
+
+```
+
+<br>
+
+One of the main takeaways from comparing these two maps is that the GOP vote share margin in the Midwest and South decreases. The map in these areas goes from the darker shades of red to a lighter shade, suggesting that Republicans in these states are receiving less support.
+
+<br>
+
+Below are two maps plotting the GOP seat share in 2010 and 2012.
+
+```{r SeatShare}
+
+# making a map of GOP seat share by state (national) - 2010 to 2014
+
+# load data from the 2010, 2012, and 2014 elections
+seats_years <- read_csv("export copy.csv", 
+    skip = 2)
+
+# eliminating NAs and delimiters
+seats_years <- subset(seats_years, seats_years$RaceDate == 20101102 | seats_years$RaceDate == 20121106)
+
+# cleaning the data
+seats_years <- seats_years %>%
+  group_by(RaceDate) %>%
+  mutate(RepWinner = as.numeric(RepWinner),
+         DemWinner = as.numeric(DemWinner),
+         OtherWinner = as.numeric(OtherWinner),
+         TotalSeats = RepWinner + DemWinner + OtherWinner,
+         RepSeatShare = (RepWinner/TotalSeats),
+         DemSeatShare = (DemWinner/TotalSeats)) %>%
+  # summarize party seat share by state
+  group_by(Area) %>%
+  rename(state = Area) %>%
+  mutate_at(vars(RepSeatShare, DemSeatShare), ~ round(., 4))
+
+# new dfs for each year
+seat10 <- seats_years %>%
+  filter(RaceDate == 20101102)
+
+seat12 <- seats_years %>%
+  filter(RaceDate == 20121106)
+
+# load usmap
+states_map <- usmap::us_map()
+unique(states_map$abbr)
+
+# plot 2010 republican
+ss10_r <- plot_usmap(data = seat10, regions = "states", values = "RepSeatShare") +
+scale_fill_gradient(low = "white", high = "firebrick", name = "GOP Seat Share") +
+theme_void()
+
+# plot 2010 democrate
+ss10_d <- plot_usmap(data = seat10, regions = "states", values = "DemSeatShare") +
+scale_fill_gradient(low = "white", high = "dodgerblue4", name = "Democratic Seat Share") +
+theme_void()
+
+# plot 2012 republican 
+ss12_r <- plot_usmap(data = seat12, regions = "states", values = "RepSeatShare") +
+scale_fill_gradient(low = "white", high = "firebrick", name = "GOP Seat Share") +
+theme_void()
+
+# plot 2012 democrat
+ss12_d <- plot_usmap(data = seat12, regions = "states", values = "DemSeatShare") +
+scale_fill_gradient(low = "white", high = "dodgerblue4", name = "Democratic Seat Share") +
+theme_void()
 
 
+# add plotly to make interactive
+ggplotly(ss10_r) %>% 
+  layout(xaxis = list(showline = FALSE),
+         yaxis = list(showline = FALSE),
+         title = "GOP House of Representatives Seat Share - 2010")
 
+ggplotly(ss12_r) %>% 
+  layout(xaxis = list(showline = FALSE),
+         yaxis = list(showline = FALSE),
+         title = "GOP House of Representatives Seat Share - 2012")
 
+```
+
+<br>
+
+Looking at these two maps side by side, we see what looks like an increase in GOP seat share in the mid-Atlantic. In comparing the two maps from 2010 side by side, we can see that while the GOP vote share margin map does not look particularly red, the GOP seat share map is much darker. This shows us that despite Republicans not receiving an overwhelming number of votes in the 2010 election, they were still able to capture a large number of House seats. Looking at the data more quantitatively, we find that Republicans in 2010 won an additional 63 seats in the House, giving them a total of 242, and won the popular vote by 6.8%. These were the results before the redistricting.
+
+<br>
+
+Now looking at the two maps from 2012, we see essentially the same pattern: the map of vote share margin for Republicans is not overwhelmingly red, while the seat share map is heavily red, specifically in the Midwest and Mid-Atlantic regions. In this election -- the first since the new districts -- Republicans actually ended up losing 7 seats, bringing them down to 233. While my initial expectations from gerrymandering would have led me to predict Republicans would win even more seats, I will also acknowledge that I am not very familiar with the political mood at the time. Were Republicans expected to lose even *more* seats had they not redistricted? 
+
+<br>
+
+After the 2020 Census report, again politicians were brought in to fix the maps and redistrict. The results of the most recent redistricting will be revealed in this upcoming 2022 election, and will impact the outcomes of elections for the next 10 years. The people in charge of creating these districts need checks and balances in place to ensure that democracy persists and the maps are representative of the voters.
 
 
 
