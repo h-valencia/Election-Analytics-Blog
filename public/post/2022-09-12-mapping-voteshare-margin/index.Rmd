@@ -76,7 +76,6 @@ R_2012 <- h %>%
 # load usmap
 # install.packages('plot_usmap')
 states_map <- usmap::us_map()
-unique(states_map$abbr)
 
 # plot 2010
 vm2010 <- plot_usmap(data = R_2010, regions = "states", values = "R_votemargin_st") +
@@ -143,7 +142,6 @@ seat12 <- seats_years %>%
 
 # load usmap
 states_map <- usmap::us_map()
-unique(states_map$abbr)
 
 # plot 2010 republican
 ss10_r <- plot_usmap(data = seat10, regions = "states", values = "RepSeatShare") +
