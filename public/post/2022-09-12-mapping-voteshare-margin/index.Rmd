@@ -5,9 +5,33 @@ date: '2022-09-12'
 slug: []
 categories: []
 tags: []
+summary: "From now until November 3, I will be updating this weekly blog series with my **2022 US midterm election prediction model**. In this first blog, I'll be comparing the voteshare margin by party to the seat share by party in each state to hopefully explore the effects of gerrymandering."
 ---
 
-Welcome to my first blog!
+*This blog is part of a series related to Gov 1347: Election Analytics, a course at [Harvard University](https://www.harvard.edu/) taught by Professor [Ryan D. Enos](http://ryandenos.com/)*.
+
+<br>
+
+From now until November 3, I will be updating this weekly blog series with my **2022 US midterm election prediction model**. In this first blog, I'll be comparing the vote share margin by party to the seat share by party in each state to hopefully explore the effects of gerrymandering.
+
+<br>
+
+# Gerrymandering
+
+Gerrymandering, or the act of manipulating the boundaries of an electoral constituency in order to give one party an advantage, can be likened to a legal way of stealing an election. By analyzing the voters in a state, politicians can change the boundaries of the state's congressional districts in order to achieve a favored outcome. For example, if there is a group of strong democrats all located in a similar geographic region, politicians can gerrymander by drawing district boundaries in such a way that splits up this democratic center and groups them with a stronger Republican area -- even if the district lines make no logical sense -- so that the seat ends up going to a Republican candidate.
+
+<br>
+
+In states with these arguably unfair districts, the share of House seats that end up with each party may very likely differ from what the results of a popular vote would predict. Gerrymandering is anti-democratic in that it diminishes voter power by creating outcomes that are not aligned with voter preferences. While redistricting itself is important to the democratic process and representing voters, when the power of redistricting is left to politicians they can essentially pick and choose their voters.
+
+<br>
+
+Every 10 years when Census numbers are released, the districts are redrawn. This took place in 2011, following the 2010 midterm election, at a time when Democrats held power in Congress and in the White House. Republicans worked to redistrict the map in a way that would give them more power in the following elections. In order to assess whether their gerrymandering efforts were successful, I have analyzed both vote share margin by party and seat share by party across the country to see how the two compare. I chose to look specifically at 2010 and 2012, since the 2010 election used the old districts and the 2012 election was the first election with the new districts. In a state where gerrymandering was used, we would expect to see a party's seat share be greater than the vote share margin; where the popular vote percentage does not translate into House seats.
+
+
+
+
+
 
 
 

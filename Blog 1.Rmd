@@ -8,6 +8,8 @@ date: '2022-09-13'
 knitr::opts_chunk$set(echo = TRUE)
 
 library(tidyverse)
+library(usmap)
+library(plotly)
 ```
 
 ```{r}
@@ -115,7 +117,7 @@ ggplot() +
 
 ```
 
-```{r}
+```{r, eval = FALSE}
 ## make map of GOP vote share by state (national) - 2014
 # use h dataset from earlier
 # house_party_vote_share_by_district_1948_2020 <-
@@ -128,26 +130,95 @@ R_2014 <- h %>%
   # summarize party vote share by state
   group_by(State) %>%
   # mutate Rep vote margin by state %>%
-  mutate(R_votemargin_st = (sum(RepVotes))/
-  sum(RepVotes + DemVotes),
-  D_votemargin_st = (sum(DemVotes))/
-  
-  sum(RepVotes + DemVotes)) %>%
-  
+  mutate(R_votemargin_st = (sum(RepVotes))/sum(RepVotes + DemVotes),
+         D_votemargin_st = (sum(DemVotes))/sum(RepVotes + DemVotes)) %>%
   rename(state = State)
-
 
 # load usmap
 # install.packages('plot_usmap')
-library(usmap)
 states_map <- usmap::us_map()
 unique(states_map$abbr)
 
 # plot
 plot_usmap(data = R_2014, regions = "states", values = "R_votemargin_st") +
-scale_fill_gradient(low = "white", high = "red", name = "GOP two-party voteshare margin") +
+scale_fill_gradient(low = "white", high = "firebrick", name = "GOP two-party voteshare margin") +
 theme_void()
 ```
+
+```{r}
+## make map of GOP vote share by state (national) - 2010
+# use h dataset from earlier
+# filter for relevant variables
+R_2010 <- h %>%
+  filter(raceYear == 2010) %>%
+  select(raceYear, State, district_num, district_id, RepVotes, DemVotes) %>%
+  # summarize party vote share by state
+  group_by(State) %>%
+  # mutate Rep vote margin by state %>%
+  mutate(R_votemargin_st = (sum(RepVotes))/sum(RepVotes + DemVotes),
+         D_votemargin_st = (sum(DemVotes))/sum(RepVotes + DemVotes)) %>%
+  rename(state = State) %>%
+  mutate_at(vars(R_votemargin_st, D_votemargin_st), ~ round(., 4))
+
+# repeat for 2012 (after redistricting)
+R_2012 <- h %>%
+  filter(raceYear == 2012) %>%
+  select(raceYear, State, district_num, district_id, RepVotes, DemVotes) %>%
+  # summarize party vote share by state
+  group_by(State) %>%
+  # mutate Rep vote margin by state %>%
+  mutate(R_votemargin_st = (sum(RepVotes))/sum(RepVotes + DemVotes),
+         D_votemargin_st = (sum(DemVotes))/sum(RepVotes + DemVotes)) %>%
+  rename(state = State) %>%
+  mutate_at(vars(R_votemargin_st, D_votemargin_st), ~ round(., 4))
+
+# repeat for 2014
+R_2014 <- h %>%
+  filter(raceYear == 2014) %>%
+  select(raceYear, State, district_num, district_id, RepVotes, DemVotes) %>%
+  # summarize party vote share by state
+  group_by(State) %>%
+  # mutate Rep vote margin by state %>%
+  mutate(R_votemargin_st = (sum(RepVotes))/sum(RepVotes + DemVotes),
+         D_votemargin_st = (sum(DemVotes))/sum(RepVotes + DemVotes)) %>%
+  rename(state = State) %>%
+  mutate_at(vars(R_votemargin_st, D_votemargin_st), ~ round(., 4))
+
+# load usmap
+# install.packages('plot_usmap')
+states_map <- usmap::us_map()
+unique(states_map$abbr)
+
+# plot 2010
+vm2010 <- plot_usmap(data = R_2010, regions = "states", values = "R_votemargin_st") +
+scale_fill_gradient(low = "white", high = "firebrick", name = "GOP two-party voteshare margin") +
+theme_void()
+
+# plot 2012
+vm2012 <- plot_usmap(data = R_2012, regions = "states", values = "R_votemargin_st") +
+scale_fill_gradient(low = "white", high = "firebrick", name = "GOP two-party voteshare margin") +
+theme_void() 
+
+# plot 2014
+vm2014 <- plot_usmap(data = R_2014, regions = "states", values = "R_votemargin_st") +
+scale_fill_gradient(low = "white", high = "firebrick", name = "GOP two-party voteshare margin") +
+theme_void()
+
+# make interactive
+ggplotly(vm2010) %>% 
+  layout(xaxis = list(showline = FALSE),
+         yaxis = list(showline = FALSE))
+
+ggplotly(vm2012) %>% 
+  layout(xaxis = list(showline = FALSE),
+         yaxis = list(showline = FALSE))
+
+ggplotly(vm2014) %>% 
+  layout(xaxis = list(showline = FALSE),
+         yaxis = list(showline = FALSE))
+```
+
+
 
 ```{r}
 
@@ -172,9 +243,126 @@ plot_usmap(data = R_all, regions = "states", values = "R_votemargin_st") +
 ```
 
 
+```{r}
+
+# reading in Data from HKS for map of seat share by party
+# using the year 2014
+seats <- read_csv("export.csv", skip = 2)
+```
+
+```{r}
+# making a map of GOP seat share by state (national) - 2014
+
+# filter for relevant variables
+seats <- seats %>%
+  head(51) %>%
+  mutate(RepWinner = as.numeric(RepWinner),
+         DemWinner = as.numeric(DemWinner),
+         OtherWinner = as.numeric(OtherWinner),
+         TotalSeats = RepWinner + DemWinner + OtherWinner,
+         RepSeatShare = (RepWinner/TotalSeats),
+         DemSeatShare = (DemWinner/TotalSeats)) %>%
+  # summarize party seat share by state
+  group_by(Area) %>%
+  rename(state = Area)
+
+# load usmap
+states_map <- usmap::us_map()
+unique(states_map$abbr)
+
+# plot
+plot_usmap(data = seats, regions = "states", values = "RepSeatShare") +
+scale_fill_gradient(low = "white", high = "firebrick", name = "GOP House Seat Share - 2014") +
+theme_void()
+
+plot_usmap(data = seats, regions = "states", values = "DemSeatShare") +
+scale_fill_gradient(low = "white", high = "dodgerblue4", name = "Democratic House Seat Share - 2014") +
+theme_void()
+```
 
 
+```{r}
 
+# making a map of GOP seat share by state (national) - 2010 to 2014
+
+# load data from the 2010, 2012, and 2014 elections
+seats_years <- read_csv("export copy.csv", 
+    skip = 2)
+
+# eliminating NAs and delimiters
+seats_years <- subset(seats_years, seats_years$RaceDate == 20101102 | seats_years$RaceDate == 20121106 | seats_years$RaceDate == 20141104)
+
+# cleaning the data
+seats_years <- seats_years %>%
+  group_by(RaceDate) %>%
+  mutate(RepWinner = as.numeric(RepWinner),
+         DemWinner = as.numeric(DemWinner),
+         OtherWinner = as.numeric(OtherWinner),
+         TotalSeats = RepWinner + DemWinner + OtherWinner,
+         RepSeatShare = (RepWinner/TotalSeats),
+         DemSeatShare = (DemWinner/TotalSeats)) %>%
+  # summarize party seat share by state
+  group_by(Area) %>%
+  rename(state = Area) %>%
+  mutate_at(vars(RepSeatShare, DemSeatShare), ~ round(., 4))
+
+# new dfs for each year
+seat10 <- seats_years %>%
+  filter(RaceDate == 20101102)
+
+seat12 <- seats_years %>%
+  filter(RaceDate == 20121106)
+
+seat14 <- seats_years %>%
+  filter(RaceDate == 20141104)
+
+# load usmap
+states_map <- usmap::us_map()
+unique(states_map$abbr)
+
+# plot 2010 republican
+ss10_r <- plot_usmap(data = seat10, regions = "states", values = "RepSeatShare") +
+scale_fill_gradient(low = "white", high = "firebrick", name = "GOP House of Representatives Seat Share - 2010") +
+theme_void()
+
+# plot 2010 democrate
+ss10_d <- plot_usmap(data = seat10, regions = "states", values = "DemSeatShare") +
+scale_fill_gradient(low = "white", high = "dodgerblue4", name = "Democratic House Seat Share - 2010") +
+theme_void()
+
+# plot 2012 republican 
+ss12_r <- plot_usmap(data = seat12, regions = "states", values = "RepSeatShare") +
+scale_fill_gradient(low = "white", high = "firebrick", name = "GOP House of Representatives Seat Share - 2012") +
+theme_void()
+
+# plot 2012 democrat
+ss12_d <- plot_usmap(data = seat12, regions = "states", values = "DemSeatShare") +
+scale_fill_gradient(low = "white", high = "dodgerblue4", name = "Democratic House Seat Share - 2012") +
+theme_void()
+
+# plot 2014 republican
+ss14_r <- plot_usmap(data = seat14, regions = "states", values = "RepSeatShare") +
+scale_fill_gradient(low = "white", high = "firebrick", name = "GOP House of Representatives Seat Share - 2014") +
+theme_void()
+
+# plot 2014 democrat
+ss14_d <- plot_usmap(data = seat14, regions = "states", values = "DemSeatShare") +
+scale_fill_gradient(low = "white", high = "dodgerblue4", name = "Democratic House Seat Share - 2014") +
+theme_void()
+
+# add plotly to make interactive
+ggplotly(ss10_r) %>% 
+  layout(xaxis = list(showline = FALSE),
+         yaxis = list(showline = FALSE))
+
+ggplotly(ss12_r) %>% 
+  layout(xaxis = list(showline = FALSE),
+         yaxis = list(showline = FALSE))
+
+ggplotly(ss14_r) %>% 
+  layout(xaxis = list(showline = FALSE),
+         yaxis = list(showline = FALSE))
+```
 
 
 
