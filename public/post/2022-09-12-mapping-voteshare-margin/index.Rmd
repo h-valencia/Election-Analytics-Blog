@@ -28,7 +28,7 @@ From now until November 3, I will be updating this weekly blog series with my **
 
 # Gerrymandering
 
-Gerrymandering, or the act of manipulating the boundaries of an electoral constituency in order to give one party an advantage, can be likened to a legal way of stealing an election. By analyzing the voters in a state, politicians can change the boundaries of the state's congressional districts in order to achieve a favored outcome. For example, if there is a group of strong democrats all located in a similar geographic region, politicians can gerrymander by drawing district boundaries in such a way that splits up this democratic center and groups them with a stronger Republican area -- even if the district lines make no logical sense -- so that the seat ends up going to a Republican candidate.
+Gerrymandering, or the act of drawing political boundaries to give your party a numeric advantage over an opposing party (as defined by Christopher Ingraham for the Washington Post), can be likened to a legal way of stealing an election. By analyzing the voters in a state, politicians can change the boundaries of the state's congressional districts in order to achieve a favored outcome. For example, if there is a group of strong democrats all located in a similar geographic region, politicians can gerrymander by drawing district boundaries in such a way that splits up this democratic center and groups them with a stronger Republican area -- even if the district lines make no logical sense -- so that the seat ends up going to a Republican candidate.
 
 <br>
 
@@ -179,12 +179,18 @@ ggplotly(ss12_r) %>%
 
 <br>
 
-Now looking at the two maps from 2012, we see essentially the same pattern: the map of vote share margin for Republicans is not overwhelmingly red, while the seat share map is heavily red, specifically in the Midwest and Mid-Atlantic regions. In this election -- the first since the new districts -- Republicans actually ended up losing 7 seats, bringing them down to 233. While my initial expectations from gerrymandering would have led me to predict Republicans would win even more seats, I will also acknowledge that I am not very familiar with the political mood at the time. Were Republicans expected to lose even *more* seats had they not redistricted? 
+Now looking at the two maps from 2012, we see essentially the same pattern: the map of vote share margin for Republicans is not overwhelmingly red, while the seat share map is heavily red, specifically in the Midwest and Mid-Atlantic regions. In this election -- the first since the new districts -- Republicans actually ended up losing 7 seats, bringing them down to 233. While my initial expectations from gerrymandering would have led me to predict Republicans would win even more seats, I will also acknowledge that I am not very familiar with the political mood at the time. Were Republicans expected to lose even *more* seats had they not redistricted? It is also important to note that these tactics are not solely used by Republicans, but Democrats as well. While in the past decade we have seen the effects of gerrymandering mainly benefiting the Republican party, it is still used by Democrats to gain an advantage in states like Maryland (Kirschenbaum & Li, 2021). 
 
 <br>
 
-After the 2020 Census report, again politicians were brought in to fix the maps and redistrict. The results of the most recent redistricting will be revealed in this upcoming 2022 election, and will impact the outcomes of elections for the next 10 years. The people in charge of creating these districts need checks and balances in place to ensure that democracy persists and the maps are representative of the voters.
+Disproportionately, the costs of gerrymandering are "borne by communities of color" with the Supreme Court's 2019 ruling in Rucho v. Common Cause allowing maps to discriminate against a political party (Democrats), despite the correlation of party with race (Kirschenbaum & Li, 2021). After the 2020 Census report, again politicians were brought in to fix the maps and redistrict. The results of the most recent redistricting will be revealed in this upcoming 2022 election, and will impact the outcomes of elections for the next 10 years. The people in charge of creating these districts need checks and balances in place to ensure that democracy persists and the maps are representative of the voters. 
 
+<br>
 
+Sources:
+
+Kirschenbaum, Julia, and Michael Li. “Gerrymandering Explained.” *Brennan Center for Justice*, 11 Aug. 2022, https://www.brennancenter.org/our-work/research-reports/gerrymandering-explained. 
+
+Ingraham, Christopher. “This Is the Best Explanation of Gerrymandering You Will Ever See.” *The Washington Post*, WP Company, 25 Nov. 2021, https://www.washingtonpost.com/news/wonk/wp/2015/03/01/this-is-the-best-explanation-of-gerrymandering-you-will-ever-see/. 
 
 
