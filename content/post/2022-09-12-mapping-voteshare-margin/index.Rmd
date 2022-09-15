@@ -40,11 +40,11 @@ Every 10 years when Census numbers are released, the districts are redrawn. This
 
 <br>
 
-Below are two maps plotting the GOP vote share margin in 2010 and 2012.
+Below are two maps plotting from 2010, with the first showing the GOP vote share margin and the second showing the GOP seat share.
 
 <br>
 
-```{r VoteShareMap, warning=FALSE, message=FALSE}
+```{r, warning=FALSE, message=FALSE}
 
 ## make map of GOP vote share by state (national) - 2010
 # use h dataset from earlier
@@ -52,18 +52,6 @@ Below are two maps plotting the GOP vote share margin in 2010 and 2012.
 h <- read_csv("house party vote share by district 1948-2020.csv")
 R_2010 <- h %>%
   filter(raceYear == 2010) %>%
-  select(raceYear, State, district_num, district_id, RepVotes, DemVotes) %>%
-  # summarize party vote share by state
-  group_by(State) %>%
-  # mutate Rep vote margin by state %>%
-  mutate(R_votemargin_st = (sum(RepVotes))/sum(RepVotes + DemVotes),
-         D_votemargin_st = (sum(DemVotes))/sum(RepVotes + DemVotes)) %>%
-  rename(state = State) %>%
-  mutate_at(vars(R_votemargin_st, D_votemargin_st), ~ round(., 4))
-
-# repeat for 2012 (after redistricting)
-R_2012 <- h %>%
-  filter(raceYear == 2012) %>%
   select(raceYear, State, district_num, district_id, RepVotes, DemVotes) %>%
   # summarize party vote share by state
   group_by(State) %>%
@@ -82,36 +70,14 @@ vm2010 <- plot_usmap(data = R_2010, regions = "states", values = "R_votemargin_s
 scale_fill_gradient(low = "white", high = "firebrick", name = "Voteshare Margin") +
 theme_void()
 
-# plot 2012
-vm2012 <- plot_usmap(data = R_2012, regions = "states", values = "R_votemargin_st") +
-scale_fill_gradient(low = "white", high = "firebrick", name = "Voteshare Margin") +
-theme_void() 
-
 # make interactive
 ggplotly(vm2010) %>% 
   layout(xaxis = list(showline = FALSE),
          yaxis = list(showline = FALSE),
          title = "GOP Two-Party Vote Share Margin 2010")
 
-ggplotly(vm2012) %>% 
-  layout(xaxis = list(showline = FALSE),
-         yaxis = list(showline = FALSE),
-         title = "GOP Two-Party Vote Share Margin 2012")
 
-```
-
-<br>
-
-One of the main takeaways from comparing these two maps is that the GOP vote share margin in the Midwest and South decreases. The map in these areas goes from the darker shades of red to a lighter shade, suggesting that Republicans in these states are receiving less support.
-
-<br>
-
-Below are two maps plotting the GOP seat share in 2010 and 2012.
-
-```{r SeatShare, warning=FALSE, message=FALSE}
-
-# making a map of GOP seat share by state (national) - 2010 to 2014
-
+# making a map of GOP seat share by state (national) - 2010
 # load data from the 2010, 2012, and 2014 elections
 seats_years <- read_csv("export copy.csv", 
     skip = 2)
@@ -137,12 +103,6 @@ seats_years <- seats_years %>%
 seat10 <- seats_years %>%
   filter(RaceDate == 20101102)
 
-seat12 <- seats_years %>%
-  filter(RaceDate == 20121106)
-
-# load usmap
-states_map <- usmap::us_map()
-
 # plot 2010 republican
 ss10_r <- plot_usmap(data = seat10, regions = "states", values = "RepSeatShare") +
 scale_fill_gradient(low = "white", high = "firebrick", name = "GOP Seat Share") +
@@ -152,6 +112,52 @@ theme_void()
 ss10_d <- plot_usmap(data = seat10, regions = "states", values = "DemSeatShare") +
 scale_fill_gradient(low = "white", high = "dodgerblue4", name = "Democratic Seat Share") +
 theme_void()
+
+# add plotly to make interactive
+ggplotly(ss10_r) %>% 
+  layout(xaxis = list(showline = FALSE),
+         yaxis = list(showline = FALSE),
+         title = "GOP House of Representatives Seat Share - 2010")
+
+```
+<br>
+
+In comparing the two maps from 2010 side by side, we can see that while the GOP vote share margin map does not look particularly red, the GOP seat share map is much darker. This shows us that despite Republicans not receiving an overwhelming number of votes in the 2010 election, they were still able to capture a large number of House seats. Looking at the data more quantitatively, we find that Republicans in 2010 won an additional 63 seats in the House, giving them a total of 242, and won the popular vote by 6.8%. These were the results before the redistricting.
+
+<br>
+```{r, warning=FALSE, message=FALSE}
+
+## make map of GOP vote share by state (national) - 2012
+# repeat for 2012 (after redistricting)
+R_2012 <- h %>%
+  filter(raceYear == 2012) %>%
+  select(raceYear, State, district_num, district_id, RepVotes, DemVotes) %>%
+  # summarize party vote share by state
+  group_by(State) %>%
+  # mutate Rep vote margin by state %>%
+  mutate(R_votemargin_st = (sum(RepVotes))/sum(RepVotes + DemVotes),
+         D_votemargin_st = (sum(DemVotes))/sum(RepVotes + DemVotes)) %>%
+  rename(state = State) %>%
+  mutate_at(vars(R_votemargin_st, D_votemargin_st), ~ round(., 4))
+
+# load usmap
+# install.packages('plot_usmap')
+states_map <- usmap::us_map()
+
+# plot 2012
+vm2012 <- plot_usmap(data = R_2012, regions = "states", values = "R_votemargin_st") +
+scale_fill_gradient(low = "white", high = "firebrick", name = "Voteshare Margin") +
+theme_void() 
+
+# interactive
+ggplotly(vm2012) %>% 
+  layout(xaxis = list(showline = FALSE),
+         yaxis = list(showline = FALSE),
+         title = "GOP Two-Party Vote Share Margin 2012")
+
+# 2012 df seat share
+seat12 <- seats_years %>%
+  filter(RaceDate == 20121106)
 
 # plot 2012 republican 
 ss12_r <- plot_usmap(data = seat12, regions = "states", values = "RepSeatShare") +
@@ -163,23 +169,13 @@ ss12_d <- plot_usmap(data = seat12, regions = "states", values = "DemSeatShare")
 scale_fill_gradient(low = "white", high = "dodgerblue4", name = "Democratic Seat Share") +
 theme_void()
 
-
-# add plotly to make interactive
-ggplotly(ss10_r) %>% 
-  layout(xaxis = list(showline = FALSE),
-         yaxis = list(showline = FALSE),
-         title = "GOP House of Representatives Seat Share - 2010")
-
+# interactive
 ggplotly(ss12_r) %>% 
   layout(xaxis = list(showline = FALSE),
          yaxis = list(showline = FALSE),
          title = "GOP House of Representatives Seat Share - 2012")
 
 ```
-
-<br>
-
-Looking at these two maps side by side, we see what looks like an increase in GOP seat share in the mid-Atlantic. In comparing the two maps from 2010 side by side, we can see that while the GOP vote share margin map does not look particularly red, the GOP seat share map is much darker. This shows us that despite Republicans not receiving an overwhelming number of votes in the 2010 election, they were still able to capture a large number of House seats. Looking at the data more quantitatively, we find that Republicans in 2010 won an additional 63 seats in the House, giving them a total of 242, and won the popular vote by 6.8%. These were the results before the redistricting.
 
 <br>
 
