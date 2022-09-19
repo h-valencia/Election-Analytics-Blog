@@ -103,6 +103,13 @@ data2$CPI_pct_change <- cpi_df$CPI_pct_change[match(data2$year, cpi_df$year)]
 
 ```
 
+So far, we have touched on a few different forces that affect the way in which people vote -- aside from simply party affiliation. Last week, we learned about end heuristics, or how voters tend to focus on the period of time right before an election rather than an incumbent's entire time in office. If the candidate ends their term strong, that is what people are likely to remember. I have brought that idea into this week's analysis of economic forces -- choosing to focus on quarter 7, or July through August in an election year.
+
+<br>
+
+According to Lewis-Beck and Stegmaier (2000), voters tend to weigh economic issues more heavily than other issues, and they "hold the government responsible for economic performance". While the government can only do so much to mitigate the economy's natural cycles, people still hold those in office responsible for it all. It should also be noted that Republicans give more weight to economic issues than Democratic voters. The economic variables that I will consider in this analysis are GDP growth percentage, percent change in disposable income, percent change in Consumer Price Index (CPI), and the national unemployment rate. 
+
+<br>
 
 
 
