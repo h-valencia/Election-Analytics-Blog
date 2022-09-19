@@ -129,6 +129,8 @@ While the relationship between CPI percent change and vote share is positive in 
 
 To look at how these models fit over time, I created a graph that shows each model's predictions alongside the actual values of incumbent party vote share. Each model is a colored, dotted line, while the actual values are represented by the black, solid line. As we can see, all of the colored lines do not have as much variation as the true values line; they are all much flatter. Only the green line representing Model 4 comes close to following the patterns of the actual vote share values, but even it cannot recreate the variation we see over time. This model that used CPI did a decent job of predicting between 1970 and 2000. After 2000, however, it did not hit the lows that we saw with the actual values. Until the 1990s, incumbent vote share typically sat above 52%. After this period and into the 2000s, however, the incumbent was not as successful, often falling into the mid 40-percents. It is during this time period that the residuals appear to grow.
 
+<br>
+
 
 ```{r, results='asis'}
 
@@ -173,6 +175,8 @@ I repeated this modelling process and prediction but instead using Republican se
 <br>
 
 Once again, I created a plot of the predictions versus the true values over time. Interestingly, we see the same pattern of the CPI model fairly accurately fitting the actual values until the 1990s, after which they diverge and the residuals grow. The other three models appear as flat lines in this graph, similar to the plot above.
+
+ <br>
 
 ```{r, warning = FALSE, message = FALSE}
 
@@ -222,13 +226,22 @@ legend("topleft", c("Actual Seat Share", "Model 1 Pred", "Model 2 Pred", "Model 
 
 ```
 
+<br>
+
+One issue to note when analyzing the effects of different economic forces jointly on a dependent variable is multicollinearity. This is a problem that occurs when multiple independent variables are correlated with one another and negatively impacts the reliability of the inferences we can draw from these models. To assess if multicollinearity exists between any of the independent variables, I have created a correlation matrix below.
+
+<br>
+
+
 ```{r}
 corrmat <- data2[, c(4, 6:9)]
 res <- cor(corrmat)
 corrplot(res, type = "upper", order = "hclust", 
-         tl.col = "black", tl.srt = 45)
+         tl.col = "black", tl.srt = 45, addCoef.col = "grey70")
 ```
+<br>
 
+We can see that GDP growth percentage is highly negatively correlated with the percent change in disposable income, with a correlation of -0.72. There is also a moderately strong correlation between the unemployment rate and the percent change of disposable income. Both of these correlations may impact the validity of our models and hurt any insights we draw from this analysis.
 
 
 
