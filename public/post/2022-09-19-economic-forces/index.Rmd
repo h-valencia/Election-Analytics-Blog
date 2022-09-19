@@ -103,15 +103,23 @@ data2$CPI_pct_change <- cpi_df$CPI_pct_change[match(data2$year, cpi_df$year)]
 
 ```
 
-So far, we have touched on a few different forces that affect the way in which people vote -- aside from simply party affiliation. Last week, we learned about end heuristics, or how voters tend to focus on the period of time right before an election rather than an incumbent's entire time in office. If the candidate ends their term strong, that is what people are likely to remember. I have brought that idea into this week's analysis of economic forces -- choosing to focus on quarter 7, or July through August in an election year.
+So far, we have touched on a few different forces that affect the way in which people vote -- aside from simply party affiliation. Last week, we learned about end heuristics, or how voters tend to focus on the period of time right before an election rather than an incumbent's entire time in office. If the candidate ends their term strong, that is what people are likely to remember. I have brought that idea into this week's analysis of economic forces -- choosing to focus on Quarter 7, or July through August in an election year.
 
 <br>
 
-According to Lewis-Beck and Stegmaier (2000), voters tend to weigh economic issues more heavily than other issues, and they "hold the government responsible for economic performance". While the government can only do so much to mitigate the economy's natural cycles, people still hold those in office responsible for it all. It should also be noted that Republicans give more weight to economic issues than Democratic voters. The economic variables that I will consider in this analysis are GDP growth percentage, percent change in disposable income, percent change in Consumer Price Index (CPI), and the national unemployment rate. 
+According to Lewis-Beck and Stegmaier (2000), voters tend to weigh economic issues more heavily than other issues, and they "hold the government responsible for economic performance". While the government can only do so much to mitigate the economy's natural cycles, people still hold those in office responsible for it all. It should also be noted that Republicans give more weight to economic issues than Democratic voters. The economic variables that I will consider in this analysis are GDP growth percentage, percent change in disposable income, percent change in Consumer Price Index (CPI), and the national unemployment rate.
 
 <br>
 
+In order to make predictions, I have created four different linear regression models that build off of one another in the variables used to predict the incumbent party's vote share percent. The first starts off with only GDP growth percent as an independent variable, and we find this is not a good model for prediction. As shown in the regression table under "Model 1", the coefficient on GDP growth is insignificant and the model has an R-squared value of 0.00, telling us that 0% of the variation in incumbent party vote share can be explained by GDP growth percent in this model. This model does not fit the data well at all.
 
+<br>
+
+We expand on this model by then adding an independent variable for the percent change in disposable income (Model 2), and then, in a different model, another independent variable for the unemployment rate (Model 3). In both of these models, all the independent variables' coefficients remain insignificant, although we do see a *slight* rise in the R-squared value. In Model 2, the R-square value is 0.02, and in Model 3 it is 0.04. While this shows a slight increase from Model 1, these numbers are still indicative of a model that does not fit the data well at all.
+
+<br>
+
+In the final model, I added an independent variable for the percent change in CPI. Here (Model 4), this CPI variable is significant at the 5% level. For every 1% change in CPI, the incumbent party vote share percent increases by 1.55 on average. In a healthy economy, some inflation is expected, so this increase in CPI leading to an increase in the incumbent's vote share percent could indicate that people see rising prices as a positive thing. While that is the relationship this model shows, current events could change this relationship, or at least create an inflation threshold where it goes from being seen as a good thing to a bad thing. Our inflation levels are so high right now that the CPI index is likely negatively correlated with how the incumbent party will do in the upcoming election.
 
 
 ```{r, results='asis'}
@@ -132,6 +140,22 @@ export_summs(econ1, econ2, econ3, econ4, scale=TRUE,
                        "Disposable Income Percent Change" = "DSPIC_change_pct",
                        "Unemployment Rate" = "unrate",
                        "CPI Percent Change" = "CPI_pct_change"))
+
+
+# use model predictors on vote share
+plot(data2$year, data2$H_incumbent_party_majorvote_pct, 
+     type="l",
+     main="True and Predicted Vote Share by Year",
+     xlab = "Year",
+     ylab = "Incumbent Party Vote Share")
+lines(data2$year, predict(econ4, data2), col = "green", lty = 3)
+lines(data2$year, predict(econ3, data2), col = "blue", lty = 3)
+lines(data2$year, predict(econ2, data2), col = "red", lty = 3)
+lines(data2$year, predict(econ1, data2), col = "orange", lty = 3)
+
+legend("bottomleft", c("Actual VS", "Model 4 Prediction", "Model 3 Prediction", "Model 2 Prediction", "Model 1 Prediction"),
+       lty = c(1, 3, 3, 3, 3, 3),
+       col = c("black", "green", "blue", "red", "orange"))
 
 ```
 
@@ -167,33 +191,6 @@ export_summs(ss1, ss2, ss3, ss4, scale=TRUE,
                        "Unemployment Rate" = "unrate",
                        "CPI Percent Change" = "CPI_pct_change"))
 
-```
-
-```{r}
-corrmat <- data2[, c(4, 6:9)]
-res <- cor(corrmat)
-corrplot(res, type = "upper", order = "hclust", 
-         tl.col = "black", tl.srt = 45)
-```
-
-
-```{r}
-
-# use model predictors on vote share
-plot(data2$year, data2$H_incumbent_party_majorvote_pct, 
-     type="l",
-     main="True and Predicted Vote Share by Year",
-     xlab = "Year",
-     ylab = "Incumbent Party Vote Share")
-lines(data2$year, predict(econ4, data2), col = "green", lty = 3)
-lines(data2$year, predict(econ3, data2), col = "blue", lty = 3)
-lines(data2$year, predict(econ2, data2), col = "red", lty = 3)
-lines(data2$year, predict(econ1, data2), col = "orange", lty = 3)
-
-legend("bottomleft", c("Actual VS", "Model 4 Prediction", "Model 3 Prediction", "Model 2 Prediction", "Model 1 Prediction"),
-       lty = c(1, 3, 3, 3, 3, 3),
-       col = c("black", "green", "blue", "red", "orange"))
-
 # use model predictors on seat share
 plot(data2$year, data2$RepSeatShare, 
      type="l",
@@ -210,6 +207,14 @@ legend("topleft", c("Actual Seat Share", "Model 1 Pred", "Model 2 Pred", "Model 
        col = c("black", "green", "blue", "red", "orange"))
 
 ```
+
+```{r}
+corrmat <- data2[, c(4, 6:9)]
+res <- cor(corrmat)
+corrplot(res, type = "upper", order = "hclust", 
+         tl.col = "black", tl.srt = 45)
+```
+
 
 
 
