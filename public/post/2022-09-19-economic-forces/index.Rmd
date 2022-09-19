@@ -119,7 +119,15 @@ We expand on this model by then adding an independent variable for the percent c
 
 <br>
 
-In the final model, I added an independent variable for the percent change in CPI. Here (Model 4), this CPI variable is significant at the 5% level. For every 1% change in CPI, the incumbent party vote share percent increases by 1.55 on average. In a healthy economy, some inflation is expected, so this increase in CPI leading to an increase in the incumbent's vote share percent could indicate that people see rising prices as a positive thing. While that is the relationship this model shows, current events could change this relationship, or at least create an inflation threshold where it goes from being seen as a good thing to a bad thing. Our inflation levels are so high right now that the CPI index is likely negatively correlated with how the incumbent party will do in the upcoming election.
+In the final model, I added an independent variable for the percent change in CPI. Here (Model 4), this CPI variable is significant at the 5% level. For every 1% change in CPI, the incumbent party vote share percent increases by 1.55 on average. In a healthy economy, some inflation is expected, so this increase in CPI leading to an increase in the incumbent's vote share percent could indicate that people see rising prices as a positive thing. This model also has an R-squared value of 0.23, showing that it is a much better fit for the data than the previous three models. I coded the CPI percent change variable by changing the monthly CPI statistic into a quarterly average, and then created the CPI change variable by lagging the CPI from the previous quarter and converting it into a percent change with respect to that quarter's CPI. I believed this would give an accurate representation of inflation in the economy, and is more understandable than the CPI index number that shows the price of a specific basket of goods. 
+
+<br>
+
+While the relationship between CPI percent change and vote share is positive in this model shows, current events could change this relationship, or at least create an inflation threshold where it goes from being seen as a good thing to a bad thing. Our inflation levels are so high right now that the CPI index is likely negatively correlated with how the incumbent party will do in the upcoming election.
+
+<br>
+
+To look at how these models fit over time, I created a graph that shows each model's predictions alongside the actual values of incumbent party vote share. Each model is a colored, dotted line, while the actual values are represented by the black, solid line. As we can see, all of the colored lines do not have as much variation as the true values line; they are all much flatter. Only the green line representing Model 4 comes close to following the patterns of the actual vote share values, but even it cannot recreate the variation we see over time. This model that used CPI did a decent job of predicting between 1970 and 2000. After 2000, however, it did not hit the lows that we saw with the actual values. 
 
 
 ```{r, results='asis'}
