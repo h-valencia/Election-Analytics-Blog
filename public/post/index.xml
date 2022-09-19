@@ -6,7 +6,16 @@
     <description>Recent content in Posts on My New Hugo Site</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Mon, 12 Sep 2022 00:00:00 +0000</lastBuildDate><atom:link href="http://example.org/post/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Mon, 19 Sep 2022 00:00:00 +0000</lastBuildDate><atom:link href="http://example.org/post/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Economic Forces</title>
+      <link>http://example.org/post/2022-09-19-economic-forces/</link>
+      <pubDate>Mon, 19 Sep 2022 00:00:00 +0000</pubDate>
+      
+      <guid>http://example.org/post/2022-09-19-economic-forces/</guid>
+      <description>This week, we looked at using various economic variables as predictors for election outcomes. In this blog, I aim to predict Republican seat share and incumbent party vote share using variables such as GDP growth percentage, CPI percent change, disposable income percent change, and the national unemployment rate.</description>
+    </item>
+    
     <item>
       <title>Using Voteshare Margin and Seat Share to Analyze Gerrymandering</title>
       <link>http://example.org/post/2022-09-12-mapping-voteshare-margin/</link>

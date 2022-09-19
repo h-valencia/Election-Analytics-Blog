@@ -1,0 +1,213 @@
+---
+title: Economic Forces
+author: Hannah Valencia
+date: '2022-09-19'
+slug: []
+categories: []
+tags: []
+summary: "This week, we looked at using various economic variables as predictors for election outcomes. In this blog, I aim to predict Republican seat share and incumbent party vote share using variables such as GDP growth percentage, CPI percent change, disposable income percent change, and the national unemployment rate."
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+
+library(tidyverse)
+library(car)
+library(ggplot2)
+library(sf)
+library(readr)
+library(jtools)
+library(lfe)
+library(corrplot)
+```
+
+<br>
+
+This week, we looked at using various economic variables as predictors for election outcomes. In this blog, I aim to predict Republican seat share and incumbent party vote share using variables such as GDP growth percentage, CPI percent change, disposable income percent change, and the national unemployment rate.
+
+<br>
+
+```{r, warning=FALSE, message=FALSE}
+
+# load data
+popvote_df <- read_csv('election-section-2/house_popvote_seats.csv') # house and seat share by year
+economy_df <- read_csv('election-section-2/GDP_quarterly.csv') # GDP data by quarter
+state_df <- read_csv('election-section-2/unemployment_state_monthly.csv') # state unemployment data
+rdi_df <- read_csv('election-section-2/RDI_quarterly.csv') # rdi
+cpi_df <- read_csv('election-section-2/CPI_monthly.csv') #cpi 
+unemp_df <- read_csv('election-section-2/unemployment_national_quarterly_final.csv') # national unemploymend data
+
+```
+
+```{r, warning=FALSE, message=FALSE}
+
+# Clean Data
+# merge
+dat <- left_join(economy_df, popvote_df, by = 'year')
+
+# drop NAs (only election years)
+dat <- dat %>%
+  drop_na()
+
+# new df
+dat2 <- dat %>% 
+    select('year', 'winner_party', 'H_incumbent_party', 'H_incumbent_party_majorvote_pct', 
+           'quarter_cycle', 'GDP_growth_pct') %>%
+    filter(quarter_cycle == 7)  
+
+# merge    
+data <- left_join(rdi_df, popvote_df, by = 'year')
+
+# drop NAs (only election years)
+data <- data %>%
+  drop_na()
+
+# new df
+data2 <- data %>% 
+    select('year', 'winner_party', 'H_incumbent_party', 'H_incumbent_party_majorvote_pct', 
+           'quarter_cycle', 'DSPIC_change_pct') %>%
+    filter(quarter_cycle == 7) 
+
+# using quarter_cycle 3 instead of 7 because the years in this dataframe do not align with the years in the other dataframes. Here, quarters 1-4 are in 1948 while in the other dataframes, quarters 5-8 are in 1948. 3 is the quarter that aligns with 7 in terms of the time of year (July - August).
+data3 <- unemp_df %>%
+  select('year', 'UNRATE', 'quarter_cycle') %>%
+  filter(quarter_cycle == 3) 
+
+# merge data2 and dat2
+data2$GDP_growth_pct <- dat2$GDP_growth_pct[match(data2$year, dat2$year)]
+data2$unrate <- data3$UNRATE[match(data2$year, data3$year)]
+
+```
+
+```{r, warning=FALSE, message=FALSE}
+
+# create month and year cols for CPI
+cpi_df$year <- as.numeric(format(as.Date(cpi_df$DATE, format="%Y-%m-%d"),"%Y"))
+cpi_df$month <- as.numeric(format(as.Date(cpi_df$DATE, format="%Y-%m-%d"),"%m"))
+
+# create quarter variable for CPI - only 4 to make it easier but can use year to change it into 8
+# create a CPI quarterly variable that averages the CPI across the months of each quarter
+# create a CPI change variable that shows CPI change from the previous quarter since people are likely to feel CPI relatively
+cpi_df <- cpi_df %>%
+  mutate(quarter = case_when(month == c(1:3) ~ "1",
+                             month == c(4:6) ~ "2",
+                             month == c(7:9) ~ "3",
+                             TRUE ~ "4")) %>%
+  group_by(year, quarter) %>%
+  mutate(CPI_quarter_avg = mean(CPIAUCSL)) %>%
+  ungroup() %>%
+  mutate(CPI_pct_change = (CPI_quarter_avg/lag(CPI_quarter_avg, n = 3) - 1) * 100) %>%
+  filter(quarter == 3)
+
+data2$CPI_pct_change <- cpi_df$CPI_pct_change[match(data2$year, cpi_df$year)]
+
+```
+
+
+
+
+
+```{r, results='asis'}
+
+# national-level reg
+econ1 <- lm(H_incumbent_party_majorvote_pct ~ GDP_growth_pct, 
+              data = data2)
+econ2 <- lm(H_incumbent_party_majorvote_pct ~ GDP_growth_pct + DSPIC_change_pct, 
+              data = data2)
+econ3 <- lm(H_incumbent_party_majorvote_pct ~ GDP_growth_pct + DSPIC_change_pct + unrate, 
+              data = data2)
+econ4 <- lm(H_incumbent_party_majorvote_pct ~ GDP_growth_pct + DSPIC_change_pct + unrate + CPI_pct_change,
+              data = data2)
+
+export_summs(econ1, econ2, econ3, econ4, scale=TRUE,
+             coefs = c("Intercept"= "(Intercept)",
+                       "GDP Growth Percentage" = "GDP_growth_pct",
+                       "Disposable Income Percent Change" = "DSPIC_change_pct",
+                       "Unemployment Rate" = "unrate",
+                       "CPI Percent Change" = "CPI_pct_change"))
+
+```
+
+
+```{r}
+
+# repeat analysis for seat share
+popvote_df <- popvote_df %>%
+  mutate(RepSeatShare = R_seats/(R_seats + D_seats + Other_seats),
+         DemSeatShare = D_seats/(R_seats + D_seats + Other_seats))
+
+# add new seat share vars to df with other econ data
+data2$RepSeatShare <- popvote_df$RepSeatShare[match(data2$year, popvote_df$year)]
+data2$DemSeatShare <- popvote_df$DemSeatShare[match(data2$year, popvote_df$year)]
+
+```
+
+```{r, results='asis'}
+
+ss1 <- lm(RepSeatShare ~ GDP_growth_pct, 
+              data = data2)
+ss2 <- lm(RepSeatShare ~ GDP_growth_pct + DSPIC_change_pct, 
+              data = data2)
+ss3 <- lm(RepSeatShare ~ GDP_growth_pct + DSPIC_change_pct + unrate, 
+              data = data2)
+ss4 <- lm(RepSeatShare ~ GDP_growth_pct + DSPIC_change_pct + unrate + CPI_pct_change,
+              data = data2)
+
+export_summs(ss1, ss2, ss3, ss4, scale=TRUE,
+             coefs = c("Intercept"= "(Intercept)",
+                       "GDP Growth Percentage" = "GDP_growth_pct",
+                       "Disposable Income Percent Change" = "DSPIC_change_pct",
+                       "Unemployment Rate" = "unrate",
+                       "CPI Percent Change" = "CPI_pct_change"))
+
+```
+
+```{r}
+corrmat <- data2[, c(4, 6:9)]
+res <- cor(corrmat)
+corrplot(res, type = "upper", order = "hclust", 
+         tl.col = "black", tl.srt = 45)
+```
+
+
+```{r}
+
+# use model predictors on vote share
+plot(data2$year, data2$H_incumbent_party_majorvote_pct, 
+     type="l",
+     main="True and Predicted Vote Share by Year",
+     xlab = "Year",
+     ylab = "Incumbent Party Vote Share")
+lines(data2$year, predict(econ4, data2), col = "green", lty = 3)
+lines(data2$year, predict(econ3, data2), col = "blue", lty = 3)
+lines(data2$year, predict(econ2, data2), col = "red", lty = 3)
+lines(data2$year, predict(econ1, data2), col = "orange", lty = 3)
+
+legend("bottomleft", c("Actual VS", "Model 4 Prediction", "Model 3 Prediction", "Model 2 Prediction", "Model 1 Prediction"),
+       lty = c(1, 3, 3, 3, 3, 3),
+       col = c("black", "green", "blue", "red", "orange"))
+
+# use model predictors on seat share
+plot(data2$year, data2$RepSeatShare, 
+     type="l",
+     main="True and Predicted Seat Share by Year",
+     xlab = "Year",
+     ylab = "Republican Party Seat Share")
+lines(data2$year, predict(ss1, data2), col = "green", lty = 3)
+lines(data2$year, predict(ss2, data2), col = "blue", lty = 3)
+lines(data2$year, predict(ss3, data2), col = "red", lty = 3)
+lines(data2$year, predict(ss4, data2), col = "orange", lty = 3)
+
+legend("topleft", c("Actual Seat Share", "Model 1 Pred", "Model 2 Pred", "Model 3 Pred", "Model 4 Pred"),
+       lty = c(1, 3, 3, 3, 3, 3),
+       col = c("black", "green", "blue", "red", "orange"))
+
+```
+
+
+
+
+
+
+
+
