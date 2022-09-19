@@ -1,0 +1,133 @@
+---
+title: Economic Forces
+author: Hannah Valencia
+date: '2022-09-19'
+slug: []
+categories: []
+tags: []
+---
+
+
+
+<pre class="r"><code># load data
+popvote_df &lt;- read_csv(&#39;election-section-2/house_popvote_seats.csv&#39;) # house and seat share by year</code></pre>
+<pre><code>## New names:
+## Rows: 37 Columns: 21
+## ── Column specification
+## ──────────────────────────────────────────────────────── Delimiter: &quot;,&quot; chr
+## (4): AreaAll, winner_party, president_party, H_incumbent_party dbl (16): ...1,
+## year, R_seats, D_seats, Other_seats, total_votes, R_votes, D... lgl (1):
+## H_incumbent_party_winner
+## ℹ Use `spec()` to retrieve the full column specification for this data. ℹ
+## Specify the column types or set `show_col_types = FALSE` to quiet this message.
+## • `` -&gt; `...1`</code></pre>
+<pre class="r"><code>economy_df &lt;- read_csv(&#39;election-section-2/GDP_quarterly.csv&#39;) # GDP data by quarter</code></pre>
+<pre><code>## New names:
+## Rows: 302 Columns: 10
+## ── Column specification
+## ──────────────────────────────────────────────────────── Delimiter: &quot;,&quot; chr
+## (2): date, year_qt dbl (8): ...1, ...2, GDPC1, quarter_yr, quarter_cycle, year,
+## GDP_growth_qt, ...
+## ℹ Use `spec()` to retrieve the full column specification for this data. ℹ
+## Specify the column types or set `show_col_types = FALSE` to quiet this message.
+## • `` -&gt; `...1`
+## • `...1` -&gt; `...2`</code></pre>
+<pre class="r"><code>state_df &lt;- read_csv(&#39;election-section-2/unemployment_state_monthly.csv&#39;) # state unemployment data</code></pre>
+<pre><code>## Rows: 29521 Columns: 12
+## ── Column specification ────────────────────────────────────────────────────────
+## Delimiter: &quot;,&quot;
+## chr  (1): State and area
+## dbl (11): Count, FIPS Code, Year, Month, Population, LaborForce, LaborForce_...
+## 
+## ℹ Use `spec()` to retrieve the full column specification for this data.
+## ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.</code></pre>
+<pre class="r"><code>rdi_df &lt;- read_csv(&#39;election-section-2/RDI_quarterly.csv&#39;) # rdi</code></pre>
+<pre><code>## New names:
+## Rows: 254 Columns: 9
+## ── Column specification
+## ──────────────────────────────────────────────────────── Delimiter: &quot;,&quot; chr
+## (2): date, year_qt dbl (7): ...1, year, quarter_yr, quarter_cycle, DSPIC_qt,
+## DSPIC_change_qt, D...
+## ℹ Use `spec()` to retrieve the full column specification for this data. ℹ
+## Specify the column types or set `show_col_types = FALSE` to quiet this message.
+## • `` -&gt; `...1`</code></pre>
+<pre class="r"><code>unemp_df &lt;- read_csv(&#39;election-section-2/unemployment_national_quarterly_final.csv&#39;) # national unemploymend data</code></pre>
+<pre><code>## New names:
+## Rows: 298 Columns: 9
+## ── Column specification
+## ──────────────────────────────────────────────────────── Delimiter: &quot;,&quot; chr
+## (2): DATE, year_qt dbl (7): ...1, ...2, UNRATE, year, quarter_yr,
+## quarter_cycle, unrate_qt_total
+## ℹ Use `spec()` to retrieve the full column specification for this data. ℹ
+## Specify the column types or set `show_col_types = FALSE` to quiet this message.
+## • `` -&gt; `...1`
+## • `...1` -&gt; `...2`</code></pre>
+<pre class="r"><code># Clean Data
+# merge
+dat &lt;- left_join(economy_df, popvote_df, by = &#39;year&#39;)
+
+# drop NAs (only election years)
+dat &lt;- dat %&gt;%
+  drop_na()
+
+# new df
+dat2 &lt;- dat %&gt;% 
+    select(&#39;year&#39;, &#39;winner_party&#39;, &#39;H_incumbent_party&#39;, &#39;H_incumbent_party_majorvote_pct&#39;, 
+           &#39;quarter_cycle&#39;, &#39;GDP_growth_pct&#39;) %&gt;%
+    filter(quarter_cycle == 7)  
+
+# merge    
+data &lt;- left_join(rdi_df, popvote_df, by = &#39;year&#39;)
+
+# drop NAs (only election years)
+data &lt;- data %&gt;%
+  drop_na()
+
+# new df
+data2 &lt;- data %&gt;% 
+    select(&#39;year&#39;, &#39;winner_party&#39;, &#39;H_incumbent_party&#39;, &#39;H_incumbent_party_majorvote_pct&#39;, 
+           &#39;quarter_cycle&#39;, &#39;DSPIC_change_pct&#39;) %&gt;%
+    filter(quarter_cycle == 7) 
+
+# using quarter_cycle 3 instead of 7 because the years in this dataframe do not align with the years in the other dataframes. Here, quarters 1-4 are in 1948 while in the other dataframes, quarters 5-8 are in 1948. 3 is the quarter that aligns with 7 in terms of the time of year (July - August).
+data3 &lt;- unemp_df %&gt;%
+  select(&#39;year&#39;, &#39;UNRATE&#39;, &#39;quarter_cycle&#39;) %&gt;%
+  filter(quarter_cycle == 3) 
+
+# merge data2 and dat2
+data2$GDP_growth_pct &lt;- dat2$GDP_growth_pct[match(data2$year, dat2$year)]
+data2$unrate &lt;- data3$UNRATE[match(data2$year, data3$year)]</code></pre>
+<pre class="r"><code># national-level reg
+econ1 &lt;- lm(H_incumbent_party_majorvote_pct ~ GDP_growth_pct, 
+              data = data2)
+econ2 &lt;- lm(H_incumbent_party_majorvote_pct ~ GDP_growth_pct + DSPIC_change_pct, 
+              data = data2)
+econ3 &lt;- lm(H_incumbent_party_majorvote_pct ~ GDP_growth_pct + DSPIC_change_pct + unrate, 
+              data = data2)
+
+stargazer(econ1, econ2, econ3, type = &quot;html&quot;, title = &quot;Economic Indices on Incumbent Party Popular Vote Percentage&quot;)</code></pre>
+<pre><code>## 
+## &lt;table style=&quot;text-align:center&quot;&gt;&lt;caption&gt;&lt;strong&gt;Economic Indices on Incumbent Party Popular Vote Percentage&lt;/strong&gt;&lt;/caption&gt;
+## &lt;tr&gt;&lt;td colspan=&quot;4&quot; style=&quot;border-bottom: 1px solid black&quot;&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td style=&quot;text-align:left&quot;&gt;&lt;/td&gt;&lt;td colspan=&quot;3&quot;&gt;&lt;em&gt;Dependent variable:&lt;/em&gt;&lt;/td&gt;&lt;/tr&gt;
+## &lt;tr&gt;&lt;td&gt;&lt;/td&gt;&lt;td colspan=&quot;3&quot; style=&quot;border-bottom: 1px solid black&quot;&gt;&lt;/td&gt;&lt;/tr&gt;
+## &lt;tr&gt;&lt;td style=&quot;text-align:left&quot;&gt;&lt;/td&gt;&lt;td colspan=&quot;3&quot;&gt;H_incumbent_party_majorvote_pct&lt;/td&gt;&lt;/tr&gt;
+## &lt;tr&gt;&lt;td style=&quot;text-align:left&quot;&gt;&lt;/td&gt;&lt;td&gt;(1)&lt;/td&gt;&lt;td&gt;(2)&lt;/td&gt;&lt;td&gt;(3)&lt;/td&gt;&lt;/tr&gt;
+## &lt;tr&gt;&lt;td colspan=&quot;4&quot; style=&quot;border-bottom: 1px solid black&quot;&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td style=&quot;text-align:left&quot;&gt;GDP_growth_pct&lt;/td&gt;&lt;td&gt;-0.045&lt;/td&gt;&lt;td&gt;-0.163&lt;/td&gt;&lt;td&gt;-0.196&lt;/td&gt;&lt;/tr&gt;
+## &lt;tr&gt;&lt;td style=&quot;text-align:left&quot;&gt;&lt;/td&gt;&lt;td&gt;(0.157)&lt;/td&gt;&lt;td&gt;(0.229)&lt;/td&gt;&lt;td&gt;(0.235)&lt;/td&gt;&lt;/tr&gt;
+## &lt;tr&gt;&lt;td style=&quot;text-align:left&quot;&gt;&lt;/td&gt;&lt;td&gt;&lt;/td&gt;&lt;td&gt;&lt;/td&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;
+## &lt;tr&gt;&lt;td style=&quot;text-align:left&quot;&gt;DSPIC_change_pct&lt;/td&gt;&lt;td&gt;&lt;/td&gt;&lt;td&gt;-0.565&lt;/td&gt;&lt;td&gt;-0.452&lt;/td&gt;&lt;/tr&gt;
+## &lt;tr&gt;&lt;td style=&quot;text-align:left&quot;&gt;&lt;/td&gt;&lt;td&gt;&lt;/td&gt;&lt;td&gt;(0.794)&lt;/td&gt;&lt;td&gt;(0.814)&lt;/td&gt;&lt;/tr&gt;
+## &lt;tr&gt;&lt;td style=&quot;text-align:left&quot;&gt;&lt;/td&gt;&lt;td&gt;&lt;/td&gt;&lt;td&gt;&lt;/td&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;
+## &lt;tr&gt;&lt;td style=&quot;text-align:left&quot;&gt;unrate&lt;/td&gt;&lt;td&gt;&lt;/td&gt;&lt;td&gt;&lt;/td&gt;&lt;td&gt;0.323&lt;/td&gt;&lt;/tr&gt;
+## &lt;tr&gt;&lt;td style=&quot;text-align:left&quot;&gt;&lt;/td&gt;&lt;td&gt;&lt;/td&gt;&lt;td&gt;&lt;/td&gt;&lt;td&gt;(0.419)&lt;/td&gt;&lt;/tr&gt;
+## &lt;tr&gt;&lt;td style=&quot;text-align:left&quot;&gt;&lt;/td&gt;&lt;td&gt;&lt;/td&gt;&lt;td&gt;&lt;/td&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;
+## &lt;tr&gt;&lt;td style=&quot;text-align:left&quot;&gt;Constant&lt;/td&gt;&lt;td&gt;52.046&lt;sup&gt;***&lt;/sup&gt;&lt;/td&gt;&lt;td&gt;52.455&lt;sup&gt;***&lt;/sup&gt;&lt;/td&gt;&lt;td&gt;50.480&lt;sup&gt;***&lt;/sup&gt;&lt;/td&gt;&lt;/tr&gt;
+## &lt;tr&gt;&lt;td style=&quot;text-align:left&quot;&gt;&lt;/td&gt;&lt;td&gt;(0.660)&lt;/td&gt;&lt;td&gt;(0.880)&lt;/td&gt;&lt;td&gt;(2.706)&lt;/td&gt;&lt;/tr&gt;
+## &lt;tr&gt;&lt;td style=&quot;text-align:left&quot;&gt;&lt;/td&gt;&lt;td&gt;&lt;/td&gt;&lt;td&gt;&lt;/td&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;
+## &lt;tr&gt;&lt;td colspan=&quot;4&quot; style=&quot;border-bottom: 1px solid black&quot;&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td style=&quot;text-align:left&quot;&gt;Observations&lt;/td&gt;&lt;td&gt;31&lt;/td&gt;&lt;td&gt;31&lt;/td&gt;&lt;td&gt;31&lt;/td&gt;&lt;/tr&gt;
+## &lt;tr&gt;&lt;td style=&quot;text-align:left&quot;&gt;R&lt;sup&gt;2&lt;/sup&gt;&lt;/td&gt;&lt;td&gt;0.003&lt;/td&gt;&lt;td&gt;0.021&lt;/td&gt;&lt;td&gt;0.042&lt;/td&gt;&lt;/tr&gt;
+## &lt;tr&gt;&lt;td style=&quot;text-align:left&quot;&gt;Adjusted R&lt;sup&gt;2&lt;/sup&gt;&lt;/td&gt;&lt;td&gt;-0.031&lt;/td&gt;&lt;td&gt;-0.049&lt;/td&gt;&lt;td&gt;-0.065&lt;/td&gt;&lt;/tr&gt;
+## &lt;tr&gt;&lt;td style=&quot;text-align:left&quot;&gt;Residual Std. Error&lt;/td&gt;&lt;td&gt;3.494 (df = 29)&lt;/td&gt;&lt;td&gt;3.524 (df = 28)&lt;/td&gt;&lt;td&gt;3.550 (df = 27)&lt;/td&gt;&lt;/tr&gt;
+## &lt;tr&gt;&lt;td style=&quot;text-align:left&quot;&gt;F Statistic&lt;/td&gt;&lt;td&gt;0.084 (df = 1; 29)&lt;/td&gt;&lt;td&gt;0.295 (df = 2; 28)&lt;/td&gt;&lt;td&gt;0.393 (df = 3; 27)&lt;/td&gt;&lt;/tr&gt;
+## &lt;tr&gt;&lt;td colspan=&quot;4&quot; style=&quot;border-bottom: 1px solid black&quot;&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td style=&quot;text-align:left&quot;&gt;&lt;em&gt;Note:&lt;/em&gt;&lt;/td&gt;&lt;td colspan=&quot;3&quot; style=&quot;text-align:right&quot;&gt;&lt;sup&gt;*&lt;/sup&gt;p&lt;0.1; &lt;sup&gt;**&lt;/sup&gt;p&lt;0.05; &lt;sup&gt;***&lt;/sup&gt;p&lt;0.01&lt;/td&gt;&lt;/tr&gt;
+## &lt;/table&gt;</code></pre>
