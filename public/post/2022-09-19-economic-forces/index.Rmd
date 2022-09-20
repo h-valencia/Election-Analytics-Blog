@@ -142,11 +142,10 @@ econ4 <- lm(H_incumbent_party_majorvote_pct ~ GDP_growth_pct + DSPIC_change_pct 
               data = data2)
 ```
 
-```{r, eval=FALSE, warning=FALSE, message=FALSE}
+```{r, results='asis', warning=FALSE, message=FALSE}
 # bad formatting so screenshotted image and inserted below
-stargazer(econ1, econ2, econ3, econ4, type="text", covariate.labels = c("GDP Growth Percentage", "Disposable Income Percent Change", "Unemployment Rate","CPI Percent Change", "Constant"))
+stargazer(econ1, econ2, econ3, econ4, type="html", covariate.labels = c("GDP Growth Percentage", "Disposable Income Percent Change", "Unemployment Rate","CPI Percent Change", "Constant"))
 ```
-![Vote Share Regression Table.](Election-Analytics-Blog/content/post/2022-09-19-economic-forces/tab1.png)
 
 ```{r, warning = FALSE, message = FALSE}
 
@@ -200,10 +199,9 @@ ss4 <- lm(RepSeatShare ~ GDP_growth_pct + DSPIC_change_pct + unrate + CPI_pct_ch
               data = data2)
 ```
 
-```{r, eval=FALSE, warning=FALSE, message=FALSE}
-stargazer(ss1, ss2, ss3, ss4, type="text", covariate.labels = c("GDP Growth Percentage", "Disposable Income Percent Change", "Unemployment Rate","CPI Percent Change", "Constant"))
+```{r, results='asis', warning=FALSE, message=FALSE}
+stargazer(ss1, ss2, ss3, ss4, type="html", covariate.labels = c("GDP Growth Percentage", "Disposable Income Percent Change", "Unemployment Rate","CPI Percent Change", "Constant"))
 ```
-![Seat Share Regression Table.](Election-Analytics-Blog/content/post/2022-09-19-economic-forces/tab2.png)
 
 ```{r, warning = FALSE, message = FALSE}
 

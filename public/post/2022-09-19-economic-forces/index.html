@@ -83,20 +83,732 @@
 <br></p>
 <p>To look at how these models fit over time, I created a graph that shows each model’s predictions alongside the actual values of incumbent party vote share. Each model is a colored, dotted line, while the actual values are represented by the black, solid line. As we can see, all of the colored lines do not have as much variation as the true values line; they are all much flatter. Only the green line representing Model 4 comes close to following the patterns of the actual vote share values, but even it cannot recreate the variation we see over time. This model that used CPI did a decent job of predicting between 1970 and 2000. After 2000, however, it did not hit the lows that we saw with the actual values. Until the 1990s, incumbent vote share typically sat above 52%. After this period and into the 2000s, however, the incumbent was not as successful, often falling into the mid 40-percents. It is during this time period that the residuals appear to grow.
 <br></p>
-<div class="figure">
-<img src="Election-Analytics-Blog/content/post/2022-09-19-economic-forces/tab1.png" alt="" />
-<p class="caption">Vote Share Regression Table.</p>
-</div>
+<table style="text-align:center">
+<tr>
+<td colspan="5" style="border-bottom: 1px solid black">
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td colspan="4">
+<em>Dependent variable:</em>
+</td>
+</tr>
+<tr>
+<td>
+</td>
+<td colspan="4" style="border-bottom: 1px solid black">
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td colspan="4">
+H_incumbent_party_majorvote_pct
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+(1)
+</td>
+<td>
+(2)
+</td>
+<td>
+(3)
+</td>
+<td>
+(4)
+</td>
+</tr>
+<tr>
+<td colspan="5" style="border-bottom: 1px solid black">
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+GDP Growth Percentage
+</td>
+<td>
+-0.045
+</td>
+<td>
+-0.163
+</td>
+<td>
+-0.196
+</td>
+<td>
+-0.080
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+(0.157)
+</td>
+<td>
+(0.229)
+</td>
+<td>
+(0.235)
+</td>
+<td>
+(0.219)
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+</td>
+<td>
+</td>
+<td>
+</td>
+<td>
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+Disposable Income Percent Change
+</td>
+<td>
+</td>
+<td>
+-0.565
+</td>
+<td>
+-0.452
+</td>
+<td>
+-0.008
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+</td>
+<td>
+(0.794)
+</td>
+<td>
+(0.814)
+</td>
+<td>
+(0.764)
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+</td>
+<td>
+</td>
+<td>
+</td>
+<td>
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+Unemployment Rate
+</td>
+<td>
+</td>
+<td>
+</td>
+<td>
+0.323
+</td>
+<td>
+0.200
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+</td>
+<td>
+</td>
+<td>
+(0.419)
+</td>
+<td>
+(0.386)
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+</td>
+<td>
+</td>
+<td>
+</td>
+<td>
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+CPI Percent Change
+</td>
+<td>
+</td>
+<td>
+</td>
+<td>
+</td>
+<td>
+2.392<sup>**</sup>
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+</td>
+<td>
+</td>
+<td>
+</td>
+<td>
+(0.950)
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+</td>
+<td>
+</td>
+<td>
+</td>
+<td>
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+Constant
+</td>
+<td>
+52.046<sup>***</sup>
+</td>
+<td>
+52.455<sup>***</sup>
+</td>
+<td>
+50.480<sup>***</sup>
+</td>
+<td>
+48.563<sup>***</sup>
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+(0.660)
+</td>
+<td>
+(0.880)
+</td>
+<td>
+(2.706)
+</td>
+<td>
+(2.587)
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+</td>
+<td>
+</td>
+<td>
+</td>
+<td>
+</td>
+</tr>
+<tr>
+<td colspan="5" style="border-bottom: 1px solid black">
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+Observations
+</td>
+<td>
+31
+</td>
+<td>
+31
+</td>
+<td>
+31
+</td>
+<td>
+31
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+R<sup>2</sup>
+</td>
+<td>
+0.003
+</td>
+<td>
+0.021
+</td>
+<td>
+0.042
+</td>
+<td>
+0.230
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+Adjusted R<sup>2</sup>
+</td>
+<td>
+-0.031
+</td>
+<td>
+-0.049
+</td>
+<td>
+-0.065
+</td>
+<td>
+0.111
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+Residual Std. Error
+</td>
+<td>
+3.494 (df = 29)
+</td>
+<td>
+3.524 (df = 28)
+</td>
+<td>
+3.550 (df = 27)
+</td>
+<td>
+3.243 (df = 26)
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+F Statistic
+</td>
+<td>
+0.084 (df = 1; 29)
+</td>
+<td>
+0.295 (df = 2; 28)
+</td>
+<td>
+0.393 (df = 3; 27)
+</td>
+<td>
+1.939 (df = 4; 26)
+</td>
+</tr>
+<tr>
+<td colspan="5" style="border-bottom: 1px solid black">
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+<em>Note:</em>
+</td>
+<td colspan="4" style="text-align:right">
+<sup><em></sup>p&lt;0.1; <sup><strong></sup>p&lt;0.05; <sup></strong></em></sup>p&lt;0.01
+</td>
+</tr>
+</table>
 <p><img src="http://example.org/post/2022-09-19-economic-forces/index_files/figure-html/unnamed-chunk-6-1.png" width="672" /></p>
 <p><br>
 I repeated this modelling process and prediction but instead using Republican seat share percentage as the dependent variable. The first three models that do not use CPI percent change again came up poorly fitting models for the data, with no significant independent variables. Only once percent change of CPI is added does the model have a relevant r-squared value of 0.30, and the CPI dependent variable is significant at the 1% level. These models demonstrate the same effects for incumbent vote share as for Republican seat share.
 <br></p>
 <p>Once again, I created a plot of the predictions versus the true values over time. Interestingly, we see the same pattern of the CPI model fairly accurately fitting the actual values until the 1990s, after which they diverge and the residuals grow. The other three models appear as flat lines in this graph, similar to the plot above.
 <br></p>
-<div class="figure">
-<img src="Election-Analytics-Blog/content/post/2022-09-19-economic-forces/tab2.png" alt="" />
-<p class="caption">Seat Share Regression Table.</p>
-</div>
+<table style="text-align:center">
+<tr>
+<td colspan="5" style="border-bottom: 1px solid black">
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td colspan="4">
+<em>Dependent variable:</em>
+</td>
+</tr>
+<tr>
+<td>
+</td>
+<td colspan="4" style="border-bottom: 1px solid black">
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td colspan="4">
+RepSeatShare
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+(1)
+</td>
+<td>
+(2)
+</td>
+<td>
+(3)
+</td>
+<td>
+(4)
+</td>
+</tr>
+<tr>
+<td colspan="5" style="border-bottom: 1px solid black">
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+GDP Growth Percentage
+</td>
+<td>
+0.002
+</td>
+<td>
+0.002
+</td>
+<td>
+0.002
+</td>
+<td>
+-0.001
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+(0.003)
+</td>
+<td>
+(0.005)
+</td>
+<td>
+(0.005)
+</td>
+<td>
+(0.004)
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+</td>
+<td>
+</td>
+<td>
+</td>
+<td>
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+Disposable Income Percent Change
+</td>
+<td>
+</td>
+<td>
+0.0002
+</td>
+<td>
+-0.001
+</td>
+<td>
+-0.012
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+</td>
+<td>
+(0.017)
+</td>
+<td>
+(0.017)
+</td>
+<td>
+(0.015)
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+</td>
+<td>
+</td>
+<td>
+</td>
+<td>
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+Unemployment Rate
+</td>
+<td>
+</td>
+<td>
+</td>
+<td>
+-0.002
+</td>
+<td>
+0.001
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+</td>
+<td>
+</td>
+<td>
+(0.009)
+</td>
+<td>
+(0.008)
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+</td>
+<td>
+</td>
+<td>
+</td>
+<td>
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+CPI Percent Change
+</td>
+<td>
+</td>
+<td>
+</td>
+<td>
+</td>
+<td>
+-0.061<sup>***</sup>
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+</td>
+<td>
+</td>
+<td>
+</td>
+<td>
+(0.019)
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+</td>
+<td>
+</td>
+<td>
+</td>
+<td>
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+Constant
+</td>
+<td>
+0.445<sup>***</sup>
+</td>
+<td>
+0.444<sup>***</sup>
+</td>
+<td>
+0.456<sup>***</sup>
+</td>
+<td>
+0.505<sup>***</sup>
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+(0.014)
+</td>
+<td>
+(0.018)
+</td>
+<td>
+(0.057)
+</td>
+<td>
+(0.052)
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+</td>
+<td>
+</td>
+<td>
+</td>
+<td>
+</td>
+</tr>
+<tr>
+<td colspan="5" style="border-bottom: 1px solid black">
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+Observations
+</td>
+<td>
+31
+</td>
+<td>
+31
+</td>
+<td>
+31
+</td>
+<td>
+31
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+R<sup>2</sup>
+</td>
+<td>
+0.016
+</td>
+<td>
+0.016
+</td>
+<td>
+0.017
+</td>
+<td>
+0.299
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+Adjusted R<sup>2</sup>
+</td>
+<td>
+-0.018
+</td>
+<td>
+-0.055
+</td>
+<td>
+-0.092
+</td>
+<td>
+0.191
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+Residual Std. Error
+</td>
+<td>
+0.073 (df = 29)
+</td>
+<td>
+0.074 (df = 28)
+</td>
+<td>
+0.075 (df = 27)
+</td>
+<td>
+0.065 (df = 26)
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+F Statistic
+</td>
+<td>
+0.458 (df = 1; 29)
+</td>
+<td>
+0.221 (df = 2; 28)
+</td>
+<td>
+0.158 (df = 3; 27)
+</td>
+<td>
+2.773<sup>**</sup> (df = 4; 26)
+</td>
+</tr>
+<tr>
+<td colspan="5" style="border-bottom: 1px solid black">
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+<em>Note:</em>
+</td>
+<td colspan="4" style="text-align:right">
+<sup><em></sup>p&lt;0.1; <sup><strong></sup>p&lt;0.05; <sup></strong></em></sup>p&lt;0.01
+</td>
+</tr>
+</table>
 <p><img src="http://example.org/post/2022-09-19-economic-forces/index_files/figure-html/unnamed-chunk-10-1.png" width="672" /></p>
 <p><br>
 One issue to note when analyzing the effects of different economic forces jointly on a dependent variable is multicollinearity. This is a problem that occurs when multiple independent variables are correlated with one another and negatively impacts the reliability of the inferences we can draw from these models. To assess if multicollinearity exists between any of the independent variables, I have created a correlation matrix below.</p>
@@ -126,7 +838,7 @@ Finally, below is my prediction of vote share for the incumbent party in the hou
         		<footer>
 			
 			<span>
-			&copy; <time datetime="2022-09-20 16:15:14.020777 -0400 EDT m=&#43;0.364258118">2022</time> . Made with <a href='https://gohugo.io'>Hugo</a> using the <a href='https://github.com/EmielH/tale-hugo/'>Tale</a> theme.
+			&copy; <time datetime="2022-09-20 16:19:32.835419 -0400 EDT m=&#43;0.342662607">2022</time> . Made with <a href='https://gohugo.io'>Hugo</a> using the <a href='https://github.com/EmielH/tale-hugo/'>Tale</a> theme.
 			</span>
 		</footer>
 
