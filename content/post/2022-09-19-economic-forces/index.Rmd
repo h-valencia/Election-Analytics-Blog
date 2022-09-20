@@ -19,6 +19,7 @@ library(readr)
 library(jtools)
 library(lfe)
 library(corrplot)
+library(stargazer)
 ```
 
 <br>
@@ -121,6 +122,9 @@ In the final model, I added an independent variable for the percent change in CP
 While the relationship between CPI percent change and vote share is positive in this model shows, current events could change this relationship, or at least create an inflation threshold where it goes from being seen as a good thing to a bad thing. Our inflation levels are so high right now that the CPI index is likely negatively correlated with how the incumbent party will do in the upcoming election.
 <br>
 
+Looking at the variable on GDP growth percentage, it is counterintuitive for the coefficient to be negative. One would think that when GDP is increasing -- a sign that the economy is doing well -- the incumbent would do better in the election. This variable is very low in magnitude, however, so should not affect the predictions much. This strange outcome could be the result of multicollinearity, which I will touch on later in this post.
+<br>
+
 To look at how these models fit over time, I created a graph that shows each model's predictions alongside the actual values of incumbent party vote share. Each model is a colored, dotted line, while the actual values are represented by the black, solid line. As we can see, all of the colored lines do not have as much variation as the true values line; they are all much flatter. Only the green line representing Model 4 comes close to following the patterns of the actual vote share values, but even it cannot recreate the variation we see over time. This model that used CPI did a decent job of predicting between 1970 and 2000. After 2000, however, it did not hit the lows that we saw with the actual values. Until the 1990s, incumbent vote share typically sat above 52%. After this period and into the 2000s, however, the incumbent was not as successful, often falling into the mid 40-percents. It is during this time period that the residuals appear to grow.
 <br>
 
@@ -137,12 +141,7 @@ econ3 <- lm(H_incumbent_party_majorvote_pct ~ GDP_growth_pct + DSPIC_change_pct 
 econ4 <- lm(H_incumbent_party_majorvote_pct ~ GDP_growth_pct + DSPIC_change_pct + unrate + CPI_pct_change,
               data = data2)
 
-export_summs(econ1, econ2, econ3, econ4, scale=TRUE,
-             coefs = c("Intercept"= "(Intercept)",
-                       "GDP Growth Percentage" = "GDP_growth_pct",
-                       "Disposable Income Percent Change" = "DSPIC_change_pct",
-                       "Unemployment Rate" = "unrate",
-                       "CPI Percent Change" = "CPI_pct_change"))
+stargazer(econ1, econ2, econ3, econ4, type="text", covariate.labels = c("GDP Growth Percentage", "Disposable Income Percent Change", "Unemployment Rate","CPI Percent Change", "Constant"))
 
 
 # use model predictors on vote share
@@ -192,12 +191,7 @@ ss3 <- lm(RepSeatShare ~ GDP_growth_pct + DSPIC_change_pct + unrate,
 ss4 <- lm(RepSeatShare ~ GDP_growth_pct + DSPIC_change_pct + unrate + CPI_pct_change,
               data = data2)
 
-export_summs(ss1, ss2, ss3, ss4, scale=TRUE,
-             coefs = c("Intercept"= "(Intercept)",
-                       "GDP Growth Percentage" = "GDP_growth_pct",
-                       "Disposable Income Percent Change" = "DSPIC_change_pct",
-                       "Unemployment Rate" = "unrate",
-                       "CPI Percent Change" = "CPI_pct_change"))
+stargazer(ss1, ss2, ss3, ss4, type="text", covariate.labels = c("GDP Growth Percentage", "Disposable Income Percent Change", "Unemployment Rate","CPI Percent Change", "Constant"))
 
 # use model predictors on seat share
 plot(data2$year, data2$RepSeatShare, 
@@ -229,9 +223,19 @@ corrplot(res, type = "upper", order = "hclust",
 <br>
 We can see that GDP growth percentage is highly negatively correlated with the percent change in disposable income, with a correlation of -0.72. There is also a moderately strong correlation between the unemployment rate and the percent change of disposable income. Both of these correlations may impact the validity of our models and hurt any insights we draw from this analysis.
 
+<br> 
+Finally, below is my prediction of vote share for the incumbent party in the house using 2022 Q6 data. While the model I fit used Q7 data, we are currently in the middle of Q7, so this information was not readily available. There will naturally be some limitations with this prediction due to this simple fact. Additionally, since the model relies so heavily on CPI percent change, the prediction is likely an overestimate of the incumbent vote share. I believe the relationship between CPI percent change and incumbent vote share is likely not linear, and with the levels of inflation that we have seen over the past year, this variable brought the prediction way up when it likely should have brought it down a little bit.
+<br>
 
+```{r}
+preddf <- data.frame("CPI_pct_change" = 2.5,
+                     "unrate" = 3.7,
+                     "GDP_growth_pct" = 0.2,
+                     "DSPIC_change_pct" = 6.6)
 
-
+predict(econ4, preddf, interval = "confidence")
+```
+<br>
 
 
 
