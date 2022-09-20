@@ -129,7 +129,7 @@ To look at how these models fit over time, I created a graph that shows each mod
 <br>
 
 
-```{r, results='asis'}
+```{r, warning = FALSE, message = FALSE}
 
 # national-level reg
 econ1 <- lm(H_incumbent_party_majorvote_pct ~ GDP_growth_pct, 
@@ -140,9 +140,15 @@ econ3 <- lm(H_incumbent_party_majorvote_pct ~ GDP_growth_pct + DSPIC_change_pct 
               data = data2)
 econ4 <- lm(H_incumbent_party_majorvote_pct ~ GDP_growth_pct + DSPIC_change_pct + unrate + CPI_pct_change,
               data = data2)
+```
 
+```{r, eval=FALSE, warning=FALSE, message=FALSE}
+# bad formatting so screenshotted image and inserted below
 stargazer(econ1, econ2, econ3, econ4, type="text", covariate.labels = c("GDP Growth Percentage", "Disposable Income Percent Change", "Unemployment Rate","CPI Percent Change", "Constant"))
+```
+![Vote Share Regression Table.](Election-Analytics-Blog/content/post/2022-09-19-economic-forces/tab1.png)
 
+```{r, warning = FALSE, message = FALSE}
 
 # use model predictors on vote share
 plot(data2$year, data2$H_incumbent_party_majorvote_pct, 
@@ -160,6 +166,8 @@ legend("bottomleft", c("Actual VS", "Model 4 Prediction", "Model 3 Prediction", 
        col = c("black", "green", "blue", "red", "orange"))
 
 ```
+
+
 <br>
 I repeated this modelling process and prediction but instead using Republican seat share percentage as the dependent variable. The first three models that do not use CPI percent change again came up poorly fitting models for the data, with no significant independent variables. Only once percent change of CPI is added does the model have a relevant r-squared value of 0.30, and the CPI dependent variable is significant at the 1% level. These models demonstrate the same effects for incumbent vote share as for Republican seat share.
 <br>
@@ -180,7 +188,7 @@ data2$DemSeatShare <- popvote_df$DemSeatShare[match(data2$year, popvote_df$year)
 
 ```
 
-```{r, results='asis'}
+```{r, warning = FALSE, message = FALSE}
 
 ss1 <- lm(RepSeatShare ~ GDP_growth_pct, 
               data = data2)
@@ -190,8 +198,14 @@ ss3 <- lm(RepSeatShare ~ GDP_growth_pct + DSPIC_change_pct + unrate,
               data = data2)
 ss4 <- lm(RepSeatShare ~ GDP_growth_pct + DSPIC_change_pct + unrate + CPI_pct_change,
               data = data2)
+```
 
+```{r, eval=FALSE, warning=FALSE, message=FALSE}
 stargazer(ss1, ss2, ss3, ss4, type="text", covariate.labels = c("GDP Growth Percentage", "Disposable Income Percent Change", "Unemployment Rate","CPI Percent Change", "Constant"))
+```
+![Seat Share Regression Table.](Election-Analytics-Blog/content/post/2022-09-19-economic-forces/tab2.png)
+
+```{r, warning = FALSE, message = FALSE}
 
 # use model predictors on seat share
 plot(data2$year, data2$RepSeatShare, 
@@ -214,7 +228,7 @@ legend("topleft", c("Actual Seat Share", "Model 1 Pred", "Model 2 Pred", "Model 
 One issue to note when analyzing the effects of different economic forces jointly on a dependent variable is multicollinearity. This is a problem that occurs when multiple independent variables are correlated with one another and negatively impacts the reliability of the inferences we can draw from these models. To assess if multicollinearity exists between any of the independent variables, I have created a correlation matrix below.
 
 <br>
-```{r}
+```{r, warning = FALSE, message = FALSE}
 corrmat <- data2[, c(4, 6:9)]
 res <- cor(corrmat)
 corrplot(res, type = "upper", order = "hclust", 
@@ -227,7 +241,7 @@ We can see that GDP growth percentage is highly negatively correlated with the p
 Finally, below is my prediction of vote share for the incumbent party in the house using 2022 Q6 data. While the model I fit used Q7 data, we are currently in the middle of Q7, so this information was not readily available. There will naturally be some limitations with this prediction due to this simple fact. Additionally, since the model relies so heavily on CPI percent change, the prediction is likely an overestimate of the incumbent vote share. I believe the relationship between CPI percent change and incumbent vote share is likely not linear, and with the levels of inflation that we have seen over the past year, this variable brought the prediction way up when it likely should have brought it down a little bit.
 <br>
 
-```{r}
+```{r, warning = FALSE, message = FALSE}
 preddf <- data.frame("CPI_pct_change" = 2.5,
                      "unrate" = 3.7,
                      "GDP_growth_pct" = 0.2,
