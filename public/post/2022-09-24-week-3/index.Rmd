@@ -35,6 +35,8 @@ fte_generic_poll_2020 <- read_csv("polling-data/538_generic_poll_2020.csv")
 poll_df$poll_date <- mdy(poll_df$poll_date)
 ```
 
+### Polling Data
+
 When first considering how to add this polling data to my forecasting model, I decided that I would filter the data in order to make it more representative of this year's upcoming midterm election. The polling data captures polling results from 1945 to 2020, but there are various reasons as to why I have chosen not to use all of this. In class last week, we discussed how Republicans gained power in the House in the 1990s for the first time in a long time. Going off of the assumption that these races were more competitive than races from 1945-1988, and therefore more closely resemble the election we are trying to predict, I will limit the data to only elections after 1990. I believe it is also reasonable to assume that polling methods have changed since 1945, so a more recent sample will hopefully produce better, more predictive results. In addition to filtering for more recent years, I also chose to filter for midterm years, removing the years in which there was a Presidential election. As we have discussed in class and seen in other forecasts, elections in Presidential years are fundamentally different than midterm elections: there is a different voter base, campaign techniques, etc. I think limiting the polling to midterm years will create a better prediction for this year than using all of the polling data would. While this week's focus was on polling, I will be building upon models from previous weeks that use economic and historical data in hopes that all the factors together will be able to build a more predictive model.
 
 ```{r}
@@ -84,6 +86,16 @@ The two plots show a wide spread of poll results across all time periods, althou
 
 One interesting note is that on the Democrat side, the polls that were taken 600+ days out from the election are clumped around a residual of 0, showing that at that time, generic party support did fairly accurately mirror the party's vote share in the election. The time frame of these points is a little less than 2 years prior to the midterm election, meaning these measurements come right after the previous Presidential election. Party support is likely high around this time and therefore corrects for the lack of support that we see later on.
 
+### Extension 1
+
+
+```{r}
+# EXTENSION
+```
+
+
+### This Week's Model
+
 Now let's get into the model. My model from last week's blog was not a great predictor, with its R-squared being around 0.5 and contained some counter-intuitive coefficients likely due to multicollinearity. I decided to start fresh, only keeping the unemployment rate. I decided to go back to the political variables from Week 1, as well, and include president party and House incumbent party in the model for this week. The dependent variable for all of these models is the two-party vote share for Democrats.
 <br>
 
@@ -129,7 +141,7 @@ I decided to start off with two univariate regressions with one using the generi
 
 I added variables such as the House incumbent and the unemployment rate in Quarter 7, both of which improved the model. When I added an interaction between the unemployment rate and the President party, the R-square value increased a lot. As we have discussed in class and is well-known to people who follow political and economic news, unemployment rate is a good indicator of the health of the economy, and Republicans more heavily weigh economy in their voting preferences. Therefore, I expect that an interaction between these terms would add to the Republicans' two-party vote share percentage, or in the case of this model, would have a negative coefficient.
 
-In my final model for this week, Model 6 in the table, it includes the same variables as Model 5, however I added a weight of days until the election. As previously mentioned, as we get closer to the election, the polls become more indicative of voter preferences. Model 5 has an R-squared of 0.91 and Model 6 has an R-squared of 0.92, both of which suggest that these are very good predictors of the democratic two-party vote share in the midterm elections.
+In my final model for this week, Model 6 in the table, it includes the same variables as Model 5, however I added a weight of days until the election. As previously mentioned, as we get closer to the election, the polls become more indicative of voter preferences. Model 5 has an R-squared of 0.91 and Model 6 has an R-squared of 0.92, both of which suggest that these are very good predictors of the democratic two-party vote share in the midterm elections. All variables are significant at the 0.01 level, which is also very reassuring.
 
 While I found this model to be a good predictor, I struggled this week trying to use it to make a prediction for the 2022 election. Specifically, I did not know how exactly to include the generic ballot support from polling into the prediction model. All of the other data I can find or source, such as President party, House incumbent, unemployment rate, and days until election. The coefficient on `support` in this model is very small, so I made my prediction by eliminating it and creating a new model with the remaining variables. The R-squared value remains very high at 0.91, so the model does not suffer from the exclusion of this variable. The new model fit is described below:
 
@@ -150,5 +162,10 @@ predict(fit8, preddf, interval = "confidence")
 
 This model estimates that the Democrats will receive 48.95% of the two-party vote share. I believe this seems like a logical estimation based on predictions from professional sources like FiveThirtyEight.
 
+While I was unable to incorporate the polling data from this week into my model, it seems as though the generic ballot data may not have a strong influence on the predictive power of the model. I will try to use district-level polling in future models, as I believe they could be better indicators than the generic ballot polls.
 
+<br>
+Sources:
+
+Gelman, A., & King, G. (1993). Why Are American Presidential Election Campaign Polls So Variable When Votes Are So Predictable? British Journal of Political Science, 23(4), 409–451. https://doi.org/10.1017/S0007123400006682
 
