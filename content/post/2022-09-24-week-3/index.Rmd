@@ -1,0 +1,86 @@
+---
+title: Week 3
+author: Hannah Valencia
+date: '2022-09-24'
+slug: []
+categories: []
+tags: []
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+
+library(tidyverse)
+library(ggplot2)
+library(lubridate)
+library(stargazer)
+```
+
+```{r, message=FALSE, warning = FALSE}
+popvote_df <- read_csv("polling-data/popvote_df.csv", skip = 1, col_types = cols(...1 = col_skip(), ...2 = col_skip()))
+economy_df <- read_csv("polling-data/economy_df.csv", col_types = cols(...1 = col_skip(), ...2 = col_skip(), ...3 = col_skip()))
+data2 <- read_csv("polling-data/data2.csv", skip = 1, col_types = cols(...1 = col_skip()))
+poll_df <- read_csv("polling-data/polls_df.csv")
+state_df <- read_csv("polling-data/state_df.csv", skip = 1, col_types = cols(...1 = col_skip()))
+data1 <- read_csv("polling-data/data1.csv", col_types = cols(...1 = col_skip()))
+fte_gen_ballot_avg_2018_2022 <- read_csv("polling-data/538_generic_ballot_averages_2018-2022.csv")
+fte_generic_poll_2018 <- read_csv("polling-data/538_generic_poll_2018.csv")
+fte_generic_poll_2020 <- read_csv("polling-data/538_generic_poll_2020.csv")
+
+# transform poll date to date class
+poll_df$poll_date <- mdy(poll_df$poll_date)
+```
+
+```{r}
+
+# filtering polling data
+# Going off of last class's discussion: In the 1990s, the Republicans gained power in the House for the first time in a long time. Going off of the assumption that these races were more competitive than races from 1945-1988, and therefore more closely resemble the election we are trying to predict, I will limit the data to only elections after 1990.
+# Polling methods have also likely changed, so a more recent sample will hopefully produce better results.
+# I also filter the year to be only for midterm elections. As we have discussed in class and seen in other forecasts, elections in Presidential years are fundamentally different than midterm elections. There is a different voter base, campaign techniques, etc. I think limiting the polling to midterm years will create a better prediction than including everything.
+# Added a column for the president's party in the year of the election, as that may help explain support
+
+poll1 <- poll_df %>%
+  filter(year %in% c(2018, 2014, 2010, 2006, 2002, 1998, 1994, 1990)) %>%
+  mutate(poll_date = as.Date(poll_date, format = '%Y-%m-%d'),
+         President_party = ifelse(year %in% c(2014, 2010, 1998, 1994), "D", "R"))
+
+poll1$H_incumbent <- popvote_df$H_incumbent_party[match(poll1$year, popvote_df$year)]
+poll1$D_majorvote_pct <- popvote_df$D_majorvote_pct[match(poll1$year, popvote_df$year)]
+poll1$R_majorvote_pct <- popvote_df$R_majorvote_pct[match(poll1$year, popvote_df$year)]
+poll1$D_totalvote_pct <- popvote_df$D_totalvote_pct[match(poll1$year, popvote_df$year)]
+poll1$R_totalvote_pct <- popvote_df$R_totalvote_pct[match(poll1$year, popvote_df$year)]
+
+```
+
+```{r}
+
+# creating a residual variable that measures the difference between the actual vote share percentage and the poll predicted support for each party
+# I want to see if the polls make more accurate predictions about party support (residuals get closer to 0) when they are run closer to the election.
+poll1 <- poll1 %>%
+  mutate(resid = case_when(party == "D" ~ (D_majorvote_pct - support),
+                           TRUE ~ (R_majorvote_pct - support)))
+
+# These plots show how the accuracy of polls change as the election gets closer. 
+
+poll1 %>%
+  ggplot(aes(x = days_until_election, y = resid, color = party)) +
+  geom_point(alpha = 0.7) +
+  geom_smooth(method = "lm") +
+  facet_wrap(~party) +
+  scale_color_manual(values = c("dodgerblue", "firebrick")) +
+  labs(x = "Days Until Election",
+       y = "Actual Vote Share - Poll Predicted Support")
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
