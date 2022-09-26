@@ -6,7 +6,7 @@
 		<meta charset="UTF-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-		<title>Week 3 &middot; My New Hugo Site</title>
+		<title>Polling &middot; My New Hugo Site</title>
 
 		
 		<link rel="stylesheet" href="/css/style.css">
@@ -56,7 +56,7 @@
         <span>on&nbsp;</span><time datetime="2022-09-24 00:00:00 &#43;0000 UTC">September 24, 2022</time>
 </div>
 
-		<h1 class="post-title">Week 3</h1>
+		<h1 class="post-title">Polling</h1>
 <div class="post-line"></div>
 
 		
@@ -74,140 +74,531 @@
 <pre><code>## Warning: Removed 6 rows containing missing values (geom_point).</code></pre>
 <p><img src="http://example.org/post/2022-09-24-week-3/index_files/figure-html/unnamed-chunk-3-1.png" width="672" />
 <br>
-The two plots show a wide spread of poll results across all time periods, although we do see a slightly higher concentration of points as the election gets closer. If the polls perfectly represented the way people voted in the election (and assuming all the poll respondents voted), we would see the points along the line 45-degree line of y=x with an intercept of 0. As the line of best fit for each of these plots show, the intercept is positive for both parties, meaning the generic ballot poll predictions often underestimate the actual two-party vote share. This is expected, because both the Democratic and Republican parties often do not have the highest approval ratings and may not be loved by people, but when people go to vote, they have to choose a candidate even if they do not necessarily support the party altogether. The lines of best fit also show that while there is a slightly negative relationship between the days until the election and the residual-type variable – showing better accuracy in predicting the vote share closer to the election – the relationship is not very strong. *******</p>
-<p>One interesting note is that on the Democrat side,the polls that were taken 600+ days out from the election are clumped around a residual of 0, showing that at that time, generic party support did fairly accurately mirror the party’s vote share in the election. The time frame of these points is a little less than 2 years prior to the midterm election, meaning these measurements come right after the previous Presidential election. Party support is likely high around this time and therefore corrects for the lack of support that we see later on.</p>
-<pre><code>## MODEL INFO:
-## Observations: 1132
-## Dependent Variable: D_majorvote_pct
-## Type: OLS linear regression 
-## 
-## MODEL FIT:
-## F(1,1130) = 212.63, p = 0.00
-## R² = 0.16
-## Adj. R² = 0.16 
-## 
-## Standard errors: OLS
-## ------------------------------------------------
-##                      Est.   S.E.   t val.      p
-## ----------------- ------- ------ -------- ------
-## (Intercept)         38.25   0.87    43.83   0.00
-## support              0.28   0.02    14.58   0.00
-## ------------------------------------------------</code></pre>
-<pre><code>## MODEL INFO:
-## Observations: 1132
-## Dependent Variable: D_majorvote_pct
-## Type: OLS linear regression 
-## 
-## MODEL FIT:
-## F(1,1130) = 1302.47, p = 0.00
-## R² = 0.54
-## Adj. R² = 0.54 
-## 
-## Standard errors: OLS
-## -----------------------------------------------------
-##                           Est.   S.E.   t val.      p
-## ---------------------- ------- ------ -------- ------
-## (Intercept)              47.40   0.12   395.02   0.00
-## President_partyR          5.36   0.15    36.09   0.00
-## -----------------------------------------------------</code></pre>
-<pre><code>## MODEL INFO:
-## Observations: 1132
-## Dependent Variable: D_majorvote_pct
-## Type: OLS linear regression 
-## 
-## MODEL FIT:
-## F(2,1129) = 778.68, p = 0.00
-## R² = 0.58
-## Adj. R² = 0.58 
-## 
-## Standard errors: OLS
-## -----------------------------------------------------
-##                           Est.   S.E.   t val.      p
-## ---------------------- ------- ------ -------- ------
-## (Intercept)              40.74   0.62    65.56   0.00
-## support                   0.15   0.01    10.91   0.00
-## President_partyR          4.93   0.15    33.64   0.00
-## -----------------------------------------------------</code></pre>
-<pre><code>## MODEL INFO:
-## Observations: 1132
-## Dependent Variable: D_majorvote_pct
-## Type: OLS linear regression 
-## 
-## MODEL FIT:
-## F(3,1128) = 530.41, p = 0.00
-## R² = 0.59
-## Adj. R² = 0.58 
-## 
-## Standard errors: OLS
-## -----------------------------------------------------
-##                           Est.   S.E.   t val.      p
-## ---------------------- ------- ------ -------- ------
-## (Intercept)              40.57   0.62    65.50   0.00
-## support                   0.16   0.01    11.23   0.00
-## President_partyR          6.62   0.46    14.29   0.00
-## H_incumbentR             -1.76   0.46    -3.85   0.00
-## -----------------------------------------------------</code></pre>
-<pre><code>## MODEL INFO:
-## Observations: 1132
-## Dependent Variable: D_majorvote_pct
-## Type: OLS linear regression 
-## 
-## MODEL FIT:
-## F(3,1128) = 620.78, p = 0.00
-## R² = 0.62
-## Adj. R² = 0.62 
-## 
-## Standard errors: OLS
-## -----------------------------------------------------
-##                           Est.   S.E.   t val.      p
-## ---------------------- ------- ------ -------- ------
-## (Intercept)              40.37   0.60    67.01   0.00
-## support                   0.16   0.01    11.55   0.00
-## President_partyR          7.50   0.56    13.33   0.00
-## H_incumbentR             -2.04   0.56    -3.64   0.00
-## -----------------------------------------------------</code></pre>
-<pre><code>## MODEL INFO:
-## Observations: 1132
-## Dependent Variable: D_majorvote_pct
-## Type: OLS linear regression 
-## 
-## MODEL FIT:
-## F(5,1126) = 2214.19, p = 0.00
-## R² = 0.91
-## Adj. R² = 0.91 
-## 
-## Standard errors: OLS
-## ------------------------------------------------------------
-##                                  Est.   S.E.   t val.      p
-## ----------------------------- ------- ------ -------- ------
-## (Intercept)                     46.62   0.35   132.89   0.00
-## support                          0.10   0.01    14.41   0.00
-## President_partyR                20.39   0.40    50.62   0.00
-## H_incumbentR                    -4.52   0.22   -20.42   0.00
-## unrate                          -0.48   0.03   -18.80   0.00
-## President_partyR:unrate         -2.64   0.06   -45.74   0.00
-## ------------------------------------------------------------</code></pre>
-<pre><code>## MODEL INFO:
-## Observations: 1132
-## Dependent Variable: D_majorvote_pct
-## Type: OLS linear regression 
-## 
-## MODEL FIT:
-## F(5,1126) = 2576.42, p = 0.00
-## R² = 0.92
-## Adj. R² = 0.92 
-## 
-## Standard errors: OLS
-## ------------------------------------------------------------
-##                                  Est.   S.E.   t val.      p
-## ----------------------------- ------- ------ -------- ------
-## (Intercept)                     47.07   0.34   139.73   0.00
-## support                          0.08   0.01    13.09   0.00
-## President_partyR                20.16   0.42    48.45   0.00
-## H_incumbentR                    -4.79   0.26   -18.28   0.00
-## unrate                          -0.46   0.03   -18.31   0.00
-## President_partyR:unrate         -2.53   0.05   -46.06   0.00
-## ------------------------------------------------------------</code></pre>
+The two plots show a wide spread of poll results across all time periods, although we do see a slightly higher concentration of points as the election gets closer. If the polls perfectly represented the way people voted in the election (and assuming all the poll respondents voted), we would see the points along the line 45-degree line of y=x with an intercept of 0. As the line of best fit for each of these plots show, the intercept is positive for both parties, meaning the generic ballot poll predictions often underestimate the actual two-party vote share. This is expected, because both the Democratic and Republican parties often do not have the highest approval ratings and may not be loved by people, but when people go to vote, they have to choose a candidate even if they do not necessarily support the party altogether. The lines of best fit also show that while there is a slightly negative relationship between the days until the election and the residual-type variable – showing better accuracy in predicting the vote share closer to the election – the relationship is not very strong. As we read with Gelman and King (1993), polling is most accurate in the months before an election but respondents are not often rational or informed in their choices which is why predicting the outcome is not always accurate.</p>
+<p>One interesting note is that on the Democrat side, the polls that were taken 600+ days out from the election are clumped around a residual of 0, showing that at that time, generic party support did fairly accurately mirror the party’s vote share in the election. The time frame of these points is a little less than 2 years prior to the midterm election, meaning these measurements come right after the previous Presidential election. Party support is likely high around this time and therefore corrects for the lack of support that we see later on.</p>
+<table style="text-align:center">
+<tr>
+<td colspan="7" style="border-bottom: 1px solid black">
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td colspan="6">
+<em>Dependent variable:</em>
+</td>
+</tr>
+<tr>
+<td>
+</td>
+<td colspan="6" style="border-bottom: 1px solid black">
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td colspan="6">
+D_majorvote_pct
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+(1)
+</td>
+<td>
+(2)
+</td>
+<td>
+(3)
+</td>
+<td>
+(4)
+</td>
+<td>
+(5)
+</td>
+<td>
+(6)
+</td>
+</tr>
+<tr>
+<td colspan="7" style="border-bottom: 1px solid black">
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+support
+</td>
+<td>
+0.280<sup>***</sup>
+</td>
+<td>
+</td>
+<td>
+0.154<sup>***</sup>
+</td>
+<td>
+0.158<sup>***</sup>
+</td>
+<td>
+0.097<sup>***</sup>
+</td>
+<td>
+0.084<sup>***</sup>
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+(0.019)
+</td>
+<td>
+</td>
+<td>
+(0.014)
+</td>
+<td>
+(0.014)
+</td>
+<td>
+(0.007)
+</td>
+<td>
+(0.006)
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+</td>
+<td>
+</td>
+<td>
+</td>
+<td>
+</td>
+<td>
+</td>
+<td>
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+President_partyR
+</td>
+<td>
+</td>
+<td>
+5.357<sup>***</sup>
+</td>
+<td>
+4.930<sup>***</sup>
+</td>
+<td>
+6.624<sup>***</sup>
+</td>
+<td>
+20.389<sup>***</sup>
+</td>
+<td>
+20.160<sup>***</sup>
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+</td>
+<td>
+(0.148)
+</td>
+<td>
+(0.147)
+</td>
+<td>
+(0.464)
+</td>
+<td>
+(0.403)
+</td>
+<td>
+(0.416)
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+</td>
+<td>
+</td>
+<td>
+</td>
+<td>
+</td>
+<td>
+</td>
+<td>
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+H_incumbentR
+</td>
+<td>
+</td>
+<td>
+</td>
+<td>
+</td>
+<td>
+-1.765<sup>***</sup>
+</td>
+<td>
+-4.521<sup>***</sup>
+</td>
+<td>
+-4.791<sup>***</sup>
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+</td>
+<td>
+</td>
+<td>
+</td>
+<td>
+(0.459)
+</td>
+<td>
+(0.221)
+</td>
+<td>
+(0.262)
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+</td>
+<td>
+</td>
+<td>
+</td>
+<td>
+</td>
+<td>
+</td>
+<td>
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+unrate
+</td>
+<td>
+</td>
+<td>
+</td>
+<td>
+</td>
+<td>
+</td>
+<td>
+-0.475<sup>***</sup>
+</td>
+<td>
+-0.464<sup>***</sup>
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+</td>
+<td>
+</td>
+<td>
+</td>
+<td>
+</td>
+<td>
+(0.025)
+</td>
+<td>
+(0.025)
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+</td>
+<td>
+</td>
+<td>
+</td>
+<td>
+</td>
+<td>
+</td>
+<td>
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+President_partyR:unrate
+</td>
+<td>
+</td>
+<td>
+</td>
+<td>
+</td>
+<td>
+</td>
+<td>
+-2.641<sup>***</sup>
+</td>
+<td>
+-2.528<sup>***</sup>
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+</td>
+<td>
+</td>
+<td>
+</td>
+<td>
+</td>
+<td>
+(0.058)
+</td>
+<td>
+(0.055)
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+</td>
+<td>
+</td>
+<td>
+</td>
+<td>
+</td>
+<td>
+</td>
+<td>
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+Constant
+</td>
+<td>
+38.255<sup>***</sup>
+</td>
+<td>
+47.404<sup>***</sup>
+</td>
+<td>
+40.742<sup>***</sup>
+</td>
+<td>
+40.565<sup>***</sup>
+</td>
+<td>
+46.618<sup>***</sup>
+</td>
+<td>
+47.066<sup>***</sup>
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+(0.873)
+</td>
+<td>
+(0.120)
+</td>
+<td>
+(0.621)
+</td>
+<td>
+(0.619)
+</td>
+<td>
+(0.351)
+</td>
+<td>
+(0.337)
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+</td>
+<td>
+</td>
+<td>
+</td>
+<td>
+</td>
+<td>
+</td>
+<td>
+</td>
+</tr>
+<tr>
+<td colspan="7" style="border-bottom: 1px solid black">
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+Observations
+</td>
+<td>
+1,132
+</td>
+<td>
+1,132
+</td>
+<td>
+1,132
+</td>
+<td>
+1,132
+</td>
+<td>
+1,132
+</td>
+<td>
+1,132
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+R<sup>2</sup>
+</td>
+<td>
+0.158
+</td>
+<td>
+0.535
+</td>
+<td>
+0.580
+</td>
+<td>
+0.585
+</td>
+<td>
+0.908
+</td>
+<td>
+0.920
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+Adjusted R<sup>2</sup>
+</td>
+<td>
+0.158
+</td>
+<td>
+0.535
+</td>
+<td>
+0.579
+</td>
+<td>
+0.584
+</td>
+<td>
+0.907
+</td>
+<td>
+0.919
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+Residual Std. Error
+</td>
+<td>
+3.198 (df = 1130)
+</td>
+<td>
+2.376 (df = 1130)
+</td>
+<td>
+2.261 (df = 1129)
+</td>
+<td>
+2.247 (df = 1128)
+</td>
+<td>
+1.061 (df = 1126)
+</td>
+<td>
+11.586 (df = 1126)
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+F Statistic
+</td>
+<td>
+212.629<sup>***</sup> (df = 1; 1130)
+</td>
+<td>
+1,302.472<sup>***</sup> (df = 1; 1130)
+</td>
+<td>
+778.682<sup>***</sup> (df = 2; 1129)
+</td>
+<td>
+530.408<sup>***</sup> (df = 3; 1128)
+</td>
+<td>
+2,214.194<sup>***</sup> (df = 5; 1126)
+</td>
+<td>
+2,576.418<sup>***</sup> (df = 5; 1126)
+</td>
+</tr>
+<tr>
+<td colspan="7" style="border-bottom: 1px solid black">
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+<em>Note:</em>
+</td>
+<td colspan="6" style="text-align:right">
+<sup><em></sup>p&lt;0.1; <sup><strong></sup>p&lt;0.05; <sup></strong></em></sup>p&lt;0.01
+</td>
+</tr>
+</table>
 
 
 		
@@ -224,7 +615,7 @@ The two plots show a wide spread of poll results across all time periods, althou
         		<footer>
 			
 			<span>
-			&copy; <time datetime="2022-09-26 13:59:17.352535 -0400 EDT m=&#43;0.604381832">2022</time> . Made with <a href='https://gohugo.io'>Hugo</a> using the <a href='https://github.com/EmielH/tale-hugo/'>Tale</a> theme.
+			&copy; <time datetime="2022-09-26 14:32:12.039247 -0400 EDT m=&#43;0.779076433">2022</time> . Made with <a href='https://gohugo.io'>Hugo</a> using the <a href='https://github.com/EmielH/tale-hugo/'>Tale</a> theme.
 			</span>
 		</footer>
 

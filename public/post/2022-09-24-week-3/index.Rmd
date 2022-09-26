@@ -1,5 +1,5 @@
 ---
-title: Week 3
+title: Polling
 author: Hannah Valencia
 date: '2022-09-24'
 slug: []
@@ -80,9 +80,9 @@ poll1 %>%
        y = "Actual Party Vote Share - Generic Poll Predicted Support")
 ```
 <br>
-The two plots show a wide spread of poll results across all time periods, although we do see a slightly higher concentration of points as the election gets closer. If the polls perfectly represented the way people voted in the election (and assuming all the poll respondents voted), we would see the points along the line 45-degree line of y=x with an intercept of 0. As the line of best fit for each of these plots show, the intercept is positive for both parties, meaning the generic ballot poll predictions often underestimate the actual two-party vote share. This is expected, because both the Democratic and Republican parties often do not have the highest approval ratings and may not be loved by people, but when people go to vote, they have to choose a candidate even if they do not necessarily support the party altogether. The lines of best fit also show that while there is a slightly negative relationship between the days until the election and the residual-type variable -- showing better accuracy in predicting the vote share closer to the election -- the relationship is not very strong. *******
+The two plots show a wide spread of poll results across all time periods, although we do see a slightly higher concentration of points as the election gets closer. If the polls perfectly represented the way people voted in the election (and assuming all the poll respondents voted), we would see the points along the line 45-degree line of y=x with an intercept of 0. As the line of best fit for each of these plots show, the intercept is positive for both parties, meaning the generic ballot poll predictions often underestimate the actual two-party vote share. This is expected, because both the Democratic and Republican parties often do not have the highest approval ratings and may not be loved by people, but when people go to vote, they have to choose a candidate even if they do not necessarily support the party altogether. The lines of best fit also show that while there is a slightly negative relationship between the days until the election and the residual-type variable -- showing better accuracy in predicting the vote share closer to the election -- the relationship is not very strong. As we read with Gelman and King (1993), polling is most accurate in the months before an election but respondents are not often rational or informed in their choices which is why predicting the outcome is not always accurate.
 
-One interesting note is that on the Democrat side,the polls that were taken 600+ days out from the election are clumped around a residual of 0, showing that at that time, generic party support did fairly accurately mirror the party's vote share in the election. The time frame of these points is a little less than 2 years prior to the midterm election, meaning these measurements come right after the previous Presidential election. Party support is likely high around this time and therefore corrects for the lack of support that we see later on.
+One interesting note is that on the Democrat side, the polls that were taken 600+ days out from the election are clumped around a residual of 0, showing that at that time, generic party support did fairly accurately mirror the party's vote share in the election. The time frame of these points is a little less than 2 years prior to the midterm election, meaning these measurements come right after the previous Presidential election. Party support is likely high around this time and therefore corrects for the lack of support that we see later on.
 
 
 
@@ -99,7 +99,7 @@ One interesting note is that on the Democrat side,the polls that were taken 600+
 #                          TRUE ~ "201+"))
 ```
 
-```{r}
+```{r, results = 'asis'}
 poll2 <- poll1 %>%
   filter(party == "D",
          days_until_election > 0)
@@ -107,25 +107,20 @@ poll2 <- poll1 %>%
 poll2$unrate <- data2$unrate[match(poll2$year, data2$year)]
 
 fit1 <- lm(D_majorvote_pct ~ support, data = poll2)
-summ(fit1)
 
 fit2 <- lm(D_majorvote_pct ~ President_party, data = poll2)
-summ(fit2)
 
 fit3 <- lm(D_majorvote_pct ~ support + President_party, data = poll2)
-summ(fit3)
 
 fit4 <- lm(D_majorvote_pct ~ support + President_party + H_incumbent, data = poll2)
-summ(fit4)
 
 fit5 <- lm(D_majorvote_pct ~ support + President_party + H_incumbent, data = poll2, weights = days_until_election)
-summ(fit5)
 
 fit6 <- lm(D_majorvote_pct ~ support + President_party + H_incumbent + unrate + unrate*President_party, data = poll2)
-summ(fit6)
 
 fit7 <- lm(D_majorvote_pct ~ support + President_party + H_incumbent + unrate + unrate*President_party, data = poll2, weights = days_until_election)
-summ(fit7)
+
+stargazer(fit1, fit2, fit3, fit4, fit6, fit7, type = "html")
 
 ```
 
