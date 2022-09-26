@@ -84,7 +84,8 @@ The two plots show a wide spread of poll results across all time periods, althou
 
 One interesting note is that on the Democrat side, the polls that were taken 600+ days out from the election are clumped around a residual of 0, showing that at that time, generic party support did fairly accurately mirror the party's vote share in the election. The time frame of these points is a little less than 2 years prior to the midterm election, meaning these measurements come right after the previous Presidential election. Party support is likely high around this time and therefore corrects for the lack of support that we see later on.
 
-
+Now let's get into the model. My model from last week's blog was not a great predictor, with its R-squared being around 0.5 and contained some counter-intuitive coefficients likely due to multicollinearity. I decided to start fresh, only keeping the unemployment rate. I decided to go back to the political variables from Week 1, as well, and include president party and House incumbent party in the model for this week. The dependent variable for all of these models is the two-party vote share for Democrats.
+<br>
 
 ```{r}
 # poll1 %>%
@@ -120,9 +121,13 @@ fit6 <- lm(D_majorvote_pct ~ support + President_party + H_incumbent + unrate + 
 
 fit7 <- lm(D_majorvote_pct ~ support + President_party + H_incumbent + unrate + unrate*President_party, data = poll2, weights = days_until_election)
 
-stargazer(fit1, fit2, fit3, fit4, fit6, fit7, type = "html")
+stargazer(fit1, fit2, fit3, fit4, fit6, fit7, type = "html", covariate.labels = c("Generic Ballot Support", "President Party - Republican", "House Incumbent - Republican", "Unemployment Rate", "President Party - R * Unemployment Rate", "Constant"))
 
 ```
+
+I decided to start off with two univariate regressions with one using the generic ballot party support as an independent variable - to get a taste of the strength of the relationship between the polls and the two-party vote share - and the second using President party as the independent variable. The generic ballot support model had a low R-squared of 0.158, which goes along with what we saw in the plots above. The Presidential party model has a much higher R-squared of 0.535, showing that this variable alone is a fairly good predictor of the vote share.
+
+I added variables such as the House incumbent and the unemployment rate, both of which improved the model. When I added an interaction between the unemployment rate and the President party, the R-square value increased a lot. As we have discussed in class and is well-known to people who follow political and economic news, unemployment rate is a good indicator of the health of the economy, and Republicans more heavily weigh economy in their voting preferences. Therefore, I expect that an interaction between these terms would add to the Republicans' two-party vote share percentage, or in the case of this model, would have a negative coefficient.
 
 
 

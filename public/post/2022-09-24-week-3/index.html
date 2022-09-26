@@ -76,6 +76,8 @@
 <br>
 The two plots show a wide spread of poll results across all time periods, although we do see a slightly higher concentration of points as the election gets closer. If the polls perfectly represented the way people voted in the election (and assuming all the poll respondents voted), we would see the points along the line 45-degree line of y=x with an intercept of 0. As the line of best fit for each of these plots show, the intercept is positive for both parties, meaning the generic ballot poll predictions often underestimate the actual two-party vote share. This is expected, because both the Democratic and Republican parties often do not have the highest approval ratings and may not be loved by people, but when people go to vote, they have to choose a candidate even if they do not necessarily support the party altogether. The lines of best fit also show that while there is a slightly negative relationship between the days until the election and the residual-type variable – showing better accuracy in predicting the vote share closer to the election – the relationship is not very strong. As we read with Gelman and King (1993), polling is most accurate in the months before an election but respondents are not often rational or informed in their choices which is why predicting the outcome is not always accurate.</p>
 <p>One interesting note is that on the Democrat side, the polls that were taken 600+ days out from the election are clumped around a residual of 0, showing that at that time, generic party support did fairly accurately mirror the party’s vote share in the election. The time frame of these points is a little less than 2 years prior to the midterm election, meaning these measurements come right after the previous Presidential election. Party support is likely high around this time and therefore corrects for the lack of support that we see later on.</p>
+<p>Now let’s get into the model. My model from last week’s blog was not a great predictor, with its R-squared being around 0.5 and contained some counter-intuitive coefficients likely due to multicollinearity. I decided to start fresh, only keeping the unemployment rate. I decided to go back to the political variables from Week 1, as well, and include president party and House incumbent party in the model for this week. The dependent variable for all of these models is the two-party vote share for Democrats.
+<br></p>
 <table style="text-align:center">
 <tr>
 <td colspan="7" style="border-bottom: 1px solid black">
@@ -129,7 +131,7 @@ D_majorvote_pct
 </tr>
 <tr>
 <td style="text-align:left">
-support
+Generic Ballot Support
 </td>
 <td>
 0.280<sup>***</sup>
@@ -188,7 +190,7 @@ support
 </tr>
 <tr>
 <td style="text-align:left">
-President_partyR
+President Party - Republican
 </td>
 <td>
 </td>
@@ -247,7 +249,7 @@ President_partyR
 </tr>
 <tr>
 <td style="text-align:left">
-H_incumbentR
+House Incumbent - Republican
 </td>
 <td>
 </td>
@@ -302,7 +304,7 @@ H_incumbentR
 </tr>
 <tr>
 <td style="text-align:left">
-unrate
+Unemployment Rate
 </td>
 <td>
 </td>
@@ -355,7 +357,7 @@ unrate
 </tr>
 <tr>
 <td style="text-align:left">
-President_partyR:unrate
+President Party - R * Unemployment Rate
 </td>
 <td>
 </td>
@@ -599,6 +601,8 @@ F Statistic
 </td>
 </tr>
 </table>
+<p>I decided to start off with two univariate regressions with one using the generic ballot party support as an independent variable - to get a taste of the strength of the relationship between the polls and the two-party vote share - and the second using President party as the independent variable. The generic ballot support model had a low R-squared of 0.158, which goes along with what we saw in the plots above. The Presidential party model has a much higher R-squared of 0.535, showing that this variable alone is a fairly good predictor of the vote share.</p>
+<p>I added variables such as the House incumbent and the unemployment rate, both of which improved the model. When I added an interaction between the unemployment rate and the President party, the R-square value increased a lot. As we have discussed in class and is well-known to people who follow political and economic news, unemployment rate is a good indicator of the health of the economy, and Republicans more heavily weigh economy in their voting preferences. Therefore, I expect that an interaction between these terms would add to the Republicans’ two-party vote share percentage, or in the case of this model, would have a negative coefficient.</p>
 
 
 		
@@ -615,7 +619,7 @@ F Statistic
         		<footer>
 			
 			<span>
-			&copy; <time datetime="2022-09-26 14:32:12.039247 -0400 EDT m=&#43;0.779076433">2022</time> . Made with <a href='https://gohugo.io'>Hugo</a> using the <a href='https://github.com/EmielH/tale-hugo/'>Tale</a> theme.
+			&copy; <time datetime="2022-09-26 15:24:51.2474 -0400 EDT m=&#43;0.581421712">2022</time> . Made with <a href='https://gohugo.io'>Hugo</a> using the <a href='https://github.com/EmielH/tale-hugo/'>Tale</a> theme.
 			</span>
 		</footer>
 
