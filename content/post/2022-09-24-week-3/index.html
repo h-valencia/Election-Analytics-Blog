@@ -548,4 +548,30 @@ F Statistic
 </tr>
 </table>
 <p>I decided to start off with two univariate regressions with one using the generic ballot party support as an independent variable - to get a taste of the strength of the relationship between the polls and the two-party vote share - and the second using President party as the independent variable. The generic ballot support model had a low R-squared of 0.158, which goes along with what we saw in the plots above. The Presidential party model has a much higher R-squared of 0.535, showing that this variable alone is a fairly good predictor of the vote share.</p>
-<p>I added variables such as the House incumbent and the unemployment rate, both of which improved the model. When I added an interaction between the unemployment rate and the President party, the R-square value increased a lot. As we have discussed in class and is well-known to people who follow political and economic news, unemployment rate is a good indicator of the health of the economy, and Republicans more heavily weigh economy in their voting preferences. Therefore, I expect that an interaction between these terms would add to the Republicans’ two-party vote share percentage, or in the case of this model, would have a negative coefficient.</p>
+<p>I added variables such as the House incumbent and the unemployment rate in Quarter 7, both of which improved the model. When I added an interaction between the unemployment rate and the President party, the R-square value increased a lot. As we have discussed in class and is well-known to people who follow political and economic news, unemployment rate is a good indicator of the health of the economy, and Republicans more heavily weigh economy in their voting preferences. Therefore, I expect that an interaction between these terms would add to the Republicans’ two-party vote share percentage, or in the case of this model, would have a negative coefficient.</p>
+<p>In my final model for this week, Model 6 in the table, it includes the same variables as Model 5, however I added a weight of days until the election. As previously mentioned, as we get closer to the election, the polls become more indicative of voter preferences. Model 5 has an R-squared of 0.91 and Model 6 has an R-squared of 0.92, both of which suggest that these are very good predictors of the democratic two-party vote share in the midterm elections.</p>
+<p>While I found this model to be a good predictor, I struggled this week trying to use it to make a prediction for the 2022 election. Specifically, I did not know how exactly to include the generic ballot support from polling into the prediction model. All of the other data I can find or source, such as President party, House incumbent, unemployment rate, and days until election. The coefficient on <code>support</code> in this model is very small, so I made my prediction by eliminating it and creating a new model with the remaining variables. The R-squared value remains very high at 0.91, so the model does not suffer from the exclusion of this variable. The new model fit is described below:</p>
+<pre><code>## MODEL INFO:
+## Observations: 1132
+## Dependent Variable: D_majorvote_pct
+## Type: OLS linear regression 
+## 
+## MODEL FIT:
+## F(4,1127) = 2760.66, p = 0.00
+## R² = 0.91
+## Adj. R² = 0.91 
+## 
+## Standard errors: OLS
+## ------------------------------------------------------------
+##                                  Est.   S.E.   t val.      p
+## ----------------------------- ------- ------ -------- ------
+## (Intercept)                     50.63   0.21   237.82   0.00
+## President_partyR                20.60   0.44    46.30   0.00
+## H_incumbentR                    -4.46   0.28   -15.95   0.00
+## unrate                          -0.45   0.03   -16.65   0.00
+## President_partyR:unrate         -2.66   0.06   -46.07   0.00
+## ------------------------------------------------------------</code></pre>
+<p>Now using this new model to predict the Democrat’s two-party vote share in the 2022 midterm:</p>
+<pre><code>##        fit      lwr     upr
+## 1 48.95346 48.72032 49.1866</code></pre>
+<p>This model estimates that the Democrats will receive 48.95% of the two-party vote share. I believe this seems like a logical estimation based on predictions from professional sources like FiveThirtyEight.</p>
