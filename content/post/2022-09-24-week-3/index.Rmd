@@ -5,6 +5,7 @@ date: '2022-09-24'
 slug: []
 categories: []
 tags: []
+summary: "This week, we studied various polling methods and tried to explain the variance among pollsters. Why are polls inaccurate? In this blog, I will add polling data to the economic data we looked at last week in an attempt to improve my model and generate better predictions for the upcoming midterm election."
 ---
 
 ```{r setup, include=FALSE}
@@ -14,8 +15,11 @@ library(tidyverse)
 library(ggplot2)
 library(lubridate)
 library(stargazer)
+library(jtools)
 ```
-
+<br>
+*This week, we studied various polling methods and tried to explain the variance among pollsters. Why are polls inaccurate and how can we improve upon them? In this blog, I will add polling data to the economic data we looked at last week in an attempt to improve my model and generate better predictions for the upcoming midterm election.*
+<br>
 ```{r, message=FALSE, warning = FALSE}
 popvote_df <- read_csv("polling-data/popvote_df.csv", skip = 1, col_types = cols(...1 = col_skip(), ...2 = col_skip()))
 economy_df <- read_csv("polling-data/economy_df.csv", col_types = cols(...1 = col_skip(), ...2 = col_skip(), ...3 = col_skip()))
@@ -30,6 +34,8 @@ fte_generic_poll_2020 <- read_csv("polling-data/538_generic_poll_2020.csv")
 # transform poll date to date class
 poll_df$poll_date <- mdy(poll_df$poll_date)
 ```
+
+When first considering how to add this polling data to my forecasting model, I decided that I would filter the data in order to make it more representative of this year's upcoming midterm election. The polling data captures polling results from 1945 to 2020, but there are various reasons as to why I have chosen not to use all of this. In class last week, we discussed how Republicans gained power in the House in the 1990s for the first time in a long time. Going off of the assumption that these races were more competitive than races from 1945-1988, and therefore more closely resemble the election we are trying to predict, I will limit the data to only elections after 1990. I believe it is also reasonable to assume that polling methods have changed since 1945, so a more recent sample will hopefully produce better, more predictive results. In addition to filtering for more recent years, I also chose to filter for midterm years, removing the years in which there was a Presidential election. As we have discussed in class and seen in other forecasts, elections in Presidential years are fundamentally different than midterm elections: there is a different voter base, campaign techniques, etc. I think limiting the polling to midterm years will create a better prediction for this year than using all of the polling data would. While this week's focus was on polling, I will be building upon models from previous weeks that use economic and historical data in hopes that all the factors together will be able to build a more predictive model.
 
 ```{r}
 
@@ -52,6 +58,8 @@ poll1$R_totalvote_pct <- popvote_df$R_totalvote_pct[match(poll1$year, popvote_df
 
 ```
 
+To start, I wanted to look at the filtered polling data to see how predictive it is. The polling data is taken from a generic ballot measured in "support" for each party, with a value for each poll's predicted Democratic and Republican support as a percentage (but the two do not add up to 100%). To understand the predictive power of this generic ballot poll on the actual election results, I created a residual-esq variable that measures the actual party support from that year's election minus the generic ballot's measure of support. I then plotted this variable against the days until the election to see if they are more predictive as the election gets closer, with the hope that people's generic party support represents how they will vote in the election. The graphs of this relationship between the residual and the days until election by party are plotted below.
+
 ```{r}
 
 # creating a residual variable that measures the difference between the actual vote share percentage and the poll predicted support for each party
@@ -60,7 +68,7 @@ poll1 <- poll1 %>%
   mutate(resid = case_when(party == "D" ~ (D_majorvote_pct - support),
                            TRUE ~ (R_majorvote_pct - support)))
 
-# These plots show how the accuracy of polls change as the election gets closer. 
+# These plots show how the accuracy of polls (as measured by the residual) change as the election gets closer.
 
 poll1 %>%
   ggplot(aes(x = days_until_election, y = resid, color = party)) +
@@ -69,14 +77,57 @@ poll1 %>%
   facet_wrap(~party) +
   scale_color_manual(values = c("dodgerblue", "firebrick")) +
   labs(x = "Days Until Election",
-       y = "Actual Vote Share - Poll Predicted Support")
+       y = "Actual Party Vote Share - Generic Poll Predicted Support")
+```
+<br>
+The two plots show a wide spread of poll results across all time periods, although we do see a slightly higher concentration of points as the election gets closer. If the polls perfectly represented the way people voted in the election (and assuming all the poll respondents voted), we would see the points along the line 45-degree line of y=x with an intercept of 0. As the line of best fit for each of these plots show, the intercept is positive for both parties, meaning the generic ballot poll predictions often underestimate the actual two-party vote share. This is expected, because both the Democratic and Republican parties often do not have the highest approval ratings and may not be loved by people, but when people go to vote, they have to choose a candidate even if they do not necessarily support the party altogether. The lines of best fit also show that while there is a slightly negative relationship between the days until the election and the residual-type variable -- showing better accuracy in predicting the vote share closer to the election -- the relationship is not very strong. *******
+
+One interesting note is that on the Democrat side,the polls that were taken 600+ days out from the election are clumped around a residual of 0, showing that at that time, generic party support did fairly accurately mirror the party's vote share in the election. The time frame of these points is a little less than 2 years prior to the midterm election, meaning these measurements come right after the previous Presidential election. Party support is likely high around this time and therefore corrects for the lack of support that we see later on.
+
+
+
+```{r}
+# poll1 %>%
+#   filter(party == "D",
+#          days_until_election > 0) %>%
+#   mutate(dte = case_when(days_until_election > 0 & days_until_election <= 10 ~ "0-10",
+#                          days_until_election > 10 & days_until_election <= 30 ~ "11-30",
+#                          days_until_election > 30 & days_until_election <= 60 ~ "31-60",
+#                          days_until_election > 60 & days_until_election <= 90 ~ "61-90",
+#                          days_until_election > 90 & days_until_election <= 150 ~ "91-150",
+#                          days_until_election > 150 & days_until_election <= 200 ~ "151-200",
+#                          TRUE ~ "201+"))
 ```
 
+```{r}
+poll2 <- poll1 %>%
+  filter(party == "D",
+         days_until_election > 0)
 
+poll2$unrate <- data2$unrate[match(poll2$year, data2$year)]
 
+fit1 <- lm(D_majorvote_pct ~ support, data = poll2)
+summ(fit1)
 
+fit2 <- lm(D_majorvote_pct ~ President_party, data = poll2)
+summ(fit2)
 
+fit3 <- lm(D_majorvote_pct ~ support + President_party, data = poll2)
+summ(fit3)
 
+fit4 <- lm(D_majorvote_pct ~ support + President_party + H_incumbent, data = poll2)
+summ(fit4)
+
+fit5 <- lm(D_majorvote_pct ~ support + President_party + H_incumbent, data = poll2, weights = days_until_election)
+summ(fit5)
+
+fit6 <- lm(D_majorvote_pct ~ support + President_party + H_incumbent + unrate + unrate*President_party, data = poll2)
+summ(fit6)
+
+fit7 <- lm(D_majorvote_pct ~ support + President_party + H_incumbent + unrate + unrate*President_party, data = poll2, weights = days_until_election)
+summ(fit7)
+
+```
 
 
 

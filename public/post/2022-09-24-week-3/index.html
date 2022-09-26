@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en-us">
+    <head>
+		
+		
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+		<title>Week 3 &middot; My New Hugo Site</title>
+
+		
+		<link rel="stylesheet" href="/css/style.css">
+		<link rel="stylesheet" href="/css/fonts.css">
+		
+		<link rel="icon" href="/favicon.ico"/>
+		<link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32.png">
+		<link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16.png">
+		<link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+
+		
+		<link href="" rel="alternate" type="application/rss+xml" title="My New Hugo Site" />
+
+		<script src="/js/darkmode.js"></script>
+	</head>
+
+    <body>
+        		<nav class="nav">
+			<div class="nav-container">
+				<a href="/">
+					
+						<h2 class="nav-title">My New Hugo Site</h2>
+					
+				</a>
+				<ul>
+    
+    
+</ul>
+			</div>
+		</nav>
+
+        <div id="darkModeToggle" onclick="toggleDarkMode()">
+  &#9680; 
+</div>
+
+        
+
+<main>
+	
+
+
+        <div class="post">
+		<div class="post-info">
+    <span>Written by</span>
+        Hannah Valencia
+        <br>
+        <span>on&nbsp;</span><time datetime="2022-09-24 00:00:00 &#43;0000 UTC">September 24, 2022</time>
+</div>
+
+		<h1 class="post-title">Week 3</h1>
+<div class="post-line"></div>
+
+		
+
+		
+
+
+<p><br>
+<em>This week, we studied various polling methods and tried to explain the variance among pollsters. Why are polls inaccurate and how can we improve upon them? In this blog, I will add polling data to the economic data we looked at last week in an attempt to improve my model and generate better predictions for the upcoming midterm election.</em>
+<br></p>
+<p>When first considering how to add this polling data to my forecasting model, I decided that I would filter the data in order to make it more representative of this year’s upcoming midterm election. The polling data captures polling results from 1945 to 2020, but there are various reasons as to why I have chosen not to use all of this. In class last week, we discussed how Republicans gained power in the House in the 1990s for the first time in a long time. Going off of the assumption that these races were more competitive than races from 1945-1988, and therefore more closely resemble the election we are trying to predict, I will limit the data to only elections after 1990. I believe it is also reasonable to assume that polling methods have changed since 1945, so a more recent sample will hopefully produce better, more predictive results. In addition to filtering for more recent years, I also chose to filter for midterm years, removing the years in which there was a Presidential election. As we have discussed in class and seen in other forecasts, elections in Presidential years are fundamentally different than midterm elections: there is a different voter base, campaign techniques, etc. I think limiting the polling to midterm years will create a better prediction for this year than using all of the polling data would. While this week’s focus was on polling, I will be building upon models from previous weeks that use economic and historical data in hopes that all the factors together will be able to build a more predictive model.</p>
+<p>To start, I wanted to look at the filtered polling data to see how predictive it is. The polling data is taken from a generic ballot measured in “support” for each party, with a value for each poll’s predicted Democratic and Republican support as a percentage (but the two do not add up to 100%). To understand the predictive power of this generic ballot poll on the actual election results, I created a residual-esq variable that measures the actual party support from that year’s election minus the generic ballot’s measure of support. I then plotted this variable against the days until the election to see if they are more predictive as the election gets closer, with the hope that people’s generic party support represents how they will vote in the election. The graphs of this relationship between the residual and the days until election by party are plotted below.</p>
+<pre><code>## `geom_smooth()` using formula &#39;y ~ x&#39;</code></pre>
+<pre><code>## Warning: Removed 6 rows containing non-finite values (stat_smooth).</code></pre>
+<pre><code>## Warning: Removed 6 rows containing missing values (geom_point).</code></pre>
+<p><img src="http://example.org/post/2022-09-24-week-3/index_files/figure-html/unnamed-chunk-3-1.png" width="672" />
+<br>
+The two plots show a wide spread of poll results across all time periods, although we do see a slightly higher concentration of points as the election gets closer. If the polls perfectly represented the way people voted in the election (and assuming all the poll respondents voted), we would see the points along the line 45-degree line of y=x with an intercept of 0. As the line of best fit for each of these plots show, the intercept is positive for both parties, meaning the generic ballot poll predictions often underestimate the actual two-party vote share. This is expected, because both the Democratic and Republican parties often do not have the highest approval ratings and may not be loved by people, but when people go to vote, they have to choose a candidate even if they do not necessarily support the party altogether. The lines of best fit also show that while there is a slightly negative relationship between the days until the election and the residual-type variable – showing better accuracy in predicting the vote share closer to the election – the relationship is not very strong. *******</p>
+<p>One interesting note is that on the Democrat side,the polls that were taken 600+ days out from the election are clumped around a residual of 0, showing that at that time, generic party support did fairly accurately mirror the party’s vote share in the election. The time frame of these points is a little less than 2 years prior to the midterm election, meaning these measurements come right after the previous Presidential election. Party support is likely high around this time and therefore corrects for the lack of support that we see later on.</p>
+<pre><code>## MODEL INFO:
+## Observations: 1132
+## Dependent Variable: D_majorvote_pct
+## Type: OLS linear regression 
+## 
+## MODEL FIT:
+## F(1,1130) = 212.63, p = 0.00
+## R² = 0.16
+## Adj. R² = 0.16 
+## 
+## Standard errors: OLS
+## ------------------------------------------------
+##                      Est.   S.E.   t val.      p
+## ----------------- ------- ------ -------- ------
+## (Intercept)         38.25   0.87    43.83   0.00
+## support              0.28   0.02    14.58   0.00
+## ------------------------------------------------</code></pre>
+<pre><code>## MODEL INFO:
+## Observations: 1132
+## Dependent Variable: D_majorvote_pct
+## Type: OLS linear regression 
+## 
+## MODEL FIT:
+## F(1,1130) = 1302.47, p = 0.00
+## R² = 0.54
+## Adj. R² = 0.54 
+## 
+## Standard errors: OLS
+## -----------------------------------------------------
+##                           Est.   S.E.   t val.      p
+## ---------------------- ------- ------ -------- ------
+## (Intercept)              47.40   0.12   395.02   0.00
+## President_partyR          5.36   0.15    36.09   0.00
+## -----------------------------------------------------</code></pre>
+<pre><code>## MODEL INFO:
+## Observations: 1132
+## Dependent Variable: D_majorvote_pct
+## Type: OLS linear regression 
+## 
+## MODEL FIT:
+## F(2,1129) = 778.68, p = 0.00
+## R² = 0.58
+## Adj. R² = 0.58 
+## 
+## Standard errors: OLS
+## -----------------------------------------------------
+##                           Est.   S.E.   t val.      p
+## ---------------------- ------- ------ -------- ------
+## (Intercept)              40.74   0.62    65.56   0.00
+## support                   0.15   0.01    10.91   0.00
+## President_partyR          4.93   0.15    33.64   0.00
+## -----------------------------------------------------</code></pre>
+<pre><code>## MODEL INFO:
+## Observations: 1132
+## Dependent Variable: D_majorvote_pct
+## Type: OLS linear regression 
+## 
+## MODEL FIT:
+## F(3,1128) = 530.41, p = 0.00
+## R² = 0.59
+## Adj. R² = 0.58 
+## 
+## Standard errors: OLS
+## -----------------------------------------------------
+##                           Est.   S.E.   t val.      p
+## ---------------------- ------- ------ -------- ------
+## (Intercept)              40.57   0.62    65.50   0.00
+## support                   0.16   0.01    11.23   0.00
+## President_partyR          6.62   0.46    14.29   0.00
+## H_incumbentR             -1.76   0.46    -3.85   0.00
+## -----------------------------------------------------</code></pre>
+<pre><code>## MODEL INFO:
+## Observations: 1132
+## Dependent Variable: D_majorvote_pct
+## Type: OLS linear regression 
+## 
+## MODEL FIT:
+## F(3,1128) = 620.78, p = 0.00
+## R² = 0.62
+## Adj. R² = 0.62 
+## 
+## Standard errors: OLS
+## -----------------------------------------------------
+##                           Est.   S.E.   t val.      p
+## ---------------------- ------- ------ -------- ------
+## (Intercept)              40.37   0.60    67.01   0.00
+## support                   0.16   0.01    11.55   0.00
+## President_partyR          7.50   0.56    13.33   0.00
+## H_incumbentR             -2.04   0.56    -3.64   0.00
+## -----------------------------------------------------</code></pre>
+<pre><code>## MODEL INFO:
+## Observations: 1132
+## Dependent Variable: D_majorvote_pct
+## Type: OLS linear regression 
+## 
+## MODEL FIT:
+## F(5,1126) = 2214.19, p = 0.00
+## R² = 0.91
+## Adj. R² = 0.91 
+## 
+## Standard errors: OLS
+## ------------------------------------------------------------
+##                                  Est.   S.E.   t val.      p
+## ----------------------------- ------- ------ -------- ------
+## (Intercept)                     46.62   0.35   132.89   0.00
+## support                          0.10   0.01    14.41   0.00
+## President_partyR                20.39   0.40    50.62   0.00
+## H_incumbentR                    -4.52   0.22   -20.42   0.00
+## unrate                          -0.48   0.03   -18.80   0.00
+## President_partyR:unrate         -2.64   0.06   -45.74   0.00
+## ------------------------------------------------------------</code></pre>
+<pre><code>## MODEL INFO:
+## Observations: 1132
+## Dependent Variable: D_majorvote_pct
+## Type: OLS linear regression 
+## 
+## MODEL FIT:
+## F(5,1126) = 2576.42, p = 0.00
+## R² = 0.92
+## Adj. R² = 0.92 
+## 
+## Standard errors: OLS
+## ------------------------------------------------------------
+##                                  Est.   S.E.   t val.      p
+## ----------------------------- ------- ------ -------- ------
+## (Intercept)                     47.07   0.34   139.73   0.00
+## support                          0.08   0.01    13.09   0.00
+## President_partyR                20.16   0.42    48.45   0.00
+## H_incumbentR                    -4.79   0.26   -18.28   0.00
+## unrate                          -0.46   0.03   -18.31   0.00
+## President_partyR:unrate         -2.53   0.05   -46.06   0.00
+## ------------------------------------------------------------</code></pre>
+
+
+		
+	</div>
+
+	<div class="pagination">
+		<a href="/post/2022-09-19-economic-forces/" class="left arrow">&#8592;</a>
+
+		<a href="#" class="top">Top</a>
+	</div>
+</main>
+
+
+        		<footer>
+			
+			<span>
+			&copy; <time datetime="2022-09-26 13:59:17.352535 -0400 EDT m=&#43;0.604381832">2022</time> . Made with <a href='https://gohugo.io'>Hugo</a> using the <a href='https://github.com/EmielH/tale-hugo/'>Tale</a> theme.
+			</span>
+		</footer>
+
+    </body>
+</html>
