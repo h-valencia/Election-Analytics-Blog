@@ -1,0 +1,103 @@
+---
+title: Week 4
+author: Hannah Valencia
+date: '2022-09-29'
+slug: []
+categories: []
+tags: []
+summary: "This week we looked at the effect of incumbency on models' predictions. We compared and contrasted various pollsters and models to see which generated the most accurate predictions, which I will continue to look at through visualizations in this blog." 
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+
+# load libraries
+
+library(tidyverse)
+library(usmap)
+library(plotly)
+library(rmapshaper)
+library(sf)
+```
+
+```{r, message=FALSE, warning=FALSE}
+
+# load data
+
+incumb_dist <- read_csv("incumb_dist_1948-2022 (2).csv")
+HVS_district <- read_csv("house party vote share by district 1948-2020.csv")
+expert_rating <- read_csv("expert_rating.csv")
+dist_polls <- read_csv("dist_polls_2018-2022.csv")
+
+cd114 <- st_read("districts114.shp", quiet = TRUE)
+```
+
+
+```{r}
+
+# clean data
+# get labels to match shape file
+
+HVS_district <- HVS_district %>%
+  filter(raceYear == 2018) %>%
+  select(raceYear, State, state_abb, district_num, RepVotesMajorPercent, DemVotesMajorPercent) %>%
+  group_by(district_num, State) %>%
+  mutate(DISTRICT = district_num,
+         STATENAME = State,
+         vsmargin = (RepVotesMajorPercent - DemVotesMajorPercent))
+
+```
+
+```{r}
+
+# make shape file district numeric
+cd114$DISTRICT <- as.numeric(cd114$DISTRICT)
+
+# join election returns with shape files
+cd114 <- cd114 %>% left_join(HVS_district, by=c("DISTRICT", "STATENAME"))
+cd114 <- ms_simplify(cd114)
+
+```
+
+
+```{r}
+ggplot() +
+  geom_sf(data =cd114,aes(fill = vsmargin),
+          inherit.aes = FALSE, alpha = 0.9) +
+  scale_fill_gradient2(low = "blue", mid = "white", high = "red", limits = c(-100, 100)) +
+  theme_void() + coord_sf(xlim = c(-172.27, -66.57), ylim = c(18.55, 71.23), expand = FALSE) + labs(
+              title = "The 2018 Election Vote Share by District and State",
+              subtitle = "Red represents a larger share for Republicans and blue for Democrats") +
+theme(axis.title.x=element_blank(),
+      axis.text.x=element_blank(),
+      axis.ticks.x=element_blank(),
+      axis.title.y=element_blank(),
+      axis.text.y=element_blank(),
+      axis.ticks.y=element_blank())
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

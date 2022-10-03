@@ -1,0 +1,485 @@
+---
+title: "Fundamentals II: Incumbency"
+subtitle: "Gov 1347: Election Analysis"
+author: Kiara Hernandez
+date: \today
+institute: Harvard University
+fontsize: 10pt
+output:
+ beamer_presentation:
+    keep_tex: true
+    theme: metropolis
+    latex_engine: pdflatex
+    slide_level: 2
+    highlight: zenburn
+    incremental: false
+header-includes:
+  \setbeamercolor{frametitle}{bg=purple}
+  \hypersetup{colorlinks,citecolor=orange,filecolor=red,linkcolor=brown,urlcolor=blue}
+# subtitle: 'Gov 1347: Election Analytics'
+---
+<!---classoption: "handout"-->
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse); library(knitr)
+```
+
+# How does Klarner and Buchanan's model work in practice?
+\tiny
+Two approaches outlined:
+
+(1) District-level approach: Polls
+
+(2) Aggregate approach: "National partisan tide" (similar to a fundamentals-only model)
+    -health of the economy, presidential approval, quality of candidates, voting intentions
+    
+Their approach: combine both (similar to what we did last week!)
+  -DV: Democrat two-party voteshare
+  -IVs: (a) district partisan composition
+          (i) past House vote: Democrat two-party voteshare from most recent House election
+          (ii) past presidential vote: district presidential voteshare - national Democratic two-party voteshare 
+  
+  (b) candidate attributes
+    (i) Incumbency
+    (ii) quality candidate, closed: candidate facing an incumbent
+    (iii) quality candidate, open: two non-incumbents
+    (iv) past House member, closed
+    (v) past House member, open
+  
+  (c) national partisan tides
+    (i) Democratic vote intention: % of respondents who expressed intention to vote for Democratic House candidate (Gallup poll ~March 10)
+    (ii) Presidential approval: coded towards Democrats and conditional on party of sitting president (if Dem president, approval rate; if Rep president, disapproval rate) (Gallup poll ~March 10)
+    (iii) change in RDI: percent change per capita RDI, February of year before election year - February of election year
+    (iv) Midterm penalty: president's party should lose votes
+
+# Individual seat prediction: A district with (pretty) good polling data
+## Example: Ohio District 01 (3901)
+
+```{r, eval = TRUE, echo=FALSE, message=FALSE, warning=FALSE}
+# load polling data
+dist_polls_2018_2022 <- read_csv("dist_polls_2018-2022.csv")
+
+# subset
+polls_df <- dist_polls_2018_2022 %>%
+  select(pollster, sponsors, display_name, fte_grade,
+         start_date, end_date, sample_size, population, cycle, election_date,
+         party, candidate_name, pct, st_cd_fips) %>%
+  rename('year' = 'cycle') %>% # for merging
+  filter(st_cd_fips == '3901')
+
+# merge with incumbency data
+# load data
+incumb_df <- read_csv("incumb_dist_1948-2022 (2).csv")
+# filter for specific district and year
+oh <- NA
+oh <- incumb_df %>%
+  filter(year == c('2018', '2020'), st_cd_fips == '3901')
+
+# join by 'year'
+oh <- left_join(oh, polls_df)
+
+# code new incumbent variable
+oh <- oh %>%
+              mutate(INCUMB = case_when(winner_party == 'R' & RepStatus == 'Incumbent' ~  TRUE,
+                              winner_party == 'D' & DemStatus == 'Incumbent' ~ TRUE,
+                              winner_party == 'R' & RepStatus == 'Challenger' ~  FALSE,
+                              winner_party == 'D' & DemStatus == 'Challenger' ~  FALSE))
+
+# fit lm
+dat_poll_inc <- oh[oh$INCUMB,]
+#dat_poll_chl <- oh[!oh$INCUMB,]
+mod_poll_inc <- lm(RepVotesMajorPercent ~ pct, data = dat_poll_inc)
+#mod_poll_chl <- lm(DemVotesMajorPercent ~ pct, data = dat_poll_chl)
+
+# assess model
+# summary(mod_poll_inc)
+
+## in-sample fit
+mean(abs(mod_poll_inc$residuals))
+
+plot(mod_poll_inc$fitted.values, oh$RepVotesMajorPercent,
+       main="polls (incumbent)", xlab="predicted", ylab="true", 
+       cex.lab=2, cex.main=2, type='n',xlim=c(40,55),ylim=c(40,55))
+  text(mod_poll_inc$fitted.values, oh$RepVotesMajorPercent, oh$year)
+  abline(a=0, b=1, lty=2)
+  
+## out-of-sample evaluation - 2018
+outsamp_mod1 <- lm(RepVotesMajorPercent ~ pct, 
+                   dat_poll_inc[dat_poll_inc$year != 2018,]) 
+                    
+outsamp_pred <- predict(outsamp_mod1, 
+                        dat_poll_inc[dat_poll_inc$year != 2018,]) 
+
+outsamp_true <- oh$RepVotesMajorPercent[oh$year == 2018]   
+
+head(outsamp_pred - outsamp_true, 1)
+
+## out-of-sample evaluation - 2020
+outsamp_mod1 <- lm(RepVotesMajorPercent ~ pct, 
+                   dat_poll_inc[dat_poll_inc$year != 2020,]) 
+                    
+outsamp_pred <- predict(outsamp_mod1, 
+                        dat_poll_inc[dat_poll_inc$year != 2020,]) 
+
+outsamp_true <- oh$RepVotesMajorPercent[oh$year == 2020]   
+
+head(outsamp_pred - outsamp_true, 1)
+## if we could do leave-one-out validation
+# years_outsamp <- sample(oh$year, 1)
+# mod <- lm(RepVotesMajorPercent ~ pct,
+#           dat_poll_inc[!(dat_poll_inc$year %in% years_outsamp),])
+# outsamp_pred <- predict(mod,
+#                 newdata = dat_poll_inc[dat_poll_inc$year %in% 
+#                                  years_outsamp,])
+# mean(outsamp_pred - oh$RepVotesMajorPercent[oh$year 
+#                                             %in% years_outsamp])
+# 
+# sqrt(mean(outsamp_pred - oh$RepVotesMajorPercent[oh$year 
+#                                             %in% years_outsamp])^2)
+
+# predict 2022
+oh_22 <- polls_df %>%
+  filter(st_cd_fips == '3901', year == 2022, party == 'REP')
+
+pred_poll_inc <- predict(mod_poll_inc, oh_22, 
+                          interval = "prediction", level=0.95)
+pred_poll_inc
+
+# taking it further (following 538)
+# weight based on sample size
+
+# weight based on recency
+
+# weight based on pollster ratings
+
+```
+\pause
+```{r, echo=TRUE, eval= TRUE}
+# predict 2022
+oh_22 <- polls_df %>%
+  filter(st_cd_fips == '3901', year == 2022, party == 'REP')
+
+pred_poll_inc <- predict(mod_poll_inc, oh_22, 
+                          interval = "prediction", level=0.95)
+pred_poll_inc
+```
+
+
+# Individual seat prediction: A district with bad polling data
+## Example: Florida District 18 (something with similar demographics or likely R)
+  We will "borrow" data from a district that is comparable on relevant variables to OH01. 
+  Q: What do you consider relevant variables? What is a reasonable margin for comparison?
+  
+  General process:
+      (1) Choose a district that is comparable on relevant demographic and electoral characteristics
+      (2) Append polls
+      (3) Consider weighting here: we probably want to attach smaller weights to the borrowed polls
+      or account in some other way for the fact that they are borrowed.
+      (4) Model
+      (5) Predict
+
+\begin{figure}
+\includegraphics[width=0.98\textwidth]{comparison table.png}
+\end{figure}
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+# # find a district with low number of polls
+# # table(dist_polls_2018_2022$st_cd_fips) 
+# 
+# # create demographic table for example
+# CPVI <- c('R+5')
+# VAP <- c(551000)
+# black_vap <- c(0.21*551000)
+# white_vap <- c(0.74*551000)
+# foreignborn_vap <- c(0.04*551000)
+# median_income_all <- c('$64000')
+# bachelors_degree_all <- c(0.34*551000)
+# urban <- c("92.5%")
+# rural <- c("7.5%")
+# 
+# demogs_OH <- c('CPVI', 'VAP', 'black_vap','white_vap',
+#             'foreignborn_vap', 'median_income_all', 
+#             'bachelors_degree_all',
+#             'urban', 'rural')
+# var <- c(CPVI, VAP, black_vap, white_vap,
+#                     foreignborn_vap,
+#                     median_income_all, 
+#                     bachelors_degree_all, urban, rural)
+# df_oh01 <- data.frame(demogs_OH, var)
+# df_oh01 
+# 
+# 
+# # compare with FL12
+# CPVI <- c('R+5')
+# VAP <- c(556783)
+# black_vap <- c(0.127*556783)
+# white_vap <- c(0.684*556783)
+# foreignborn_vap <- c(0.156*556783)
+# median_income_all <- c('$68744')
+# bachelors_degree_all <- c(0.34*556783)
+# urban <- c("96.37%")
+# rural <- c("3.63%")
+# 
+# demogs_FL <- c('CPVI', 'VAP', 'black_vap','white_vap',
+#             'foreignborn_vap', 'median_income_all', 
+#             'bachelors_degree_all',
+#             'urban', 'rural')
+# var <- c(CPVI, VAP, black_vap, white_vap,
+#                     foreignborn_vap,
+#                     median_income_all, 
+#                     bachelors_degree_all, urban, rural)
+# df_fl18 <- data.frame(demogs_FL, var)
+# df_fl18
+
+```
+\pause
+
+```{r, echo=TRUE, eval = TRUE, message=FALSE, warning=FALSE}
+# compare
+# data.frame(df_oh01, df_fl18) %>%
+#   kable(format = "latex")
+
+```
+
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+# # load polling data
+# dist_polls_2018_2022 <- read_csv("dist_polls_2018-2022.csv")
+# table(dist_polls_2018_2022$st_cd_fips)
+# # subset
+# polls_df <- dist_polls_2018_2022 %>%
+#   select(pollster, sponsors, display_name, fte_grade,
+#          start_date, end_date, sample_size, population, cycle, election_date,
+#          party, candidate_name, pct, st_cd_fips) %>%
+#   rename('year' = 'cycle') %>% # for merging
+#   filter(st_cd_fips == '1218')
+# 
+# # merge with incumbency data
+# # load data
+# incumb_df <- read_csv("incumb_dist_1948-2022 (2).csv")
+# # filter for specific district and year
+# fl <- NA
+# fl <- incumb_df %>%
+#   filter(st_cd_fips == '1218') %>%
+#   filter(year == c(2020, 2018))
+# 
+# # join by 'year'
+# fl <- left_join(fl, polls_df)
+# 
+# # code new incumbent variable
+# fl <- fl %>%
+#               mutate(INCUMB = case_when(winner_party == 'R' & RepStatus == 'Incumbent' 
+#                                         & party == 'DEM'~  FALSE,
+#                                         winner_party == 'R' & RepStatus == 'Incumbent' 
+#                                         & party == 'REP'~  TRUE))
+# # drop NAs
+# fl <- fl %>%
+#   drop_na(INCUMB)
+# append polls from OH01
+
+# # fit lm
+# dat_poll_inc <- fl[fl$INCUMB,]
+# dat_poll_chl <- fl[!fl$INCUMB,]
+# mod_poll_inc <- lm(RepVotesMajorPercent ~ pct, data = dat_poll_inc)
+# mod_poll_chl <- lm(DemVotesMajorPercent ~ pct, data = dat_poll_chl)
+# 
+# # assess model
+# summary(mod_poll_inc)
+# summary(mod_poll_chl)
+# 
+# ## in-sample fit
+# mean(abs(mod_poll_inc$residuals))
+# mean(abs(mod_poll_chl$residuals))
+# 
+# plot(mod_poll_inc$fitted.values, fl$RepVotesMajorPercent,
+#        main="polls (incumbent)", xlab="predicted", ylab="true", 
+#        cex.lab=2, cex.main=2, type='n',xlim=c(40,55),ylim=c(40,55))
+#   text(mod_poll_inc$fitted.values, fl$RepVotesMajorPercent, fl$year)
+#   abline(a=0, b=1, lty=2)
+#   
+# ## out-of-sample evaluation - 2018
+# outsamp_mod1 <- lm(RepVotesMajorPercent ~ pct, 
+#                    dat_poll_inc[dat_poll_inc$year != 2018,]) 
+#                     
+# outsamp_pred <- predict(outsamp_mod1, 
+#                         dat_poll_inc[dat_poll_inc$year != 2018,]) 
+# 
+# outsamp_true <- fl$RepVotesMajorPercent[oh$year == 2018]   
+# 
+# head(outsamp_pred - outsamp_true, 1)
+# 
+# ## out-of-sample evaluation - 2020
+# outsamp_mod1 <- lm(RepVotesMajorPercent ~ pct, 
+#                    dat_poll_inc[dat_poll_inc$year != 2020,]) 
+#                     
+# outsamp_pred <- predict(outsamp_mod1, 
+#                         dat_poll_inc[dat_poll_inc$year != 2020,]) 
+# 
+# outsamp_true <- fl$RepVotesMajorPercent[oh$year == 2020]   
+# 
+# head(outsamp_pred - outsamp_true, 1)
+# ## if we could do leave-one-out validation
+# # years_outsamp <- sample(oh$year, 1)
+# # mod <- lm(RepVotesMajorPercent ~ pct,
+# #           dat_poll_inc[!(dat_poll_inc$year %in% years_outsamp),])
+# # outsamp_pred <- predict(mod,
+# #                 newdata = dat_poll_inc[dat_poll_inc$year %in% 
+# #                                  years_outsamp,])
+# # mean(outsamp_pred - oh$RepVotesMajorPercent[oh$year 
+# #                                             %in% years_outsamp])
+# # 
+# # sqrt(mean(outsamp_pred - oh$RepVotesMajorPercent[oh$year 
+# #                                             %in% years_outsamp])^2)
+# 
+# # predict 2022
+# fl_22 <- polls_df %>%
+#   filter(st_cd_fips == '1218', year == 2022, party == 'REP')
+# 
+# pred_poll_inc <- predict(mod_poll_inc, fl_22, 
+#                           interval = "prediction", level=0.95)
+# pred_poll_inc
+# 
+# # taking it further (following 538)
+# # weight based on sample size
+# 
+# # weight based on recency
+# 
+# # weight based on pollster ratings
+
+
+```
+
+# Aggregating seat predictions
+
+As we just saw, predicting individual seats involves a lot of discrete work. 
+
+See Yao's code in the Class dropbox for starter code on how to do aggregate our seat-level predictions.
+
+# The incumbency advantage
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+library(tidyverse)
+library(knitr)
+library(readr)
+incumb_df <- read_csv("~/Dropbox/ElectionAnalytics_Midterms/Lab sessions/fundamentals II_ incumbency/incumb_dist_1948-2020.csv") # replace with your wd()
+
+incumb_df <- 
+  incumb_df %>%
+  mutate(winner_candidate = case_when(winner_party == 'R' ~ 'RepCandidate',
+                                      TRUE ~ 'DemCandidate'),
+         winner_candidate_inc = case_when(winner_candidate == 'RepCandidate' & RepStatus == 'Incumbent' ~ "Incumbent",
+                                                 winner_candidate == 'RepCandidate' & RepStatus == 'Challenger' ~ "Challenger",
+                                             winner_candidate == 'DemCandidate' & DemStatus == 'Incumbent' ~ "Incumbent",
+                                             winner_candidate == 'DemCandidate' & DemStatus == 'Challenger' ~ "Challenger",
+                                             TRUE ~ "Challenger"))
+```
+
+## The incumbency advantage: descriptive statistics
+
+How many post-war elections where \textcolor{purple}{incumbent candidate won?} \pause
+\footnotesize
+```{r, warning=FALSE, message=FALSE}
+# in how many elections did the incumbent candidate win
+incumb_df %>%
+  select(year, winner_party, winner_candidate, winner_candidate_inc) %>%
+  mutate(winparty_last = lag(winner_party, order_by = year),
+        wincand_last  = lag(winner_candidate,  order_by = year),
+        wincand_last_inc  = lag(winner_candidate_inc,  order_by = year)) %>%
+  mutate(reelect.cand = wincand_last_inc == winner_candidate_inc) %>%
+  filter(year > 1948) %>%
+  group_by(reelect.cand) %>% 
+  summarise(n = n()) %>% 
+  as.data.frame() %>%
+  kable(format = "latex")
+
+```
+
+## The incumbency advantage: descriptive statistics
+
+How many post-war elections where \textcolor{purple}{incumbent party won?}
+\footnotesize
+```{r, warning=FALSE, message=FALSE}
+incumb_df %>%
+  select(year, winner_party, winner_candidate, winner_candidate_inc) %>%
+  mutate(winparty_last = lag(winner_party, order_by = year),
+        wincand_last  = lag(winner_candidate,  order_by = year)) %>%
+  mutate(reelect.party = winparty_last == winner_party) %>%
+  filter(year > 1948) %>%
+  group_by(reelect.party) %>% 
+  summarise(n = n()) %>% 
+  as.data.frame() %>%
+  kable(format = "latex")
+
+```
+
+<!--
+Comports with what see saw in the Lecture video: incumbents often win, yet the incumbent party is still punished
+-->
+
+## So, what's the deal with incumbency?
+
+\textbf{Some incumbency advantages}: \pause
+
+  * More media coverage
+  * Campaign finance access \pause
+  * \textbf{\textcolor{pink}In the presidential context, {"Pork"}} $\rightsquigarrow$ short-term economic gains (Bartels 2008), 
+  credit-claiming (Kriner and Reeves 2012)
+
+\textbf{Some incumbency (dis/non-)advantages}: \pause
+
+  * Polarized electorate $\rightsquigarrow$ partisanship, not incumbency matters (Donovan et al. 2019)
+  * Recessions, disasters $\rightsquigarrow$ blame attribution (Achen and Bartels 2016)
+  * Incumbency fatigue
+
+## (2) Credit and blame: the time-for-change model
+\pause 
+Alan Abramowitz's \textbf{time-for-change} model is a classic model of incumbency
+and, since 1992, has a \underline{true} out-of-sample PV prediction error of $1.7\%$ 
+\textcolor{red}{(Typically used in the presidential forecasting context, but if we consider the fact 
+that midterm elections are often referenda on the president, it may be relevant).}
+
+$$
+\underbrace{\texttt{pv2p}}_{incumbent \ party} = A + B_1 \underbrace{\texttt{G2GDP}}_{Q2 \ \ GDP \ growth} + B_2 \underbrace{\texttt{NETAPP}}_{Gallup \ job \ approval} + B_3 \underbrace{\texttt{TERM1INC}}_{sitting \ pres}
+$$
+\tiny
+\begin{center}
+\href{https://pollyvote.com/en/components/models/retrospective/fundamentals-plus-models/time-for-change-model/}{(\texttt{pollyvote.com} model repo)}
+\end{center}
+\normalsize
+
+# Preview of next week: Probabilistic models
+
+## One major problem with linear regression
+
+* When we fit a linear regression model $Y = \alpha + \beta X$, there are no restrictions on $Y$. What's wrong with that? \pause
+
+* $\rightsquigarrow$ It is possible to have a prediction interval lower bound $< 0$ (\textbf{out of support}). \pause
+
+* \textbf{This often occurs when we are extrapolating but also when there is sparse data} \pause \textbf{(e.g. district-level polls).}
+
+## Solution: probabilistic models
+
+* In a linear regression, $$DemPV_{state} = \alpha + \beta_1 x_1 + \ldots + \beta_k x_k,$$ our probabilistic assumption is that errors in predicted PV follow a bell curve, $DemPV_{state} - \widehat{DemPV_{state}} \sim Normal()$ \pause
+
+* In reality, the process of elections is some "draw" of voters from the voter-eligible population (VEP) turning out to vote for a party: \small
+$$
+\Pr\Big(DemPV_{district} = \texttt{2  million} \ | \ VEP_{district} = \texttt{5  million}\Big) = 
+f(\alpha + \beta_1 x_1 + \ldots + \beta_k x_k)
+$$ 
+with some other probabilistic assumption, $DemPV_{district} \sim ?$. \pause
+
+* A model that allows the DV or error to have a non-normal distribution (specified by a particular choice of function $f(\cdot)$) is called a \textbf{generalized linear model} $\rightsquigarrow$ \textcolor{red}{more on this and how to apply them in \textsf{R} next time!}
+
+## Blog Extensions
+\tiny
+1. \textbf{How accurate are expert predictions? pt.1} Visualize actual voteshare (seatshare) in 2018 and compare that to various expert predictions for that election cycle. How do they compare? 
+
+2. \textbf{How accurate are expert predictions? pt.2} Visualize actual voteshare (seatshare) in 2018 and compare that to various expert predictions for that election cycle. How do they compare? Create 3 maps: (1) a map that visualizes voteshare (seatshare) at the district-level; (2) a map that visualizes expert predictions at the district-level; (3) a map that visualizes the difference between actual voteshare and expert prediction at the district-level.
+
+This is going to require you to use your own discretion in coding up variables.
+
+On (2): these expert predictions are in the form of "lean D/R," "likely D/R," etc. Transform these variables into a continuous numeric variable, i.e. "Likely R" ~ -2, "Lean R" ~ -1, "Tossup" ~ 0, "Lean D" ~ 1, "Likely D" ~ 2, and so on. Visualize the results.
+
+On (3): you will need to figure out how to compare voteshare and expert predictions. One possibility: transform one of the variables to be on the same scale as the other variable. Ex: voteshare of 54% for Democrats ~ "Safe D," voteshare of 52% for Democrats ~ "Likely D," etc. or vice versa, "Safe D" district ~ "54% voteshare" ...
+
