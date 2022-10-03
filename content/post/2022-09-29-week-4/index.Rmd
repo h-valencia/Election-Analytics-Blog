@@ -46,38 +46,109 @@ HVS_district <- HVS_district %>%
          STATENAME = State,
          vsmargin = (RepVotesMajorPercent - DemVotesMajorPercent))
 
-```
-
-```{r}
-
 # make shape file district numeric
 cd114$DISTRICT <- as.numeric(cd114$DISTRICT)
 
 # join election returns with shape files
-cd114 <- cd114 %>% left_join(HVS_district, by=c("DISTRICT", "STATENAME"))
-cd114 <- ms_simplify(cd114)
+cd114_map1 <- cd114 %>% left_join(HVS_district, by=c("DISTRICT", "STATENAME"))
+cd114_map1 <- ms_simplify(cd114_map1)
 
 ```
 
 
 ```{r}
+
+# actual results
+# plot US Map with each district shaded by the vote share margin from the 2018 election
+
 ggplot() +
-  geom_sf(data =cd114,aes(fill = vsmargin),
+  geom_sf(data =cd114_map1, aes(fill = vsmargin),
           inherit.aes = FALSE, alpha = 0.9) +
-  scale_fill_gradient2(low = "blue", mid = "white", high = "red", limits = c(-100, 100)) +
-  theme_void() + coord_sf(xlim = c(-172.27, -66.57), ylim = c(18.55, 71.23), expand = FALSE) + labs(
-              title = "The 2018 Election Vote Share by District and State",
-              subtitle = "Red represents a larger share for Republicans and blue for Democrats") +
-theme(axis.title.x=element_blank(),
-      axis.text.x=element_blank(),
-      axis.ticks.x=element_blank(),
-      axis.title.y=element_blank(),
-      axis.text.y=element_blank(),
-      axis.ticks.y=element_blank())
+  scale_fill_gradient2(low = "blue", mid = "white", high = "red", 
+                       limits = c(-100, 100),
+                       name = "Vote Share Margin") +
+  theme_void() + 
+  coord_sf(xlim = c(-172.27, -66.57), ylim = c(18.55, 71.23), expand = FALSE) + 
+  labs(title = "Vote Share Margin by District for 2018",
+       subtitle = "Red for Republican and blue for Democratic majorities") +
+  theme(axis.title.x=element_blank(),
+        axis.text.x=element_blank(),
+        axis.ticks.x=element_blank(),
+        axis.title.y=element_blank(),
+        axis.text.y=element_blank(),
+        axis.ticks.y=element_blank())
+
+```
+
+```{r}
+
+# cleaning poll data to match format of actual vote share data
+
+dist_polls1 <- dist_polls %>%
+  filter(cycle == 2018) %>%
+  
+  # vars I think might be handy to have but do not presently need
+  # select(cycle, question_id, pollster, fte_grade, state, race_id, seat_number, party, answer, pct, cd_fips, st_fips, st_cd_fips) %>% 
+  
+  # super simple list of vars that I need
+  select(question_id, st_cd_fips, state, seat_number, party, pct) %>%
+  filter(party == c("DEM", "REP")) %>%
+  pivot_wider(names_from = party, values_from = pct) %>%
+  mutate(DISTRICT = seat_number,
+         STATENAME = state,
+         vsmargin = (REP - DEM),
+         st_cd_fips = as.numeric(st_cd_fips))
+
+# making a for loop to average the vote share margin estimated across polls for each district
+# creating an empty row for the average
+dist_polls1$vsmargin_avg <- NA
+
+
+# looping by each district fips code
+for(i in 1:max(dist_polls1$st_cd_fips)){
+  x <- dist_polls1 %>% filter(st_cd_fips == i)    # filter by each district
+  vsavg <- mean(x$vsmargin)    # take the mean of the vote share margin across all the polls for the district
+  
+  dist_polls1$vsmargin_avg[dist_polls1$st_cd_fips == i] <- vsavg    # save the average VS margin to the original dataframe
+}
+
+```
+
+```{r}
+
+# keeping only the necessary information for the map
+# removing duplicate rows for each district using distinct
+
+dist_polls1 <- dist_polls1 %>%
+  select(DISTRICT, STATENAME, vsmargin_avg) %>%
+  distinct()
+
+cd114_map2 <- cd114 %>% left_join(dist_polls1, by=c("DISTRICT", "STATENAME"))
+cd114_map2 <- ms_simplify(cd114_map2)
 ```
 
 
+```{r}
 
+# poll predictions
+
+ggplot() +
+  geom_sf(data =cd114_map2, aes(fill = vsmargin_avg),
+          inherit.aes = FALSE, alpha = 0.9) +
+  scale_fill_gradient2(low = "blue", mid = "white", high = "red", 
+                       limits = c(-100, 100),
+                       name = "Vote Share Margin") +
+  theme_void() + 
+  coord_sf(xlim = c(-172.27, -66.57), ylim = c(18.55, 71.23), expand = FALSE) + 
+  labs(title = "Predicted Vote Share Margin by District for 2018",
+       subtitle = "Average vote share margin across polls for each district in 2018") +
+  theme(axis.title.x=element_blank(),
+        axis.text.x=element_blank(),
+        axis.ticks.x=element_blank(),
+        axis.title.y=element_blank(),
+        axis.text.y=element_blank(),
+        axis.ticks.y=element_blank())
+```
 
 
 
