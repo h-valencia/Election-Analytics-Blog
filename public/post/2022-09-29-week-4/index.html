@@ -74,6 +74,8 @@
 <p>Looking at the map, we see strong Democratic predictions along the west and east coasts, and scattered around some major cities in in the middle of the country. The map appears heavily red, however, as some parts of the less-populated Midwest have larger districts. Most districts across the map appear to be Solid D or Solid R, as shown by their darker hues. There are some districts that are lighter shades or white, representing a prediction of a closer election where one party only has a lean estimated vote, but as it appears here and as we know from our discussions in class, there are many districts that can be counted on going one way.</p>
 <p><img src="http://example.org/post/2022-09-29-week-4/index_files/figure-html/unnamed-chunk-4-1.png" width="672" /></p>
 <p>While comparing the two maps above, we can see obvious differences in the coloring, with the poll predictions having lots of darker hues and the actual vote share map showing many mid hues. This would lead us to believe that the election was more competitive than pollsters predicted. However, in the map below we will account for the difference in scales and measure the difference between the actual vote share on the 7-point scale versus the predicted vote on the 7-point scale.</p>
+<p>I coded the 1-7 variables off of the actual vote shares for each district. For Democratic or Republican two-party vote shares greater than 56% majority, I coded these as 1 and 7 respectively, representing Solid Democrat and Solid Republican. Vote shares between 54% and 56% for each party I thought of as being likely democrat/republican, and therefore coded them as 2 and 6. Vote shares between 52% and 54% I thought of as leans for each party, and coded them as 3 and 5. Finally, vote shares between 48% and 52% I consider to be toss-ups, coding these districts as a 4.</p>
+<p>After transforming these variables to be on the same scale as the polling predictions, I took the difference of the actual results minus the poll predicted results. This difference is depicted on the map below, which we see as being mostly white and light colors. The white represents 0 difference between the actual and predicted levels, and the significant amounts of white on the map show us that the pollsters did a good job estimating the election. The light coloring shows the places where the actual vote was more Republican (red) or Democratic (blue) than the pollsters predcited. We do not see dark colors on the map, so even when the difference was not 0, the polls were still fairly representative of the outcome.</p>
 <p><img src="http://example.org/post/2022-09-29-week-4/index_files/figure-html/unnamed-chunk-6-1.png" width="672" /></p>
 
 
@@ -91,7 +93,7 @@
         		<footer>
 			
 			<span>
-			&copy; <time datetime="2022-10-03 22:50:46.889048 -0400 EDT m=&#43;1.834955044">2022</time> . Made with <a href='https://gohugo.io'>Hugo</a> using the <a href='https://github.com/EmielH/tale-hugo/'>Tale</a> theme.
+			&copy; <time datetime="2022-10-03 23:12:31.109393 -0400 EDT m=&#43;1.305803710">2022</time> . Made with <a href='https://gohugo.io'>Hugo</a> using the <a href='https://github.com/EmielH/tale-hugo/'>Tale</a> theme.
 			</span>
 		</footer>
 

@@ -137,7 +137,9 @@ ggplot() +
 
 While comparing the two maps above, we can see obvious differences in the coloring, with the poll predictions having lots of darker hues and the actual vote share map showing many mid hues. This would lead us to believe that the election was more competitive than pollsters predicted. However, in the map below we will account for the difference in scales and measure the difference between the actual vote share on the 7-point scale versus the predicted vote on the 7-point scale.
 
+I coded the 1-7 variables off of the actual vote shares for each district. For Democratic or Republican two-party vote shares greater than 56% majority, I coded these as 1 and 7 respectively, representing Solid Democrat and Solid Republican. Vote shares between 54% and 56% for each party I thought of as being likely democrat/republican, and therefore coded them as 2 and 6. Vote shares between 52% and 54% I thought of as leans for each party, and coded them as 3 and 5. Finally, vote shares between 48% and 52% I consider to be toss-ups, coding these districts as a 4.
 
+After transforming these variables to be on the same scale as the polling predictions, I took the difference of the actual results minus the poll predicted results. This difference is depicted on the map below, which we see as being mostly white and light colors. The white represents 0 difference between the actual and predicted levels, and the significant amounts of white on the map show us that the pollsters did a good job estimating the election. The light coloring shows the places where the actual vote was more Republican (red) or Democratic (blue) than the pollsters predcited. We do not see dark colors on the map, so even when the difference was not 0, the polls were still fairly representative of the outcome.
 
 ```{r}
 
@@ -168,7 +170,7 @@ ggplot() +
           inherit.aes = FALSE, alpha = 0.9) +
   scale_fill_gradient2(low = "blue", mid = "white", high = "red", 
                        limits = c(-7, 7),
-                       name = "Difference in Vote Share Margins (actual - predicted)") +
+                       name = "Difference in Vote (actual - predicted)") +
   theme_void() + 
   coord_sf(xlim = c(-172.27, -66.57), ylim = c(18.55, 71.23), expand = FALSE) + 
   labs(title = "Difference Between Actual and Predicted Vote Share Margin by District for 2018",
