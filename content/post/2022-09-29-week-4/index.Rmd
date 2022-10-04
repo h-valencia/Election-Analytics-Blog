@@ -8,6 +8,10 @@ tags: []
 summary: "This week we looked at the effect of incumbency on models' predictions. We compared and contrasted various pollsters and models to see which generated the most accurate predictions, which I will continue to look at through visualizations in this blog." 
 ---
 
+*This blog is part of a series related to Gov 1347: Election Analytics, a course at [Harvard University](https://www.harvard.edu/) taught by Professor [Ryan D. Enos](http://ryandenos.com/)*.
+
+This week we looked at the effect of incumbency on models' predictions. We compared and contrasted various pollsters and models to see which generated the most accurate predictions, which I will continue to look at through visualizations in this blog.
+
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = FALSE)
 
@@ -28,10 +32,10 @@ incumb_dist <- read_csv("incumb_dist_1948-2022 (2).csv")
 HVS_district <- read_csv("house party vote share by district 1948-2020.csv")
 expert_rating <- read_csv("expert_rating.csv")
 dist_polls <- read_csv("dist_polls_2018-2022.csv")
+ratings_share <- read_csv("2018_ratings_share.csv")
 
 cd114 <- st_read("districts114.shp", quiet = TRUE)
 ```
-
 
 ```{r}
 
@@ -54,6 +58,8 @@ cd114_map1 <- cd114 %>% left_join(HVS_district, by=c("DISTRICT", "STATENAME"))
 cd114_map1 <- ms_simplify(cd114_map1)
 
 ```
+
+Last week, we looked at national data from generic ballot polls which gave us a general sense of political sentiment across the nation. While this data can be a good indicator for predicting elections, this
 
 
 ```{r}
@@ -82,66 +88,79 @@ ggplot() +
 
 ```{r}
 
-# cleaning poll data to match format of actual vote share data
+# using Ethan's cleaned data as shared on Slack to get the polling data for all congressional districts.
+# when using the section data provided, only 135 observations were available, making the map mostly grey (NAs)
 
-dist_polls1 <- dist_polls %>%
-  filter(cycle == 2018) %>%
-  
-  # vars I think might be handy to have but do not presently need
-  # select(cycle, question_id, pollster, fte_grade, state, race_id, seat_number, party, answer, pct, cd_fips, st_fips, st_cd_fips) %>% 
-  
-  # super simple list of vars that I need
-  select(question_id, st_cd_fips, state, seat_number, party, pct) %>%
-  filter(party == c("DEM", "REP")) %>%
-  pivot_wider(names_from = party, values_from = pct) %>%
-  mutate(DISTRICT = seat_number,
-         STATENAME = state,
-         vsmargin = (REP - DEM),
-         st_cd_fips = as.numeric(st_cd_fips))
+# separating the state name and district into their own columns
+ratings_share1 <- ratings_share %>%
+  separate(District, c("stateabb", "DISTRICT"), "-")
 
-# making a for loop to average the vote share margin estimated across polls for each district
-# creating an empty row for the average
-dist_polls1$vsmargin_avg <- NA
+# changing the state from abbreviations to names
+ratings_share1$STATENAME <- state.name[match(ratings_share1$stateabb, state.abb)]
 
+# matching the class of the variables to that of the cd114 shape file data
+ratings_share1 <- ratings_share1 %>%
+  mutate(STATENAME = as.character(STATENAME),
+         DISTRICT = as.numeric(DISTRICT))
 
-# looping by each district fips code
-for(i in 1:max(dist_polls1$st_cd_fips)){
-  x <- dist_polls1 %>% filter(st_cd_fips == i)    # filter by each district
-  vsavg <- mean(x$vsmargin)    # take the mean of the vote share margin across all the polls for the district
-  
-  dist_polls1$vsmargin_avg[dist_polls1$st_cd_fips == i] <- vsavg    # save the average VS margin to the original dataframe
-}
+# joining the data together
+cd114_map5 <- cd114 %>% left_join(ratings_share1, by=c("DISTRICT", "STATENAME"))
+cd114_map5 <- ms_simplify(cd114_map5)
+
+# plot
+ggplot() +
+  geom_sf(data =cd114_map5, aes(fill = avg),
+          inherit.aes = FALSE, alpha = 0.9) +
+  scale_fill_gradient2(low = "blue", mid = "white", high = "red",
+                       limits = c(1, 7),
+                       name = "Predicted Vote") +
+  theme_void() +
+  coord_sf(xlim = c(-172.27, -66.57), ylim = c(18.55, 71.23), expand = FALSE) +
+  labs(title = "Predicted Vote by District for 2018",
+       subtitle = "Average predicted vote across polls for each district in 2018 from Solid D (1) to Solid R (7)") +
+  theme(axis.title.x=element_blank(),
+        axis.text.x=element_blank(),
+        axis.ticks.x=element_blank(),
+        axis.title.y=element_blank(),
+        axis.text.y=element_blank(),
+        axis.ticks.y=element_blank())
 
 ```
 
 ```{r}
 
-# keeping only the necessary information for the map
-# removing duplicate rows for each district using distinct
+# Transforming the variables for the percent vote share to align with the 1-7 D/R scale
 
-dist_polls1 <- dist_polls1 %>%
-  select(DISTRICT, STATENAME, vsmargin_avg) %>%
-  distinct()
+cd114_map1a <- cd114_map1 %>%
+  mutate(scaledvs = case_when(DemVotesMajorPercent >= 56 ~ 1,
+                              DemVotesMajorPercent >= 54 & DemVotesMajorPercent < 56 ~ 2,
+                              DemVotesMajorPercent >=52 & DemVotesMajorPercent < 54 ~ 3,
+                              DemVotesMajorPercent >= 48 & DemVotesMajorPercent < 52 ~ 4,
+                              RepVotesMajorPercent >= 52 & RepVotesMajorPercent < 54 ~ 5,
+                              RepVotesMajorPercent >= 54 & RepVotesMajorPercent < 56 ~ 6,
+                              TRUE ~ 7))
 
-cd114_map2 <- cd114 %>% left_join(dist_polls1, by=c("DISTRICT", "STATENAME"))
-cd114_map2 <- ms_simplify(cd114_map2)
+# combining the data and taking the difference between the actual and predicted
+
+cd114_map5$scaledvs <- cd114_map1a$scaledvs[match(cd114_map5$ID, cd114_map1a$ID)]
+cd114_map5$vs_diff <- (cd114_map5$scaledvs - cd114_map5$avg)
+
 ```
-
 
 ```{r}
 
-# poll predictions
+# plotting the difference of the actual vote and the poll predicted vote on the 1-7 scale
 
 ggplot() +
-  geom_sf(data =cd114_map2, aes(fill = vsmargin_avg),
+  geom_sf(data =cd114_map5, aes(fill = vs_diff),
           inherit.aes = FALSE, alpha = 0.9) +
   scale_fill_gradient2(low = "blue", mid = "white", high = "red", 
-                       limits = c(-100, 100),
-                       name = "Vote Share Margin") +
+                       limits = c(-7, 7),
+                       name = "Difference in Vote Share Margins (actual - predicted)") +
   theme_void() + 
   coord_sf(xlim = c(-172.27, -66.57), ylim = c(18.55, 71.23), expand = FALSE) + 
-  labs(title = "Predicted Vote Share Margin by District for 2018",
-       subtitle = "Average vote share margin across polls for each district in 2018") +
+  labs(title = "Difference Between Actual and Predicted Vote Share Margin by District for 2018",
+       subtitle = "Red for more actual Republican votes than predicted, blue for more Democrat") +
   theme(axis.title.x=element_blank(),
         axis.text.x=element_blank(),
         axis.ticks.x=element_blank(),
@@ -151,6 +170,145 @@ ggplot() +
 ```
 
 
+
+
+
+
+
+
+
+```{r, warning=FALSE, eval=FALSE}
+
+# using the expert rating data but missing many districts
+
+# expert_rating1 <- expert_rating %>%
+#   filter(year == 2018) %>%
+#   select(state, district, cook, sabatos_crystal_ball, real_clear) %>%
+#   mutate(STATENAME = state,
+#          DISTRICT = as.numeric(district),
+#          avg_pred = ((cook + sabatos_crystal_ball + real_clear)/3))
+# 
+# cd114_map4 <- cd114 %>% left_join(expert_rating1, by=c("DISTRICT", "STATENAME"))
+# cd114_map4 <- ms_simplify(cd114_map4)
+# 
+# ggplot() +
+#   geom_sf(data =cd114_map4, aes(fill = avg_pred),
+#           inherit.aes = FALSE, alpha = 0.9) +
+#   scale_fill_gradient2(low = "blue", high = "red",
+#                        limits = c(1, 7),
+#                        name = "Vote Share Margin") +
+#   theme_void() +
+#   coord_sf(xlim = c(-172.27, -66.57), ylim = c(18.55, 71.23), expand = FALSE) +
+#   labs(title = "Predicted Vote Share Margin by District for 2018",
+#        subtitle = "Average vote share margin across polls for each district in 2018") +
+#   theme(axis.title.x=element_blank(),
+#         axis.text.x=element_blank(),
+#         axis.ticks.x=element_blank(),
+#         axis.title.y=element_blank(),
+#         axis.text.y=element_blank(),
+#         axis.ticks.y=element_blank())
+
+```
+
+```{r, eval=FALSE}
+
+## cleaning poll data to match format of actual vote share data
+
+# dist_polls1 <- dist_polls %>%
+#   filter(cycle == 2018) %>%
+#   
+#   # vars I think might be handy to have but do not presently need
+#   # select(cycle, question_id, pollster, fte_grade, state, race_id, seat_number, party, answer, pct, cd_fips, st_fips, st_cd_fips) %>% 
+#   
+#   # super simple list of vars that I need
+#   select(question_id, st_cd_fips, state, seat_number, party, pct) %>%
+#   filter(party == c("DEM", "REP")) %>%
+#   pivot_wider(names_from = party, values_from = pct) %>%
+#   mutate(DISTRICT = seat_number,
+#          STATENAME = state,
+#          vsmargin = (REP - DEM),
+#          st_cd_fips = as.numeric(st_cd_fips))
+# 
+# # making a for loop to average the vote share margin estimated across polls for each district
+# # creating an empty row for the average
+# dist_polls1$vsmargin_avg <- NA
+# 
+# 
+# # looping by each district fips code
+# for(i in 1:max(dist_polls1$st_cd_fips)){
+#   x <- dist_polls1 %>% filter(st_cd_fips == i)    # filter by each district
+#   vsavg <- mean(x$vsmargin)    # take the mean of the vote share margin across all the polls for the district
+#   
+#   dist_polls1$vsmargin_avg[dist_polls1$st_cd_fips == i] <- vsavg    # save the average VS margin to the original dataframe
+# }
+
+```
+
+```{r, eval=FALSE}
+
+# # keeping only the necessary information for the map
+# # removing duplicate rows for each district using distinct
+# 
+# dist_polls1 <- dist_polls1 %>%
+#   select(DISTRICT, STATENAME, vsmargin_avg) %>%
+#   distinct()
+# 
+# # joining to map data
+# 
+# cd114_map2 <- cd114 %>% left_join(dist_polls1, by=c("DISTRICT", "STATENAME"))
+# cd114_map2 <- ms_simplify(cd114_map2)
+# 
+# # poll predictions
+# 
+# ggplot() +
+#   geom_sf(data =cd114_map2, aes(fill = vsmargin_avg),
+#           inherit.aes = FALSE, alpha = 0.9) +
+#   scale_fill_gradient2(low = "blue", mid = "white", high = "red", 
+#                        limits = c(-100, 100),
+#                        name = "Vote Share Margin") +
+#   theme_void() + 
+#   coord_sf(xlim = c(-172.27, -66.57), ylim = c(18.55, 71.23), expand = FALSE) + 
+#   labs(title = "Predicted Vote Share Margin by District for 2018",
+#        subtitle = "Average vote share margin across polls for each district in 2018") +
+#   theme(axis.title.x=element_blank(),
+#         axis.text.x=element_blank(),
+#         axis.ticks.x=element_blank(),
+#         axis.title.y=element_blank(),
+#         axis.text.y=element_blank(),
+#         axis.ticks.y=element_blank())
+
+```
+
+```{r, eval=FALSE}
+# 
+# cd114_map3 <- cd114_map2 
+# cd114_map3$vsmargin_map1 <- cd114_map1$vsmargin[match(cd114_map3$ID, cd114_map3$ID)]
+# 
+# 
+# cd114_map3$vsmargin_diff <- (cd114_map3$vsmargin_map1 - cd114_map3$vsmargin_avg)
+  
+```
+
+```{r, eval=FALSE}
+
+# ggplot() +
+#   geom_sf(data =cd114_map3, aes(fill = vsmargin_diff),
+#           inherit.aes = FALSE, alpha = 0.9) +
+#   scale_fill_gradient2(low = "blue", mid = "white", high = "red", 
+#                        limits = c(-100, 100),
+#                        name = "Difference in Vote Share Margins (actual - predicted)") +
+#   theme_void() + 
+#   coord_sf(xlim = c(-172.27, -66.57), ylim = c(18.55, 71.23), expand = FALSE) + 
+#   labs(title = "Difference Between Actual and Predicted Vote Share Margin by District for 2018",
+#        subtitle = "Red for more actual Republican votes than predicted, blue for more Democrat") +
+#   theme(axis.title.x=element_blank(),
+#         axis.text.x=element_blank(),
+#         axis.ticks.x=element_blank(),
+#         axis.title.y=element_blank(),
+#         axis.text.y=element_blank(),
+#         axis.ticks.y=element_blank())
+
+```
 
 
 
