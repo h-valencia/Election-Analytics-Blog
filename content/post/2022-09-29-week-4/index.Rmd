@@ -1,5 +1,5 @@
 ---
-title: Polling by District
+title: Incumbency and Expert Predictions
 author: Hannah Valencia
 date: '2022-09-29'
 slug: []
@@ -10,7 +10,7 @@ summary: "This week we looked at the effect of incumbency on models' predictions
 
 *This blog is part of a series related to Gov 1347: Election Analytics, a course at [Harvard University](https://www.harvard.edu/) taught by Professor [Ryan D. Enos](http://ryandenos.com/)*.
 
-This week we looked at the effect of incumbency on models' predictions. We compared and contrasted various pollsters and models to see which generated the most accurate predictions, which I will continue to look at through visualizations in this blog.
+This week we looked at the effect of incumbency on models' predictions. We compared and contrasted various pollsters and expert models to see which generated the most accurate predictions, which I will continue to look at through visualizations in this blog.
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = FALSE)
@@ -90,7 +90,7 @@ ggplot() +
 
 Now moving on to the map of predicted vote by district in 2018. While I originally made this map using the expert rating data and then again trying the district polling data set, I found that with both of these provided data sets there were only 135 recorded district polls for 2018. When I tried to print the maps using this data, they ended up very grey, indicating no observation for the district. From here, I went to the class Slack page to see if anyone had the same troubles as I, and found [Ethan Jasny's cleaned data set](https://github.com/ethanjasny/gov1347). Ethan's data set provided observations for 435 districts, allowing us to create a more complete-looking map of polling.
 
-While using the expert ratings and district polls data, I had wanted to incorporate multiple pollsters. The district polls data set has 167 unique pollsters in the full data set across the 2018, 2020, and 2022 election cycles. The expert rating data is more limited, with 15 pollsters represented in the dataset. However, in viewing this data, many of the pollsters included have NA values for most districts in 2018. To prevent any confounding that might result from including all 15 polls in some districts and only 4 in others, I had limited the data to only include four of the pollsters: the Cook Political Report, Inside Election's Rothenberg report, Sabato's Crystal Ball, and the Real Clear Politics reports. While this work can be seen in my code hidden at the bottom of my Index.Rmd, Ethan's data followed a similar logic. The data set he created that I use below uses data from all the same pollsters, except for the Real Clear Politics report. All four of these polls are highly regarded in the world of election predictions and operate on the same scale from 1-7 with 1 being Solid Democrat and 7 being Solid Republican. The map below shows the average score across these 3 polls on the same 1-7 scale. 
+While using the expert ratings and district polls data, I had wanted to incorporate multiple pollsters. The district polls data set has 167 unique pollsters in the full data set across the 2018, 2020, and 2022 election cycles. The expert rating data is more limited, with 15 pollsters represented in the dataset. However, in viewing this data, many of the pollsters included have NA values for most districts in 2018. To prevent any confounding that might result from including all 15 polls in some districts and only 4 in others, I had limited the data to only include four of the pollsters: the Cook Political Report, Inside Election's Rothenberg report, Sabato's Crystal Ball, and the Real Clear Politics reports. While this work can be seen in my code hidden at the bottom of my Index.Rmd, Ethan's data followed a similar logic. The data set he created that I use below uses data from all the same pollsters, except for the Real Clear Politics report. All four of these polls are highly regarded in the world of election predictions and operate on the same scale from 1-7 with 1 being Solid Democrat and 7 being Solid Republican. As we saw and discussed in class last week, these pollsters can predict the election with accuracy in the high 90-percents, and one  independent variable that contributes to this accuracy is the incumbent. Despite the use of incumbency as a predictor, and the high significance of the incumbent variable in my model from [last week](https://h-valencia.github.io/Election-Analytics-Blog/post/2022-09-24-week-3/), in [Brown (2014)](https://hollis.harvard.edu/primo-explore/fulldisplay?docid=TN_cdi_proquest_journals_1680832786&context=PC&vid=HVD2&search_scope=everything&tab=everything&lang=en_US) we read about how despite the fact that incumbents have advantages in an election, voters do not -- or very minimally -- display preference for or against an incumbent. The map below shows the average score across these 3 polls on the same 1-7 scale. 
 
 Looking at the map, we see strong Democratic predictions along the west and east coasts, and scattered around some major cities in in the middle of the country. The map appears heavily red, however, as some parts of the less-populated Midwest have larger districts. Most districts across the map appear to be Solid D or Solid R, as shown by their darker hues. There are some districts that are lighter shades or white, representing a prediction of a closer election where one party only has a lean estimated vote, but as it appears here and as we know from our discussions in class, there are many districts that can be counted on going one way.
 
@@ -183,7 +183,7 @@ ggplot() +
         axis.ticks.y=element_blank())
 ```
 
-
+My model from last week is built using incumbency as a factor, and it showed high significance in predicting the vote share percentage for midterm elections. While this new polling data and expert predictions can predict elections very accurately and therefore should be taken into account for a final model, I will save creating that model for next week when I have more time available to develop a meaningful model. I also believe that while weighing expert predictions in a model is likely to create an extremely accurate prediction, we do not have full transparency on the variables the experts use. This brings us back to the question of whether or not using these expert predictions in developing our own models is "cheating", as we are not combining and weighing the independent variables ourselves in a way that makes the most sense.
 
 
 
