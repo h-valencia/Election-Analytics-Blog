@@ -1,5 +1,5 @@
 ---
-title: Week 4
+title: Polling by District
 author: Hannah Valencia
 date: '2022-09-29'
 slug: []
@@ -59,7 +59,9 @@ cd114_map1 <- ms_simplify(cd114_map1)
 
 ```
 
-Last week, we looked at national data from generic ballot polls which gave us a general sense of political sentiment across the nation. While this data can be a good indicator for predicting elections, this
+Last week, we looked at national data from generic ballot polls which gave us a general sense of political sentiment across the nation. While this data can be a good indicator for predicting elections, this week we are using more detailed, district-specific polling that gets into the strength of voter preferences. This data I expect to be even more predictive than the generic ballot polls as it looks at voter preferences in regards to the candidates they are choosing between, rather than just their general feelings towards a party - which may not accurately represent voter actions once they get to the ballot box.
+
+To start this analysis, I used the actual voting data from the 2018 election to create a map showing the vote share margin by district. I took the difference of republican two-party vote share minus the democrat two-party vote share percentages to get a map shaded by which states won heavily vs. were more of a toss-up. This map shows most areas in a mid-light shade of red or blue, indicating that there were not *that* many districts that were entirely uncontested. The size of the districts in the northeast can make the map hard to see, but we see most of the country had a vote share margin between -50 and 50. These margins are larger than the shading of the map may indicate, but we get a good sense of the contest between parties in looking at this map.
 
 
 ```{r}
@@ -86,6 +88,12 @@ ggplot() +
 
 ```
 
+Now moving on to the map of predicted vote by district in 2018. While I originally made this map using the expert rating data and then again trying the district polling data set, I found that with both of these provided data sets there were only 135 recorded district polls for 2018. When I tried to print the maps using this data, they ended up very grey, indicating no observation for the district. From here, I went to the class Slack page to see if anyone had the same troubles as I, and found [Ethan Jasny's cleaned data set](https://github.com/ethanjasny/gov1347). Ethan's data set provided observations for 435 districts, allowing us to create a more complete-looking map of polling.
+
+While using the expert ratings and district polls data, I had wanted to incorporate multiple pollsters. The district polls data set has 167 unique pollsters in the full data set across the 2018, 2020, and 2022 election cycles. The expert rating data is more limited, with 15 pollsters represented in the dataset. However, in viewing this data, many of the pollsters included have NA values for most districts in 2018. To prevent any confounding that might result from including all 15 polls in some districts and only 4 in others, I had limited the data to only include four of the pollsters: the Cook Political Report, Inside Election's Rothenberg report, Sabato's Crystal Ball, and the Real Clear Politics reports. While this work can be seen in my code hidden at the bottom of my Index.Rmd, Ethan's data followed a similar logic. The data set he created that I use below uses data from all the same pollsters, except for the Real Clear Politics report. All four of these polls are highly regarded in the world of election predictions and operate on the same scale from 1-7 with 1 being Solid Democrat and 7 being Solid Republican. The map below shows the average score across these 3 polls on the same 1-7 scale. 
+
+Looking at the map, we see strong Democratic predictions along the west and east coasts, and scattered around some major cities in in the middle of the country. The map appears heavily red, however, as some parts of the less-populated Midwest have larger districts. Most districts across the map appear to be Solid D or Solid R, as shown by their darker hues. There are some districts that are lighter shades or white, representing a prediction of a closer election where one party only has a lean estimated vote, but as it appears here and as we know from our discussions in class, there are many districts that can be counted on going one way.
+
 ```{r}
 
 # using Ethan's cleaned data as shared on Slack to get the polling data for all congressional districts.
@@ -111,7 +119,7 @@ cd114_map5 <- ms_simplify(cd114_map5)
 ggplot() +
   geom_sf(data =cd114_map5, aes(fill = avg),
           inherit.aes = FALSE, alpha = 0.9) +
-  scale_fill_gradient2(low = "blue", mid = "white", high = "red",
+  scale_fill_gradient2(low = "blue", high = "red", mid = "white", midpoint = 4,
                        limits = c(1, 7),
                        name = "Predicted Vote") +
   theme_void() +
@@ -126,6 +134,10 @@ ggplot() +
         axis.ticks.y=element_blank())
 
 ```
+
+While comparing the two maps above, we can see obvious differences in the coloring, with the poll predictions having lots of darker hues and the actual vote share map showing many mid hues. This would lead us to believe that the election was more competitive than pollsters predicted. However, in the map below we will account for the difference in scales and measure the difference between the actual vote share on the 7-point scale versus the predicted vote on the 7-point scale.
+
+
 
 ```{r}
 
