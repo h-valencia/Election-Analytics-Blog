@@ -6,7 +6,17 @@
     <description>Recent content in Posts on My New Hugo Site</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Thu, 29 Sep 2022 00:00:00 +0000</lastBuildDate><atom:link href="http://example.org/post/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Sun, 09 Oct 2022 00:00:00 +0000</lastBuildDate><atom:link href="http://example.org/post/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Week 5</title>
+      <link>http://example.org/post/2022-10-09-week-5/</link>
+      <pubDate>Sun, 09 Oct 2022 00:00:00 +0000</pubDate>
+      
+      <guid>http://example.org/post/2022-10-09-week-5/</guid>
+      <description>This blog is part of a series related to Gov 1347: Election Analytics, a course at Harvard University taught by Professor Ryan D. Enos.
+## New names: ## Rows: 3838373 Columns: 18 ## ── Column specification ## ──────────────────────────────────────────────────────── Delimiter: &amp;quot;,&amp;quot; chr ## (12): creative, market, state, race, district, party, ad_tone, ad_purpo... dbl ## (4): ...1, dma, cycle, n_stations date (1): airdate time (1): airtime ## ℹ Use `spec()` to retrieve the full column specification for this data.</description>
+    </item>
+    
     <item>
       <title>Incumbency and Expert Predictions</title>
       <link>http://example.org/post/2022-09-29-week-4/</link>

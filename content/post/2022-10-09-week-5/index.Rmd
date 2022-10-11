@@ -1,0 +1,818 @@
+---
+title: Week 5
+author: Hannah Valencia
+date: '2022-10-09'
+slug: []
+categories: []
+tags: []
+---
+
+*This blog is part of a series related to Gov 1347: Election Analytics, a course at [Harvard University](https://www.harvard.edu/) taught by Professor [Ryan D. Enos](http://ryandenos.com/)*.
+
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+
+# load libraries
+
+library(tidyverse)
+library(usmap)
+library(plotly)
+library(rmapshaper)
+library(sf)
+library(haven)
+library(sjlabelled)
+library(usdata)
+```
+
+
+```{r}
+
+# reading ad files for lab
+
+ads1 <- read_csv("ads_2006_2018 (1).csv")
+ad_issues1 <- read_csv("ads_issues_2012-2018 (1).csv")
+
+# reading WMP files
+
+# wmp_2012 <- read_dta("wmp-house-2012-v1.1.dta")
+wmp_2014 <- readRDS("WMP_house_gen_2014_ads_cleaned.rds")
+wmp_2016 <- readRDS("WMP_house_gen_2016_ads_cleaned.rds")
+wmp_2018 <- readRDS("WMP_house_gen_2018_ads_cleaned.rds")
+```
+
+```{r LabQ1, eval=FALSE}
+
+# Lab Question 1: What are some trends in the tone and purpose of Democratic ads?
+
+ads1 %>%
+  filter(party == "Democrat") %>%
+  group_by(ad_tone) %>%
+  count() %>%
+  arrange(desc(n))
+
+ads1 %>%
+  filter(party == "Democrat") %>%
+  group_by(ad_purpose) %>%
+  count() %>%
+  arrange(desc(n))
+
+ads1 %>%
+  filter(party == "Democrat") %>%
+  group_by(ad_tone, ad_purpose) %>%
+  count() %>%
+  arrange(desc(n))
+
+```
+
+```{r LabQ2, eval=FALSE}
+ad_issues %>%
+  filter(party == "Democrat") %>%
+  group_by(issue) %>%
+  count() %>%
+  arrange(desc(n))
+```
+
+```{r CleanWMP, eval=FALSE}
+
+# clean house 2012 data
+house_2012 <- wmp_2012 %>%
+  filter(race == 'US HOUSE') %>%
+  sjlabelled::as_label(party, ad_tone, per_ply) %>%
+  select(creative, market, dmaid, airdate, airtime, categorystate,
+         race, district, party, ad_tone, per_ply, station) %>% # issue not included bc diff dimensions
+  mutate(cycle = substr(airdate,0,4)) %>%
+  rename(state = categorystate, dma = dmaid) %>%
+  mutate(state = abbr2state(state) ) %>%
+  mutate(st_fips = case_when(state == 'Alabama' ~ '01',
+                             state == 'Alaska' ~ '02',
+                             state == 'Arizona' ~ '04',
+                             state == 'Arkansas' ~ '05',
+                             state =='California' ~ '06',
+                             state =='Colorado' ~ '08',
+                             state =='Connecticut' ~ '09',
+                             state =='Delaware' ~ '10',
+                             state == 'Florida' ~ '12',
+                             state == 'Georgia' ~ '13',
+                             state == 'Hawaii' ~ '15',
+                             state =='Idaho' ~ '16',
+                             state =='Illinois' ~ '17',
+                             state =='Indiana' ~ '18',
+                             state =='Iowa' ~ '19',
+                             state =='Kansas' ~ '20',
+                             state =='Kentucky' ~ '21',
+                             state =='Louisiana' ~ '22',
+                             state =='Maine' ~ '23',
+                             state =='Maryland' ~ '24',
+                             state =='Massachusetts' ~ '25',
+                             state =='Michigan' ~ '26',
+                             state =='Minnesota' ~ '27',
+                             state =='Mississippi' ~ '28',
+                             state =='Missouri' ~ '29',
+                             state =='Montana' ~ '30',
+                             state =='Nebraska' ~ '31',
+                             state =='Nevada' ~ '32',
+                             state =='New Hampshire' ~ '33',
+                             state =='New Jersey' ~ '34',
+                             state =='New Mexico' ~ '35',
+                             state =='New York' ~ '36',
+                             state =='North Carolina' ~ '37',
+                             state =='North Dakota' ~ '38',
+                             state =='Ohio' ~ '39',
+                             state =='Oklahoma' ~ '40',
+                             state =='Oregon' ~ '41',
+                             state =='Pennsylvania' ~ '42',
+                             state =='Rhode Island' ~ '44',
+                             state =='South Carolina' ~ '45',
+                             state =='South Dakota' ~ '46',
+                             state =='Tennessee' ~ '47',
+                             state =='Texas' ~ '48',
+                             state =='Utah' ~ '49',
+                             state =='Vermont' ~ '50',
+                             state =='Virginia' ~ '51',
+                             state =='Washington' ~ '53',
+                             state =='West Virginia' ~ '54',
+                             state =='Wisconsin' ~ '55',
+                             state =='Wyoming' ~ '56')) 
+
+# add st_cd_fips
+nums <- c(1, 2, 3, 4, 5, 6, 7, 8, 9)
+house_2012$cd_fips <- ifelse(house_2012$district %in% nums, 
+                             paste0("0",house_2012$district), 
+                             house_2012$district)
+
+house_2012$st_cd_fips <- paste(house_2012$st_fips,
+                               house_2012$cd_fips,
+                               sep = "")
+
+# clean 2014
+house_2014 <- wmp_2014 %>%
+  filter(race == 'US HOUSE') %>%
+  sjlabelled::as_label(party, ad_tone, per_ply) %>%
+  select(creative, market, dma, airdate, airtime, StateAbb,
+         race, district, affiliation, ad_tone, per_ply, station) %>% # issue not included bc diff dimensions
+  mutate(cycle = substr(airdate,0,4)) %>%
+  rename(party = affiliation, state = StateAbb) %>%
+  mutate(state = abbr2state(state) ) %>%
+  mutate(st_fips = case_when(state == 'Alabama' ~ '01',
+                             state == 'Alaska' ~ '02',
+                             state == 'Arizona' ~ '04',
+                             state == 'Arkansas' ~ '05',
+                             state =='California' ~ '06',
+                             state =='Colorado' ~ '08',
+                             state =='Connecticut' ~ '09',
+                             state =='Delaware' ~ '10',
+                             state == 'Florida' ~ '12',
+                             state == 'Georgia' ~ '13',
+                             state == 'Hawaii' ~ '15',
+                             state =='Idaho' ~ '16',
+                             state =='Illinois' ~ '17',
+                             state =='Indiana' ~ '18',
+                             state =='Iowa' ~ '19',
+                             state =='Kansas' ~ '20',
+                             state =='Kentucky' ~ '21',
+                             state =='Louisiana' ~ '22',
+                             state =='Maine' ~ '23',
+                             state =='Maryland' ~ '24',
+                             state =='Massachusetts' ~ '25',
+                             state =='Michigan' ~ '26',
+                             state =='Minnesota' ~ '27',
+                             state =='Mississippi' ~ '28',
+                             state =='Missouri' ~ '29',
+                             state =='Montana' ~ '30',
+                             state =='Nebraska' ~ '31',
+                             state =='Nevada' ~ '32',
+                             state =='New Hampshire' ~ '33',
+                             state =='New Jersey' ~ '34',
+                             state =='New Mexico' ~ '35',
+                             state =='New York' ~ '36',
+                             state =='North Carolina' ~ '37',
+                             state =='North Dakota' ~ '38',
+                             state =='Ohio' ~ '39',
+                             state =='Oklahoma' ~ '40',
+                             state =='Oregon' ~ '41',
+                             state =='Pennsylvania' ~ '42',
+                             state =='Rhode Island' ~ '44',
+                             state =='South Carolina' ~ '45',
+                             state =='South Dakota' ~ '46',
+                             state =='Tennessee' ~ '47',
+                             state =='Texas' ~ '48',
+                             state =='Utah' ~ '49',
+                             state =='Vermont' ~ '50',
+                             state =='Virginia' ~ '51',
+                             state =='Washington' ~ '53',
+                             state =='West Virginia' ~ '54',
+                             state =='Wisconsin' ~ '55',
+                             state =='Wyoming' ~ '56')) 
+head(house_2014)
+
+# add st_cd_fips
+nums <- c(1, 2, 3, 4, 5, 6, 7, 8, 9)
+house_2014$cd_fips <- ifelse(house_2014$district %in% nums, 
+                             paste0("0",house_2014$district), 
+                             house_2014$district)
+
+house_2014$st_cd_fips <- paste(house_2014$st_fips,
+                               house_2014$cd_fips,
+                               sep = "")
+
+# label ad purpose variable
+house_2014 <- house_2014 %>%
+  mutate(per_ply = case_when(per_ply == 0 ~ "Neither",
+                             per_ply == 1 ~ "Personal Characteristics",
+                             per_ply == 2 ~ "Policy Matters",
+                             per_ply == 3 ~ "Both Personal Characteristics and Policy Matters"),
+         ad_tone = case_when(ad_tone == 1 ~ "Contrast",
+                             ad_tone == 2 ~ "Promote", 
+                             ad_tone == 3 ~ "Attack"))
+
+# clean 2016
+house_2016 <- wmp_2016 %>%
+  filter(race == 'US HOUSE') %>%
+  sjlabelled::as_label(party, ad_tone, per_ply) %>%
+  select(creative, market, dma, airdate, airtime, categorystate,
+         race, district, Candidate_Party, ad_tone, per_ply, station) %>% # issue not included bc diff dimensions
+  mutate(cycle = substr(airdate,0,4)) %>%
+  rename(party = Candidate_Party, state = categorystate) %>%
+  mutate(state = abbr2state(state) ) %>%
+  mutate(st_fips = case_when(state == 'Alabama' ~ '01',
+                             state == 'Alaska' ~ '02',
+                             state == 'Arizona' ~ '04',
+                             state == 'Arkansas' ~ '05',
+                             state =='California' ~ '06',
+                             state =='Colorado' ~ '08',
+                             state =='Connecticut' ~ '09',
+                             state =='Delaware' ~ '10',
+                             state == 'Florida' ~ '12',
+                             state == 'Georgia' ~ '13',
+                             state == 'Hawaii' ~ '15',
+                             state =='Idaho' ~ '16',
+                             state =='Illinois' ~ '17',
+                             state =='Indiana' ~ '18',
+                             state =='Iowa' ~ '19',
+                             state =='Kansas' ~ '20',
+                             state =='Kentucky' ~ '21',
+                             state =='Louisiana' ~ '22',
+                             state =='Maine' ~ '23',
+                             state =='Maryland' ~ '24',
+                             state =='Massachusetts' ~ '25',
+                             state =='Michigan' ~ '26',
+                             state =='Minnesota' ~ '27',
+                             state =='Mississippi' ~ '28',
+                             state =='Missouri' ~ '29',
+                             state =='Montana' ~ '30',
+                             state =='Nebraska' ~ '31',
+                             state =='Nevada' ~ '32',
+                             state =='New Hampshire' ~ '33',
+                             state =='New Jersey' ~ '34',
+                             state =='New Mexico' ~ '35',
+                             state =='New York' ~ '36',
+                             state =='North Carolina' ~ '37',
+                             state =='North Dakota' ~ '38',
+                             state =='Ohio' ~ '39',
+                             state =='Oklahoma' ~ '40',
+                             state =='Oregon' ~ '41',
+                             state =='Pennsylvania' ~ '42',
+                             state =='Rhode Island' ~ '44',
+                             state =='South Carolina' ~ '45',
+                             state =='South Dakota' ~ '46',
+                             state =='Tennessee' ~ '47',
+                             state =='Texas' ~ '48',
+                             state =='Utah' ~ '49',
+                             state =='Vermont' ~ '50',
+                             state =='Virginia' ~ '51',
+                             state =='Washington' ~ '53',
+                             state =='West Virginia' ~ '54',
+                             state =='Wisconsin' ~ '55',
+                             state =='Wyoming' ~ '56')) 
+
+# add st_cd_fips
+nums <- c(1, 2, 3, 4, 5, 6, 7, 8, 9)
+house_2016$cd_fips <- ifelse(house_2016$district %in% nums, 
+                             paste0("0",house_2016$district), 
+                             house_2016$district)
+
+house_2016$st_cd_fips <- paste(house_2016$st_fips,
+                               house_2016$cd_fips,
+                               sep = "")
+
+# clean 2018
+house_2018 <- wmp_2018 %>%
+  filter(race == 'US HOUSE') %>%
+  sjlabelled::as_label(party, ad_tone, per_ply) %>%
+  select(creative, market, dma, airdate, airtime, categorystate,
+         race, district, Candidate_Party, ad_tone, per_ply, station) %>% # issue not included bc diff dimensions
+  mutate(cycle = substr(airdate,0,4)) %>%
+  rename(party = Candidate_Party, state = categorystate) %>%
+  mutate(state = abbr2state(state) ) %>%
+  mutate(st_fips = case_when(state == 'Alabama' ~ '01',
+                             state == 'Alaska' ~ '02',
+                             state == 'Arizona' ~ '04',
+                             state == 'Arkansas' ~ '05',
+                             state =='California' ~ '06',
+                             state =='Colorado' ~ '08',
+                             state =='Connecticut' ~ '09',
+                             state =='Delaware' ~ '10',
+                             state == 'Florida' ~ '12',
+                             state == 'Georgia' ~ '13',
+                             state == 'Hawaii' ~ '15',
+                             state =='Idaho' ~ '16',
+                             state =='Illinois' ~ '17',
+                             state =='Indiana' ~ '18',
+                             state =='Iowa' ~ '19',
+                             state =='Kansas' ~ '20',
+                             state =='Kentucky' ~ '21',
+                             state =='Louisiana' ~ '22',
+                             state =='Maine' ~ '23',
+                             state =='Maryland' ~ '24',
+                             state =='Massachusetts' ~ '25',
+                             state =='Michigan' ~ '26',
+                             state =='Minnesota' ~ '27',
+                             state =='Mississippi' ~ '28',
+                             state =='Missouri' ~ '29',
+                             state =='Montana' ~ '30',
+                             state =='Nebraska' ~ '31',
+                             state =='Nevada' ~ '32',
+                             state =='New Hampshire' ~ '33',
+                             state =='New Jersey' ~ '34',
+                             state =='New Mexico' ~ '35',
+                             state =='New York' ~ '36',
+                             state =='North Carolina' ~ '37',
+                             state =='North Dakota' ~ '38',
+                             state =='Ohio' ~ '39',
+                             state =='Oklahoma' ~ '40',
+                             state =='Oregon' ~ '41',
+                             state =='Pennsylvania' ~ '42',
+                             state =='Rhode Island' ~ '44',
+                             state =='South Carolina' ~ '45',
+                             state =='South Dakota' ~ '46',
+                             state =='Tennessee' ~ '47',
+                             state =='Texas' ~ '48',
+                             state =='Utah' ~ '49',
+                             state =='Vermont' ~ '50',
+                             state =='Virginia' ~ '51',
+                             state =='Washington' ~ '53',
+                             state =='West Virginia' ~ '54',
+                             state =='Wisconsin' ~ '55',
+                             state =='Wyoming' ~ '56')) 
+
+# st_cd_fips
+nums <- c(1, 2, 3, 4, 5, 6, 7, 8, 9)
+house_2018$cd_fips <- ifelse(house_2018$district %in% nums, 
+                             paste0("0",house_2018$district), 
+                             house_2018$district)
+
+house_2018$st_cd_fips <- paste(house_2018$st_fips,
+                               house_2018$cd_fips,
+                               sep = "")
+
+# join now
+names(house_2012)
+names(house_2014)
+names(house_2016)
+names(house_2018)
+
+h <- house_2012 %>%
+  rbind(house_2014) %>%
+  rbind(house_2016) %>%
+  rbind(house_2018)
+
+# write separate files - if necessary
+ write.csv(house_2012, "house_2012.csv")
+ write.csv(house_2014, "house_2014.csv")
+ write.csv(house_2016, "house_2016.csv")
+ write.csv(house_2018, "house_2018.csv")
+
+```
+
+```{r CleanHouseWMP, eval=FALSE}
+table(h$party)
+h <- h %>%
+  mutate(party = case_when(party == 'Democrat' ~ 'Democrat',
+                           party == 'DEMOCRAT' ~ 'Democrat',
+                           party == 'Democratic' ~ 'Democrat',
+                           party == 'REPUBLICAN' ~ 'Republican',
+                           party == 'Republican' ~ 'Republican')) %>%
+  mutate(ad_tone = tolower(ad_tone)) %>%
+  filter(cycle %in% c(2006, 2010, 2012, 2014, 2016, 2018)) %>%
+  rename(ad_purpose = per_ply) %>%
+  mutate(ad_purpose = tolower(ad_purpose), 
+         ad_purpose = case_when(ad_purpose == 'both personal char. and policy matters' ~ "both",
+                                ad_purpose == 'both personal characteristics and policy matters' ~ "both",
+                                ad_purpose == 'personal characteristics' ~ "personal",
+                                ad_purpose == 'policy matters' ~ "policy")) %>%
+  group_by(creative) %>%
+  mutate(n_stations = length(unique(station))) %>% ungroup()
+
+table(h$party)
+table(h$ad_tone)
+table(h$ad_purpose)
+table(h$cycle)
+head(h)
+head(h$n_stations)
+dim(h)
+# export to csv
+write.csv(h, "ads_2006_2018.csv")
+```
+
+```{r CleanHouseIssue, eval=FALSE}
+
+# from R script
+#### elections that include issues and cost 2012-2018 ####
+# 2012
+house_2012_is <- wmp_2012 %>%
+  filter(race == 'US HOUSE') %>%
+  sjlabelled::as_label(party, ad_tone, per_ply) %>%
+  select(creative, market, dmaid, issue, airdate, airtime, categorystate,
+         race, district, party, ad_tone, per_ply, est_cost, station) %>%
+  mutate(cycle = substr(airdate,0,4)) %>%
+  rename(state = categorystate, dma = dmaid) %>%
+  mutate(state = abbr2state(state) ) %>%
+  mutate(st_fips = case_when(state == 'Alabama' ~ '01',
+                             state == 'Alaska' ~ '02',
+                             state == 'Arizona' ~ '04',
+                             state == 'Arkansas' ~ '05',
+                             state =='California' ~ '06',
+                             state =='Colorado' ~ '08',
+                             state =='Connecticut' ~ '09',
+                             state =='Delaware' ~ '10',
+                             state == 'Florida' ~ '12',
+                             state == 'Georgia' ~ '13',
+                             state == 'Hawaii' ~ '15',
+                             state =='Idaho' ~ '16',
+                             state =='Illinois' ~ '17',
+                             state =='Indiana' ~ '18',
+                             state =='Iowa' ~ '19',
+                             state =='Kansas' ~ '20',
+                             state =='Kentucky' ~ '21',
+                             state =='Louisiana' ~ '22',
+                             state =='Maine' ~ '23',
+                             state =='Maryland' ~ '24',
+                             state =='Massachusetts' ~ '25',
+                             state =='Michigan' ~ '26',
+                             state =='Minnesota' ~ '27',
+                             state =='Mississippi' ~ '28',
+                             state =='Missouri' ~ '29',
+                             state =='Montana' ~ '30',
+                             state =='Nebraska' ~ '31',
+                             state =='Nevada' ~ '32',
+                             state =='New Hampshire' ~ '33',
+                             state =='New Jersey' ~ '34',
+                             state =='New Mexico' ~ '35',
+                             state =='New York' ~ '36',
+                             state =='North Carolina' ~ '37',
+                             state =='North Dakota' ~ '38',
+                             state =='Ohio' ~ '39',
+                             state =='Oklahoma' ~ '40',
+                             state =='Oregon' ~ '41',
+                             state =='Pennsylvania' ~ '42',
+                             state =='Rhode Island' ~ '44',
+                             state =='South Carolina' ~ '45',
+                             state =='South Dakota' ~ '46',
+                             state =='Tennessee' ~ '47',
+                             state =='Texas' ~ '48',
+                             state =='Utah' ~ '49',
+                             state =='Vermont' ~ '50',
+                             state =='Virginia' ~ '51',
+                             state =='Washington' ~ '53',
+                             state =='West Virginia' ~ '54',
+                             state =='Wisconsin' ~ '55',
+                             state =='Wyoming' ~ '56')) 
+
+# st_cd_fips
+nums <- c(1, 2, 3, 4, 5, 6, 7, 8, 9)
+house_2012_is$cd_fips <- ifelse(house_2012_is$district %in% nums, 
+                                paste0("0",house_2012_is$district), 
+                                house_2012_is$district)
+
+house_2012_is$st_cd_fips <- paste(house_2012_is$st_fips,
+                                  house_2012_is$cd_fips,
+                                  sep = "")
+
+# 2014
+house_2014_is <- wmp_2014 %>%
+  filter(race == 'US HOUSE') %>%
+  sjlabelled::as_label(party, ad_tone, per_ply) %>%
+  select(creative, market, dma, issue, airdate, airtime, StateAbb,
+         race, district, affiliation, ad_tone, per_ply, est_cost, station) %>% # issue not included bc diff dimensions
+  mutate(cycle = substr(airdate,0,4)) %>%
+  rename(party = affiliation, state = StateAbb) %>%
+  mutate(state = abbr2state(state) ) %>%
+  mutate(st_fips = case_when(state == 'Alabama' ~ '01',
+                             state == 'Alaska' ~ '02',
+                             state == 'Arizona' ~ '04',
+                             state == 'Arkansas' ~ '05',
+                             state =='California' ~ '06',
+                             state =='Colorado' ~ '08',
+                             state =='Connecticut' ~ '09',
+                             state =='Delaware' ~ '10',
+                             state == 'Florida' ~ '12',
+                             state == 'Georgia' ~ '13',
+                             state == 'Hawaii' ~ '15',
+                             state =='Idaho' ~ '16',
+                             state =='Illinois' ~ '17',
+                             state =='Indiana' ~ '18',
+                             state =='Iowa' ~ '19',
+                             state =='Kansas' ~ '20',
+                             state =='Kentucky' ~ '21',
+                             state =='Louisiana' ~ '22',
+                             state =='Maine' ~ '23',
+                             state =='Maryland' ~ '24',
+                             state =='Massachusetts' ~ '25',
+                             state =='Michigan' ~ '26',
+                             state =='Minnesota' ~ '27',
+                             state =='Mississippi' ~ '28',
+                             state =='Missouri' ~ '29',
+                             state =='Montana' ~ '30',
+                             state =='Nebraska' ~ '31',
+                             state =='Nevada' ~ '32',
+                             state =='New Hampshire' ~ '33',
+                             state =='New Jersey' ~ '34',
+                             state =='New Mexico' ~ '35',
+                             state =='New York' ~ '36',
+                             state =='North Carolina' ~ '37',
+                             state =='North Dakota' ~ '38',
+                             state =='Ohio' ~ '39',
+                             state =='Oklahoma' ~ '40',
+                             state =='Oregon' ~ '41',
+                             state =='Pennsylvania' ~ '42',
+                             state =='Rhode Island' ~ '44',
+                             state =='South Carolina' ~ '45',
+                             state =='South Dakota' ~ '46',
+                             state =='Tennessee' ~ '47',
+                             state =='Texas' ~ '48',
+                             state =='Utah' ~ '49',
+                             state =='Vermont' ~ '50',
+                             state =='Virginia' ~ '51',
+                             state =='Washington' ~ '53',
+                             state =='West Virginia' ~ '54',
+                             state =='Wisconsin' ~ '55',
+                             state =='Wyoming' ~ '56')) 
+
+# st_cd_fips
+nums <- c(1, 2, 3, 4, 5, 6, 7, 8, 9)
+house_2014_is$cd_fips <- ifelse(house_2014_is$district %in% nums, 
+                                paste0("0",house_2014_is$district), 
+                                house_2014_is$district)
+
+house_2014_is$st_cd_fips <- paste(house_2014_is$st_fips,
+                                  house_2014_is$cd_fips,
+                                  sep = "")
+
+house_2014_is <- house_2014_is %>%
+  mutate(per_ply = case_when(per_ply == 0 ~ "Neither",
+                             per_ply == 1 ~ "Personal Characteristics",
+                             per_ply == 2 ~ "Policy Matters",
+                             per_ply == 3 ~ "Both Personal Characteristics and Policy Matters"),
+         ad_tone = case_when(ad_tone == 1 ~ "Contrast",
+                             ad_tone == 2 ~ "Promote", 
+                             ad_tone == 3 ~ "Attack"))
+
+# 2016
+house_2016_is <- wmp_2016 %>%
+  filter(race == 'US HOUSE') %>%
+  sjlabelled::as_label(party, ad_tone, per_ply) %>%
+  select(creative, market, dma, issue, airdate, airtime, categorystate,
+         race, district, Candidate_Party, ad_tone, per_ply, est_cost, station) %>% # issue not included bc diff dimensions
+  mutate(cycle = substr(airdate,0,4)) %>%
+  rename(party = Candidate_Party, state = categorystate) %>%
+  mutate(state = abbr2state(state) ) %>%
+  mutate(st_fips = case_when(state == 'Alabama' ~ '01',
+                             state == 'Alaska' ~ '02',
+                             state == 'Arizona' ~ '04',
+                             state == 'Arkansas' ~ '05',
+                             state =='California' ~ '06',
+                             state =='Colorado' ~ '08',
+                             state =='Connecticut' ~ '09',
+                             state =='Delaware' ~ '10',
+                             state == 'Florida' ~ '12',
+                             state == 'Georgia' ~ '13',
+                             state == 'Hawaii' ~ '15',
+                             state =='Idaho' ~ '16',
+                             state =='Illinois' ~ '17',
+                             state =='Indiana' ~ '18',
+                             state =='Iowa' ~ '19',
+                             state =='Kansas' ~ '20',
+                             state =='Kentucky' ~ '21',
+                             state =='Louisiana' ~ '22',
+                             state =='Maine' ~ '23',
+                             state =='Maryland' ~ '24',
+                             state =='Massachusetts' ~ '25',
+                             state =='Michigan' ~ '26',
+                             state =='Minnesota' ~ '27',
+                             state =='Mississippi' ~ '28',
+                             state =='Missouri' ~ '29',
+                             state =='Montana' ~ '30',
+                             state =='Nebraska' ~ '31',
+                             state =='Nevada' ~ '32',
+                             state =='New Hampshire' ~ '33',
+                             state =='New Jersey' ~ '34',
+                             state =='New Mexico' ~ '35',
+                             state =='New York' ~ '36',
+                             state =='North Carolina' ~ '37',
+                             state =='North Dakota' ~ '38',
+                             state =='Ohio' ~ '39',
+                             state =='Oklahoma' ~ '40',
+                             state =='Oregon' ~ '41',
+                             state =='Pennsylvania' ~ '42',
+                             state =='Rhode Island' ~ '44',
+                             state =='South Carolina' ~ '45',
+                             state =='South Dakota' ~ '46',
+                             state =='Tennessee' ~ '47',
+                             state =='Texas' ~ '48',
+                             state =='Utah' ~ '49',
+                             state =='Vermont' ~ '50',
+                             state =='Virginia' ~ '51',
+                             state =='Washington' ~ '53',
+                             state =='West Virginia' ~ '54',
+                             state =='Wisconsin' ~ '55',
+                             state =='Wyoming' ~ '56')) 
+
+# st_cd_fips
+nums <- c(1, 2, 3, 4, 5, 6, 7, 8, 9)
+house_2016_is$cd_fips <- ifelse(house_2016_is$district %in% nums, 
+                                paste0("0",house_2016_is$district), 
+                                house_2016_is$district)
+
+house_2016_is$st_cd_fips <- paste(house_2016_is$st_fips,
+                                  house_2016_is$cd_fips,
+                                  sep = "")
+
+# 2018
+house_2018_is <- wmp_2018 %>%
+  filter(race == 'US HOUSE') %>%
+  sjlabelled::as_label(party, ad_tone, per_ply) %>%
+  select(creative, market, dma, issue, airdate, airtime, categorystate,
+         race, district, Candidate_Party, ad_tone, per_ply, est_cost, station) %>% # issue not included bc diff dimensions
+  mutate(cycle = substr(airdate,0,4)) %>%
+  rename(party = Candidate_Party, state = categorystate) %>%
+  mutate(state = abbr2state(state) ) %>%
+  mutate(st_fips = case_when(state == 'Alabama' ~ '01',
+                             state == 'Alaska' ~ '02',
+                             state == 'Arizona' ~ '04',
+                             state == 'Arkansas' ~ '05',
+                             state =='California' ~ '06',
+                             state =='Colorado' ~ '08',
+                             state =='Connecticut' ~ '09',
+                             state =='Delaware' ~ '10',
+                             state == 'Florida' ~ '12',
+                             state == 'Georgia' ~ '13',
+                             state == 'Hawaii' ~ '15',
+                             state =='Idaho' ~ '16',
+                             state =='Illinois' ~ '17',
+                             state =='Indiana' ~ '18',
+                             state =='Iowa' ~ '19',
+                             state =='Kansas' ~ '20',
+                             state =='Kentucky' ~ '21',
+                             state =='Louisiana' ~ '22',
+                             state =='Maine' ~ '23',
+                             state =='Maryland' ~ '24',
+                             state =='Massachusetts' ~ '25',
+                             state =='Michigan' ~ '26',
+                             state =='Minnesota' ~ '27',
+                             state =='Mississippi' ~ '28',
+                             state =='Missouri' ~ '29',
+                             state =='Montana' ~ '30',
+                             state =='Nebraska' ~ '31',
+                             state =='Nevada' ~ '32',
+                             state =='New Hampshire' ~ '33',
+                             state =='New Jersey' ~ '34',
+                             state =='New Mexico' ~ '35',
+                             state =='New York' ~ '36',
+                             state =='North Carolina' ~ '37',
+                             state =='North Dakota' ~ '38',
+                             state =='Ohio' ~ '39',
+                             state =='Oklahoma' ~ '40',
+                             state =='Oregon' ~ '41',
+                             state =='Pennsylvania' ~ '42',
+                             state =='Rhode Island' ~ '44',
+                             state =='South Carolina' ~ '45',
+                             state =='South Dakota' ~ '46',
+                             state =='Tennessee' ~ '47',
+                             state =='Texas' ~ '48',
+                             state =='Utah' ~ '49',
+                             state =='Vermont' ~ '50',
+                             state =='Virginia' ~ '51',
+                             state =='Washington' ~ '53',
+                             state =='West Virginia' ~ '54',
+                             state =='Wisconsin' ~ '55',
+                             state =='Wyoming' ~ '56')) 
+
+# st_cd_fips
+nums <- c(1, 2, 3, 4, 5, 6, 7, 8, 9)
+house_2018_is$cd_fips <- ifelse(house_2018_is$district %in% nums, 
+                                paste0("0",house_2018_is$district), 
+                                house_2018_is$district)
+
+house_2018_is$st_cd_fips <- paste(house_2018_is$st_fips,
+                                  house_2018_is$cd_fips,
+                                  sep = "")
+
+# join now
+names(house_2012_is)
+names(house_2014_is)
+names(house_2016_is)
+names(house_2018_is)
+
+h_is <- house_2012_is %>%
+  rbind(house_2014_is) %>%
+  rbind(house_2016_is) %>%
+  rbind(house_2018_is)
+
+# check name matching again for ad_tone and party
+table(h$party)
+h_is <- h_is %>%
+  mutate(party = case_when(party == 'Democrat' ~ 'Democrat',
+                           party == 'DEMOCRAT' ~ 'Democrat',
+                           party == 'Democratic' ~ 'Democrat',
+                           party == 'REPUBLICAN' ~ 'Republican',
+                           party == 'Republican' ~ 'Republican')) %>%
+  mutate(ad_tone = tolower(ad_tone)) %>%
+  filter(cycle %in% c(2006, 2010, 2012, 2014, 2016, 2018)) %>%
+  rename(ad_purpose = per_ply) %>%
+  mutate(ad_purpose = tolower(ad_purpose), 
+         ad_purpose = case_when(ad_purpose == 'both personal char. and policy matters' ~ "both",
+                                ad_purpose == 'both personal characteristics and policy matters' ~ "both",
+                                ad_purpose == 'personal characteristics' ~ "personal",
+                                ad_purpose == 'policy matters' ~ "policy"))
+
+# csv
+write.csv(h_is, "ads_issues_2012-2018.csv")
+```
+
+```{r}
+
+# reading in data written from R script
+
+ads <- read_csv("ads_2006_2018.csv")
+ads_issues <- read_csv("ads_issues_2012-2018.csv")
+
+# read data for house party vote share
+
+hpvsd <- read_csv("house party vote share by district 1948-2020.csv")
+
+```
+
+```{r}
+ads_issues %>%
+  group_by(party, est_cost) %>%
+  drop_na(party) %>%
+  count() %>%
+  ggplot(aes(x = est_cost, y = n, fill = party)) +
+  geom_bar(stat = 'identity')
+```
+
+```{r}
+
+ads_issues$state_abbr <- state.abb[match(ads_issues$state, state.name)]
+ads_issues$district_id <- with(ads_issues, paste0(state_abbr, cd_fips))
+
+ads_issues$DemVotesMajorPercent <- hpvsd$DemVotesMajorPercent[match(ads_issues$district_id, hpvsd$district_id)]
+ads_issues$RepVotesMajorPercent <- hpvsd$RepVotesMajorPercent[match(ads_issues$district_id, hpvsd$district_id)]
+
+ad18 <- ads_issues %>%
+  drop_na(RepVotesMajorPercent) %>%
+  filter(cycle == 2018) %>%
+  group_by(party, st_cd_fips) %>%
+  mutate(adcount = n())
+
+# ad18a <- ad18 %>%
+#   group_by(st_cd_fips) %>%
+#   mutate(totcost = sum(est_cost)) %>%
+#   select(state, party, st_cd_fips, district_id, RepVotesMajorPercent, DemVotesMajorPercent, adcount, totcost) %>%
+#   pivot_wider(names_from = party, values_from = adcount) %>%
+#   select(!`NA`) %>%
+#   group_by(st_cd_fips)
+# 
+# ad18 %>%
+#     group_by(state, st_cd_fips, district_id, RepVotesMajorPercent, DemVotesMajorPercent, adcount, party) %>%
+#     summarise(n = dplyr::n(), .groups = "drop") %>%
+#     filter(n > 1L)
+# 
+# ad18 %>%
+#   group_by(district_id) %>%
+#   ggplot(aes(x = count, y = DemVotesMajorPercent)) +
+#   geom_point()
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
