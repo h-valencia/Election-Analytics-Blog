@@ -5,15 +5,18 @@ date: '2022-10-09'
 slug: []
 categories: []
 tags: []
+summary: "This week we learned about the effect of advertising on election outcomes at the district level. There is some conflicting literature about the effects of advertising on informing, mobilizing, and persuading voters. In this blog, I will look at trends between advertising data and vote shares in previous elections, then add to my model predicting the 2022 House election."
 ---
 
 *This blog is part of a series related to Gov 1347: Election Analytics, a course at [Harvard University](https://www.harvard.edu/) taught by Professor [Ryan D. Enos](http://ryandenos.com/)*.
 
-This week we learned about how advertising can affect the outcomes of elections, 
+This week we learned about the effect of advertising on election outcomes at the district level. There is some conflicting literature about the effects of advertising on informing, mobilizing, and persuading voters. In this blog, I will look at trends between advertising data and vote shares in previous elections, then add to my model predicting the 2022 House election.
+
+This week we learned about how advertising can affect the outcomes of elections, with campaigns running ads on social media and television, with different goals in mind. Advertisements can be used to promote a candidate, attack the opposition, or both. Ads can also highlight important political issues for each party, from health care and abortion to taxes and government spending. While advertising campaigns do have an impact on voter knowledge and interest, we are curious if they imapct the actual results of the election in the form of who voters choose to vote for. [Huber and Arceneaux (2007)](https://hollis.harvard.edu/primo-explore/fulldisplay?docid=TN_cdi_proquest_miscellaneous_59786011&context=PC&vid=HVD2&search_scope=everything&tab=everything&lang=en_US), find that contrary to previous research in this area, "Advertising does a little to inform, next to nothing to mobilize, and a great deal to persuade potential voters". In analyzing this data, we can hope to find some relationships that are useful to our prediction models and good predictors for house election outcomes in each district.
 
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = FALSE)
+knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE)
 
 # load libraries
 
@@ -25,6 +28,7 @@ library(sf)
 library(haven)
 library(sjlabelled)
 library(usdata)
+library(stargazer)
 ```
 
 
@@ -822,7 +826,7 @@ ad18a <- ad18 %>%
   select(state, party, st_cd_fips, district_id, RepVotesMajorPercent, DemVotesMajorPercent, adcount, totcost, disttotcost) %>%
   distinct(party, st_cd_fips, .keep_all = TRUE) %>%
   mutate(st_cd_fips = as.numeric(st_cd_fips),
-         pctcost = totcost/disttotcost) %>%
+         pctcost = (totcost/disttotcost)*100) %>%
   drop_na(party)
 
 # pasting the number of ads difference from the other data frame to this one
@@ -831,7 +835,7 @@ ad18a$addiff <- ad18_a$addiff[match(ad18a$st_cd_fips, ad18_a$st_cd_fips)]
 
 ```
 
-In the graph below, we can look at the relationship between the difference in the number of ads run per district in 2018 (number of democratic ads minus the number of republican ads) versus the major vote percentage for democratcs.
+To start, I will look at various advertising measurements from the 2018 election and their relationship with the vote share, specifically the Democratic vote share. In the graph below, we can look at the relationship between the difference in the number of ads run per district in 2018 (number of democratic ads minus the number of republican ads) versus the major vote percentage for democrats.
 
 ```{r}
 ad18a %>%
@@ -844,26 +848,52 @@ ad18a %>%
        y = "Democrat Major Vote Percent",
        title = "Difference in the Number of Ads Run vs. Democratic Vote Percentage by District in 2018",
        subtitle = "Each point represents a district with sufficient data")
+
 ```
 
 As we can see from the line of best fit, there is a slight positive relationship between these two variables. We can interpret this to mean that on average, when the difference between the amount of ads Democrats run over Republicans is greater in a district, Democrats are more likely to also have a higher major party vote percentage. While the line of best fit depicts the relationship in this way, looking at the data points we can see some heteroskedasticity. When the difference in the number of ads run is around 0, the democratic vote percentage has much more variation than when the difference in the number of ads is greater. One explanation for this pattern could be that districts where there is no competition may not have ads run on either side, thus leading to a difference in ads of 0 but vote percentages that fall on both extremes from 0-100. We can also think of the opposite phenomenon happening, in that highly competitive districts have both parties running lots of ads, leading to a difference of 0 but a vote share that falls much closer to 50, as one party edges the other out narrowly. When one party is running a lot more ads than the other, this may be a district that leans one way but is a toss up so the underdog party might try to push ads to gain the needed votes. We can see this pattern in the points that fall on the right with vote percentages right around 50, but an ad difference that is fairly high.
 
+Below we look at a similar graph, but instead of looking at the difference in the number of ads run, we are looking at the percentage of a district's estimated total ad costs that is spent on Democratic ads. The costs are estimated by the Wesleyan Media Project, so we must consider that there may be some noise in these estimations that is unaccounted for.
+
 ```{r}
-# ad18a %>%
-#   filter(party == "Democrat") %>%
-#   filter(pctcost != 1) 
-#   ggplot(aes(x = pctcost, y = DemVotesMajorPercent)) +
-#   geom_point() +
-#   geom_smooth(method = "lm") +
-#   labs(x = "Percent of Total District Ad Cost (used for Democrat Ads)",
-#        y = "Democrat Major Vote Percent",
-#        title = "Difference in the Number of Ads Run vs. Democratic Vote Percentage by District in 2018",
-#        subtitle = "Each point represents a district with sufficient data")
+
+# graph of pctcost and dem vote pct
+# filtering for only the democrat observation for each district
+# removing observations where one party had 100% of the advertising costs - there sometimes was only one observation for a district (rep or dem) and that resulted in a pct of 100%
+
+ad18a %>%
+  filter(party == "Democrat") %>%
+  filter(pctcost != 100) %>%
+  ggplot(aes(x = pctcost, y = DemVotesMajorPercent)) +
+  geom_point() +
+  geom_smooth(method = "lm") +
+  labs(x = "Percent Democratic Ad Cost out of Total District Ad Costs (estimated costs)",
+       y = "Democrat Major Vote Percent",
+       title = "Percent Democratic Ad Cost vs. Democratic Vote Percentage by District in 2018",
+       subtitle = "Estimated cost spent on ads by Democrats over the total spending on ads in each district")
 ```
 
+This graph shows us that there is a positive relationship between the percent of a district's total ad cost that was spent by Democrats and the Democrat major vote percent. Here, the total ad cost for a district -- that is used to calculate the percent value we see on the x-axis -- is defined as the sum of estimated costs for Republican ads in a district plus the sum of estimated costs for Democratic ads in the same district. The positive relationship we see means that on average, when democrats spend a greater percentage of the district's total ad costs, they have a higher major vote percent. In this graph we can also see that districts where democrats made up a higher percent of the district's total ad costs were more competitive, shown by the points on the right falling close to the 50% major vote. We also can see that in districts where the percent of ad costs was split pretty evenly between democrats and republicans, there are vote shares that also fall around 50%. In these competitive districts, we can imagine that campaigning and the running of advertisements is rather important.
+
+```{r}
+
+# reading in data used to make old model
+poll <- read_csv("week3_data.csv")
 
 
+```
 
+```{r, results = 'asis', message=FALSE, warning = FALSE}
+
+# old model
+
+poll2 <- poll
+
+fit7 <- lm(D_majorvote_pct ~ support + President_party + H_incumbent + unrate + unrate*President_party, data = poll2, weights = days_until_election)
+
+stargazer(fit7, type = "html", covariate.labels = c("Generic Ballot Support", "President Party - Republican", "House Incumbent - Republican", "Unemployment Rate", "President Party - R * Unemployment Rate", "Constant"))
+
+```
 
 
 

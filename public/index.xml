@@ -13,9 +13,7 @@
       <pubDate>Sun, 09 Oct 2022 00:00:00 +0000</pubDate>
       
       <guid>http://example.org/post/2022-10-09-week-5/</guid>
-      <description>This blog is part of a series related to Gov 1347: Election Analytics, a course at Harvard University taught by Professor Ryan D. Enos.
-This week we learned about how advertising can affect the outcomes of elections,
-## New names: ## Rows: 3838373 Columns: 18 ## ── Column specification ## ──────────────────────────────────────────────────────── Delimiter: &amp;quot;,&amp;quot; chr ## (12): creative, market, state, race, district, party, ad_tone, ad_purpo... dbl ## (4): ...1, dma, cycle, n_stations date (1): airdate time (1): airtime ## ℹ Use `spec()` to retrieve the full column specification for this data.</description>
+      <description>This week we learned about the effect of advertising on election outcomes at the district level. There is some conflicting literature about the effects of advertising on informing, mobilizing, and persuading voters. In this blog, I will look at trends between advertising data and vote shares in previous elections, then add to my model predicting the 2022 House election.</description>
     </item>
     
     <item>
