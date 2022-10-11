@@ -9,6 +9,7 @@ tags: []
 
 *This blog is part of a series related to Gov 1347: Election Analytics, a course at [Harvard University](https://www.harvard.edu/) taught by Professor [Ryan D. Enos](http://ryandenos.com/)*.
 
+This week we learned about how advertising can affect the outcomes of elections, 
 
 
 ```{r setup, include=FALSE}
@@ -37,9 +38,9 @@ ad_issues1 <- read_csv("ads_issues_2012-2018 (1).csv")
 # reading WMP files
 
 # wmp_2012 <- read_dta("wmp-house-2012-v1.1.dta")
-wmp_2014 <- readRDS("WMP_house_gen_2014_ads_cleaned.rds")
-wmp_2016 <- readRDS("WMP_house_gen_2016_ads_cleaned.rds")
-wmp_2018 <- readRDS("WMP_house_gen_2018_ads_cleaned.rds")
+# wmp_2014 <- readRDS("WMP_house_gen_2014_ads_cleaned.rds")
+# wmp_2016 <- readRDS("WMP_house_gen_2016_ads_cleaned.rds")
+# wmp_2018 <- readRDS("WMP_house_gen_2018_ads_cleaned.rds")
 ```
 
 ```{r LabQ1, eval=FALSE}
@@ -755,21 +756,19 @@ hpvsd <- read_csv("house party vote share by district 1948-2020.csv")
 ```
 
 ```{r}
-ads_issues %>%
-  group_by(party, est_cost) %>%
-  drop_na(party) %>%
-  count() %>%
-  ggplot(aes(x = est_cost, y = n, fill = party)) +
-  geom_bar(stat = 'identity')
-```
 
-```{r}
+# matching the district IDs with the house party vote share data
 
 ads_issues$state_abbr <- state.abb[match(ads_issues$state, state.name)]
 ads_issues$district_id <- with(ads_issues, paste0(state_abbr, cd_fips))
 
+# adding the Dem and Rep Vote share percentage to the ads_issues df
+
 ads_issues$DemVotesMajorPercent <- hpvsd$DemVotesMajorPercent[match(ads_issues$district_id, hpvsd$district_id)]
 ads_issues$RepVotesMajorPercent <- hpvsd$RepVotesMajorPercent[match(ads_issues$district_id, hpvsd$district_id)]
+
+# filtering for just 2018
+# creating an ad count variable for each party and district
 
 ad18 <- ads_issues %>%
   drop_na(RepVotesMajorPercent) %>%
@@ -777,26 +776,90 @@ ad18 <- ads_issues %>%
   group_by(party, st_cd_fips) %>%
   mutate(adcount = n())
 
-# ad18a <- ad18 %>%
-#   group_by(st_cd_fips) %>%
-#   mutate(totcost = sum(est_cost)) %>%
-#   select(state, party, st_cd_fips, district_id, RepVotesMajorPercent, DemVotesMajorPercent, adcount, totcost) %>%
-#   pivot_wider(names_from = party, values_from = adcount) %>%
-#   select(!`NA`) %>%
-#   group_by(st_cd_fips)
-# 
-# ad18 %>%
-#     group_by(state, st_cd_fips, district_id, RepVotesMajorPercent, DemVotesMajorPercent, adcount, party) %>%
-#     summarise(n = dplyr::n(), .groups = "drop") %>%
-#     filter(n > 1L)
-# 
-# ad18 %>%
-#   group_by(district_id) %>%
-#   ggplot(aes(x = count, y = DemVotesMajorPercent)) +
-#   geom_point()
 ```
 
+```{r, eval=FALSE}
 
+# shortening the data by grabbing distinct districts and parties - all other values are the same
+# changing the st_cd_fips variable to numeric for the for loop later
+# created a new column for the difference in ads between democrats and republicans for each district
+
+ad18_a <- ad18 %>%
+  drop_na(party) %>%
+  select(party, st_cd_fips, DemVotesMajorPercent, RepVotesMajorPercent, adcount) %>%
+  group_by(st_cd_fips) %>%
+  distinct(st_cd_fips, party, .keep_all = TRUE) %>%
+  mutate(st_cd_fips = as.numeric(st_cd_fips),
+         addiff = NA)
+
+# a for loop that fills in the ad difference column with NA if there is not data on one party's advertisements in a district or with the difference between democrats and republican ads run for each district
+
+for(i in 1:max(ad18_a$st_cd_fips)){
+  x <- ad18_a %>% filter(st_cd_fips == i)
+  ad18_a$addiff[ad18_a$st_cd_fips == i] <- ifelse(nrow(x) > 1, x$adcount[x$party == "Democrat"] - x$adcount[x$party == "Republican"], NA)
+}
+
+# writing as a csv so that do not need to run for loop again later --> setting this chunk's eval=FALSE so it does not run again.
+
+write_csv(ad18_a, "ad18_a.csv")
+
+```
+
+```{r}
+
+# reading in the df I created above
+
+ad18_a <- read_csv("ad18_a.csv")
+
+# creating a total cost variable for each party's ad spending per district
+# keeping only one row per distrcit/party combo
+
+ad18a <- ad18 %>%
+  group_by(st_cd_fips) %>%
+  mutate(disttotcost = sum(est_cost)) %>%
+  group_by(st_cd_fips, party) %>%
+  mutate(totcost = sum(est_cost)) %>%
+  select(state, party, st_cd_fips, district_id, RepVotesMajorPercent, DemVotesMajorPercent, adcount, totcost, disttotcost) %>%
+  distinct(party, st_cd_fips, .keep_all = TRUE) %>%
+  mutate(st_cd_fips = as.numeric(st_cd_fips),
+         pctcost = totcost/disttotcost) %>%
+  drop_na(party)
+
+# pasting the number of ads difference from the other data frame to this one
+
+ad18a$addiff <- ad18_a$addiff[match(ad18a$st_cd_fips, ad18_a$st_cd_fips)]
+
+```
+
+In the graph below, we can look at the relationship between the difference in the number of ads run per district in 2018 (number of democratic ads minus the number of republican ads) versus the major vote percentage for democratcs.
+
+```{r}
+ad18a %>%
+  filter(party == "Democrat") %>%
+  drop_na(addiff) %>%
+  ggplot(aes(x = addiff, y = DemVotesMajorPercent)) +
+  geom_point() +
+  geom_smooth(method = "lm") +
+  labs(x = "Difference in Number of Ads Run (Dem - Rep)",
+       y = "Democrat Major Vote Percent",
+       title = "Difference in the Number of Ads Run vs. Democratic Vote Percentage by District in 2018",
+       subtitle = "Each point represents a district with sufficient data")
+```
+
+As we can see from the line of best fit, there is a slight positive relationship between these two variables. We can interpret this to mean that on average, when the difference between the amount of ads Democrats run over Republicans is greater in a district, Democrats are more likely to also have a higher major party vote percentage. While the line of best fit depicts the relationship in this way, looking at the data points we can see some heteroskedasticity. When the difference in the number of ads run is around 0, the democratic vote percentage has much more variation than when the difference in the number of ads is greater. One explanation for this pattern could be that districts where there is no competition may not have ads run on either side, thus leading to a difference in ads of 0 but vote percentages that fall on both extremes from 0-100. We can also think of the opposite phenomenon happening, in that highly competitive districts have both parties running lots of ads, leading to a difference of 0 but a vote share that falls much closer to 50, as one party edges the other out narrowly. When one party is running a lot more ads than the other, this may be a district that leans one way but is a toss up so the underdog party might try to push ads to gain the needed votes. We can see this pattern in the points that fall on the right with vote percentages right around 50, but an ad difference that is fairly high.
+
+```{r}
+# ad18a %>%
+#   filter(party == "Democrat") %>%
+#   filter(pctcost != 1) 
+#   ggplot(aes(x = pctcost, y = DemVotesMajorPercent)) +
+#   geom_point() +
+#   geom_smooth(method = "lm") +
+#   labs(x = "Percent of Total District Ad Cost (used for Democrat Ads)",
+#        y = "Democrat Major Vote Percent",
+#        title = "Difference in the Number of Ads Run vs. Democratic Vote Percentage by District in 2018",
+#        subtitle = "Each point represents a district with sufficient data")
+```
 
 
 

@@ -10,6 +10,7 @@ tags: []
 
 
 <p><em>This blog is part of a series related to Gov 1347: Election Analytics, a course at <a href="https://www.harvard.edu/">Harvard University</a> taught by Professor <a href="http://ryandenos.com/">Ryan D. Enos</a></em>.</p>
+<p>This week we learned about how advertising can affect the outcomes of elections,</p>
 <pre><code>## New names:
 ## Rows: 3838373 Columns: 18
 ## ── Column specification
@@ -52,4 +53,15 @@ tags: []
 ## ℹ Use `spec()` to retrieve the full column specification for this data. ℹ
 ## Specify the column types or set `show_col_types = FALSE` to quiet this message.
 ## • `` -&gt; `...1`</code></pre>
-<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-3-1.png" width="672" /></p>
+<pre><code>## Rows: 353 Columns: 6
+## ── Column specification ────────────────────────────────────────────────────────
+## Delimiter: &quot;,&quot;
+## chr (1): party
+## dbl (5): st_cd_fips, DemVotesMajorPercent, RepVotesMajorPercent, adcount, ad...
+## 
+## ℹ Use `spec()` to retrieve the full column specification for this data.
+## ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.</code></pre>
+<p>In the graph below, we can look at the relationship between the difference in the number of ads run per district in 2018 (number of democratic ads minus the number of republican ads) versus the major vote percentage for democratcs.</p>
+<pre><code>## `geom_smooth()` using formula &#39;y ~ x&#39;</code></pre>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-6-1.png" width="672" /></p>
+<p>As we can see from the line of best fit, there is a slight positive relationship between these two variables. We can interpret this to mean that on average, when the difference between the amount of ads Democrats run over Republicans is greater in a district, Democrats are more likely to also have a higher major party vote percentage. While the line of best fit depicts the relationship in this way, looking at the data points we can see some heteroskedasticity. When the difference in the number of ads run is around 0, the democratic vote percentage has much more variation than when the difference in the number of ads is greater. One explanation for this pattern could be that districts where there is no competition may not have ads run on either side, thus leading to a difference in ads of 0 but vote percentages that fall on both extremes from 0-100. We can also think of the opposite phenomenon happening, in that highly competitive districts have both parties running lots of ads, leading to a difference of 0 but a vote share that falls much closer to 50, as one party edges the other out narrowly. When one party is running a lot more ads than the other, this may be a district that leans one way but is a toss up so the underdog party might try to push ads to gain the needed votes. We can see this pattern in the points that fall on the right with vote percentages right around 50, but an ad difference that is fairly high.</p>
