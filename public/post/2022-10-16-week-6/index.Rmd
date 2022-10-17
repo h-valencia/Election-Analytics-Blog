@@ -1,0 +1,73 @@
+---
+title: The Ground Game
+author: Hannah Valencia
+date: '2022-10-16'
+slug: []
+categories: []
+tags: []
+summary: "This week we learned about how election turnout can affect the outcome of races, and how on-the-ground campaigning efforts aim to mobilize and persuade voters. We can look at this data on the district-level to uncover patterns, and compare it to last week's data on ad spending to see how they interact."
+---
+
+*This blog is part of a series related to Gov 1347: Election Analytics, a course at [Harvard University](https://www.harvard.edu/) taught by Professor [Ryan D. Enos](http://ryandenos.com/)*.
+
+*This week we learned about how election turnout can affect the outcome of races, and how on-the-ground campaigning efforts aim to mobilize and persuade voters. We can look at this data on the district-level to uncover patterns, and compare it to last week's data on ad spending to see how they interact.*
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE)
+
+# load libraries
+
+library(tidyverse)
+library(usmap)
+library(plotly)
+library(rmapshaper)
+library(sf)
+library(haven)
+library(sjlabelled)
+library(usdata)
+library(stargazer)
+
+```
+
+
+```{r}
+poll <- read_csv("week3_data.csv")
+house <- read_csv("house party vote share by district 1948-2020.csv")
+expert_rating <- read_csv("expert_rating.csv")
+house_polls_long <- read_csv("house_polls_long.csv")
+ratings2018 <- read_csv("2018_ratings_share.csv")
+cvap_2012_2020 <- read_csv("cvap_district_2012-2020_clean.csv")
+dist_polls <- read_csv("dist_polls_2018-2022.csv")
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
