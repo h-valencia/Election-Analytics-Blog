@@ -124,7 +124,52 @@
 ## Residual standard error: 19.68 on 1743 degrees of freedom
 ## Multiple R-squared:  0.2996, Adjusted R-squared:  0.2992 
 ## F-statistic: 745.7 on 1 and 1743 DF,  p-value: &lt; 2.2e-16</code></pre>
-<p>For the Democratic regression, when the candidate is a challenger, they have a predicted democrat two-party vote percentage of 39.64%. When the candidate is an incumbent, however, the vote percentage increases by 25.8 percentage points, to a Democratic vote percentage of 65.44%. The coefficient here is also highly significant, showing us that the relationship between a candidate’s status as an incumbent and their democratic vote share is highly correlated. I also ran this regression on Republican vote percentage and found a different outcome. Here, the model shows that when a candidate is a challenger, they receive 60.36% of the two-party vote share. The coefficient on candidate incumbency in this model is highly negative, with a coefficient of -25.80, and highly significant. For the Republican two-party vote share, when a candidate is an incumbent, it actually <em>hurts</em> their votes.</p>
+<p>For the Democratic regression, when the candidate is a challenger, they have a predicted democrat two-party vote percentage of 39.64%. When the candidate is an incumbent, however, the vote percentage increases by 25.8 percentage points, to a Democratic vote percentage of 65.44%. The coefficient here is also highly significant, showing us that the relationship between a candidate’s status as an incumbent and their democratic vote share is highly correlated. I also ran this regression on Republican vote percentage and found a different outcome. Here, the model shows that when a candidate is a challenger, they receive 60.36% of the two-party vote share. The coefficient on candidate incumbency in this model is highly negative, with a coefficient of -25.80, and highly significant. For the Republican two-party vote share, when a candidate is an incumbent, it actually <em>hurts</em> their votes. These results seem a bit strange to me, especially in their magnitude of difference. Not only would I expect incumbency to have the same sign on the coefficient for both Republicans and Democrats, but I also did not expect the coefficient to be so large and significant. The adjusted r-squared of this model is 0.2992, showing that while not necessarily a <em>good</em> predictor of two-party vote share, the candidate’s incumbency does have a somewhat notable relationship with the vote percentage.</p>
+<p>I would like to see how both incumbency and voter turnout influence vote share by adding the variables to the same regression.</p>
+<pre><code>## 
+## Call:
+## lm(formula = DemVotesMajorPercent ~ dist_turnout + cand_incumbent, 
+##     data = x2)
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -65.683  -7.762  -0.847   7.879  62.032 
+## 
+## Coefficients:
+##                Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept)      37.601      1.731  21.725   &lt;2e-16 ***
+## dist_turnout      3.991      3.138   1.272    0.204    
+## cand_incumbent   25.936      0.951  27.274   &lt;2e-16 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 19.68 on 1742 degrees of freedom
+## Multiple R-squared:  0.3003, Adjusted R-squared:  0.2995 
+## F-statistic: 373.8 on 2 and 1742 DF,  p-value: &lt; 2.2e-16</code></pre>
+<p>Similar to the two separate regressions we saw before, in this model incumbency is again highly significant and of a large magnitude, while turnout is small and insignificant. The adjusted r-squared of this regression is 0.2995, which is pretty much the same as what we saw in the model that used only incumbency as an independent variable. Adding turnout does very little to adjust this model.</p>
+<p>For the final part of this extension, I will also add the expert ratings to the model. This will hopefully have a large impact on the predicted vote percentage, as we saw these ratings to be a good indicator of vote share in earlier blogs. This expert rating is the generic ballot average for the year, as that data is national. I will use only the generic ballot support data for the democratic party, given that the dependent variable I am using is Democratic two-party vote percentage.</p>
+<pre><code>## 
+## Call:
+## lm(formula = DemVotesMajorPercent ~ dist_turnout + cand_incumbent + 
+##     gen_avg_dem, data = x3)
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -73.330  -7.540  -0.070   7.817  61.315 
+## 
+## Coefficients:
+##                Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept)    -13.8545    10.3647  -1.337   0.1815    
+## dist_turnout    -9.1218     4.0617  -2.246   0.0248 *  
+## cand_incumbent  25.4751     0.9488  26.849  &lt; 2e-16 ***
+## gen_avg_dem      1.2275     0.2438   5.034 5.29e-07 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 19.54 on 1741 degrees of freedom
+## Multiple R-squared:  0.3103, Adjusted R-squared:  0.3091 
+## F-statistic: 261.1 on 3 and 1741 DF,  p-value: &lt; 2.2e-16</code></pre>
+<p>Oh no… Looking at this we can immediately see that the intercept is negative, which as we spent a long time discussing this past week, is not possible! The democratic two-party vote share percentage only exists in the 0-100% range – it cannot be a negative value. And on top of that, the district’s turnout is a negative number as well with a high magnitude relative to the intercept coefficient. Something is seriously wrong here.</p>
 <pre><code>## 
 ## 2018 2020 
 ##  760  371</code></pre>
@@ -167,7 +212,7 @@
         		<footer>
 			
 			<span>
-			&copy; <time datetime="2022-10-19 16:15:54.040357 -0400 EDT m=&#43;3.892622527">2022</time> . Made with <a href='https://gohugo.io'>Hugo</a> using the <a href='https://github.com/EmielH/tale-hugo/'>Tale</a> theme.
+			&copy; <time datetime="2022-10-19 17:02:01.487118 -0400 EDT m=&#43;11.452706294">2022</time> . Made with <a href='https://gohugo.io'>Hugo</a> using the <a href='https://github.com/EmielH/tale-hugo/'>Tale</a> theme.
 			</span>
 		</footer>
 
