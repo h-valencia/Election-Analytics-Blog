@@ -1,0 +1,489 @@
+---
+title: The Ground Game
+author: "Kiara Hernandez"
+date: \today
+institute: Harvard University
+fontsize: 10pt
+output:
+ beamer_presentation:
+    keep_tex: true
+    theme: metropolis
+    latex_engine: pdflatex
+    slide_level: 2
+    highlight: zenburn
+    incremental: false
+classoption: "handout"
+header-includes:
+  \setbeamercolor{frametitle}{bg=purple}
+  \hypersetup{colorlinks,citecolor=orange,filecolor=red,linkcolor=brown,urlcolor=blue}
+subtitle: 'Gov 1347: Election Analytics'
+---
+
+```{r,  cache=TRUE, echo=FALSE, warning=FALSE, message=FALSE}
+## insert hypothetical graphs for general instruction/exploration
+## Q: what's wrong with this map?
+## A: (1) no polls in some states 
+##    (2) very high variance for some states / negative slopes 
+##    (3) y not always in [0,100] range
+
+```
+
+```{r,  cache=TRUE, echo=FALSE, eval = FALSE, warning=FALSE, message=FALSE}
+# example: PA01
+# library(readr)
+# library(tidyverse)
+# # CVAP
+# cvap_district <- read_csv("cvap_district_2012-2020_clean.csv")
+# 
+# # rename geoid
+# cvap_district <- cvap_district %>%
+#   rename(st_cd_fips = geoid) 
+# 
+# # merge with district-level polls
+# polls_df <- read_csv("house_polls_long.csv")
+# polls_df <- polls_df %>%
+#   filter(year == '2018' | year == '2020')
+# table(polls_df$year)
+# # join
+# cvap_district <- cvap_district %>%
+#   # filter to relevant years 
+#   filter(year == '2018' | year == '2020')
+# 
+# polls_cvap_df <- merge(polls_df, cvap_district, by = c('st_cd_fips', 'year'))
+# 
+# # merge with district-level voteshares
+# dist_pv_df <- read_csv("incumb_dist_1948-2020 (3).csv")
+# dist_pv_df <- dist_pv_df %>%
+#   filter(year == '2018' | year == '2020')
+# 
+# polls_cvap_vp_df <- merge(polls_cvap_df, dist_pv_df, by = c('st_cd_fips', 'year'))
+# table(polls_cvap_vp_df$st_cd_fips)
+# 
+# # for PA01
+# PA01 <- polls_cvap_vp_df %>% filter(st_cd_fips == 4201) %>%
+#   # mutate DEM/REP to numeric
+#   mutate(DEM = as.numeric(DEM), REP = as.numeric(REP))
+# 
+# # linear regression for PA01
+# PA01_lm <- lm(DemVotesMajorPercent ~ DEM, data = PA01)
+# 
+# # predict
+# prob_PA01_lm <- predict(PA01_lm, newdata = data.frame(DEM=46))
+# 
+# # binomial logit
+# PA01_glm <- glm(cbind(DemVotes, cvap-DemVotes) ~ DEM, PA01, family = binomial)
+# 
+# # predict
+# prob_PA01_glm <- predict(PA01_glm, newdata = data.frame(DEM=46), type="response")[[1]]
+
+# outputs are predictions, forecast is model
+# compare plots
+# ggplot(PA01, aes(x = DEM, y = DemVotesMajorPercent)) +
+#   geom_point() +
+#   geom_smooth(data = PA01, aes(x = cbind(DemVotes, cvap-DemVotes), y = DEM),
+#     method = "glm", method.args = list(family = "binomial"), 
+#     se = FALSE)
+# 
+# ggplot(PA01, aes(x = DEM, y = DemVotesMajorPercent)) + 
+#   geom_point() +
+#   stat_smooth(method = "lm")
+# ggplot(PA01, aes(x = DEM, y = DemVotesMajorPercent)) + 
+#   #geom_point() +
+#   stat_smooth(method = "lm")
+
+```
+
+![](imgs/poll diffs){width=750px, height=550px}
+\textbf{Q:} What's wrong with these plots?
+
+## Solution: probabilistic models
+
+\small
+\textbf{Linear regression}: outcome can be any value in a continuous range (-$\infty$, +$\infty$) \newline
+$$\%DemPV_{district} = \alpha + \beta_1 x_1 + \ldots + \beta_k x_k \quad \text{or}$$ and modeled as
+$$ \textcolor{red}{DemPV_{district} = \alpha + \beta_1 x_1 + \ldots + \beta_k x_k},$$ \newline
+but the true outcome is bounded to (0, 100) \textcolor{red}{or (0, $CVAP_{district}$)} \ldots \newline
+
+\textbf{Binomial logistic regression}: election outcome for Democrats is \underline{finite draw} of voters from the citizen voting age \underline{population} ($CVAP_{district}$) turning out to vote Democrat (a \textcolor{blue}{binomial process}) modeled as 
+$$ \begin{aligned}
+Pr(\underbrace{\text{Vote for Dem}_{district,i}}_{voter \ i \ in \ district}) &= f(\alpha + \beta_1 x_1 + \ldots + \beta_k x_k) \\
+&= \frac{exp(\alpha + \beta_1 x_1 + \ldots + \beta_k x_k)}{1 + exp(\alpha + \beta_1 x_1 + \ldots + \beta_k x_k)} \scriptsize{\text{ (for i = 1, ..., $CVAP_{district}$)}}
+\end{aligned}$$ \newline
+where \textcolor{purple}{link function f (inverse logistic function)} bounds (-$\infty$, +$\infty$) to (0, 1) 
+
+## Example of a probabilistic model: binomial logistic regression
+
+Supposing we have \texttt{x} (a single IV), \texttt{y} (a DV) as Dem's popular vote share (\%): \pause
+\begin{table}
+\begin{tabular}{r|c|c|}
+  & \textbf{Linear regression} & \textbf{Binomial logistic regression} \\[-0.5em]
+  & & \textbf{(binomial logit)} \\
+  \hline \hline
+  \small{link function} & $f(\alpha + \beta x) = \alpha + \beta x$ & $f(\alpha + \beta x) = \frac{\exp(\alpha + \beta x)}{1 + \exp(\alpha + \beta x)}$ \\ \hline \pause
+  \scriptsize{link function name} & identity & inverse logistic function \\ \hline \pause
+  \scriptsize{link function output} & predicted outcome & \small{predicted probability of one draw} \\ \hline \pause
+  \small{}
+\texttt{R} code & {\scriptsize \texttt{lm(y$\sim$x)}} & \tiny{\texttt{glm(cbind(draws, cvap-draws)$\sim$x, family=binomial)}} \\ \hline \pause
+fitting intuition  & \tiny{"do OLS to find coefficients} & \tiny{"find coefficients where fitted draw probabilities $f(\hat{\alpha} + \hat{\beta}x)$} \\[-0.5em] 
+ & \tiny{that minimize $\sum(y-\hat{y})^2$"} & \tiny{best predict observed \texttt{draws}"} \\ \hline \pause
+prediction intuition & \tiny{"plug in $x_{new}$ and get} & \tiny{"plug in $x_{new}$ and get} \\[-0.5em]
+& \tiny{(i) predicted outcome} & \tiny{(i) predicted probability of one draw, $f(\hat{\alpha} + \hat{\beta} x_{new})$;} \\[-0.5em] 
+& \tiny{$\hat{y}_{new} = \hat{\alpha} + \hat{\beta}x_{new}$} & \tiny{also plug in \texttt{CVAP} to get} \\[-0.5em] 
+& \tiny{and (ii) prediction interval} & \tiny{(ii) predicted \underline{expected number} of draws, $\widehat{\texttt{draws}}$,} $\rightsquigarrow$ $\frac{\widehat{\texttt{draws}}}{\texttt{CVAP}}$ \\[-0.5em] 
+& \tiny{$\hat{y}_{new} \pm 1.96 \times \text{se}(\hat{y}_{new})$"} & \tiny{and (iii) predicted \underline{distribution} of draws from} \\[-0.5em] 
+& & \tiny{repeated binomial process simulations"}
+\end{tabular}
+\end{table}
+
+## Simulating a distribution of election results: Extension #2
+
+Instead of (i) a probability for a single D voter or (ii) single
+expected number of D voters from \texttt{CVAP}, $\widehat{\texttt{draws}}$, we can predict a (iii)
+\textcolor{red}{\underline{distribution} of draws from binomial process on that \texttt{CVAP}.}
+
+\tiny
+```{r,  cache=TRUE, eval=TRUE, echo = FALSE, message=FALSE, warning=FALSE}
+## Get relevant data
+# CVAP
+# library(readr)
+# library(tidyverse)
+# cvap_district <- read_csv("cvap_district_2012-2020_clean.csv")
+# 
+# # rename geoid
+# cvap_district <- cvap_district %>%
+#   rename(st_cd_fips = geoid) 
+# 
+# CVAP_PA_2022 <- as.integer(cvap_district$cvap[cvap_district$state == "Pennsylvania" &
+#                                               cvap_district$cd == "1" &
+#                                               cvap_district$year == 2018])
+# # district-level polls
+# polls_df <- read_csv("fips_district_polls_2018-2022.csv")
+# 
+# # class(polls_df$st_cd_fips)
+# # class(cvap_district$st_cd_fips)
+# 
+# polls_df <- polls_df %>%
+#   select(pollster, sponsors, display_name, fte_grade,
+#          start_date, end_date, sample_size, population, year, election_date,
+#          party, candidate_name, pct, state, st_fips, cd_fips, st_cd_fips)
+# 
+# # new party candidate name variable
+# polls_df <- polls_df %>%
+#   mutate(dem_cand = case_when(party == 'DEM' ~ candidate_name),
+#          rep_cand = case_when(party == 'REP' ~ candidate_name)) %>%
+#   filter(party == "DEM" | party == "REP")
+# 
+# # pivot wide
+# polls_df_wide <- polls_df %>%
+#   pivot_wider(names_from = party, values_from = pct)
+# 
+# # make long
+# polls_df_wide <- polls_df_wide %>% 
+#   fill(dem_cand, rep_cand, .direction = "up") %>%
+#   fill(DEM, REP, .direction = "up") 
+# 
+# # delete duplicates
+# ind <- seq(1, nrow(polls_df_wide), by=2)
+# polls_df_wide <- polls_df_wide[-ind, ]
+# 
+# polls_df_wide <- apply(polls_df_wide,2,as.character)
+# 
+# # export
+# # write.csv(polls_df_wide, "~/Dropbox/ElectionAnalytics_Midterms/Lab sessions/campaigns II_ ground game/house_polls_long.csv")
+# 
+# # merge with district-level polls
+# polls_df <- read_csv("~/Dropbox/ElectionAnalytics_Midterms/Lab sessions/campaigns II_ ground game/house_polls_long.csv")
+# polls_df <- polls_df %>%
+#   filter(year == '2018' | year == '2020')
+# table(polls_df$year)
+# # join
+# cvap_district <- cvap_district %>%
+#   # filter to relevant years 
+#   filter(year == '2018' | year == '2020')
+# 
+# polls_cvap_df <- merge(polls_df, cvap_district, by = c('st_cd_fips', 'year'))
+# 
+# # merge with district-level voteshares
+# dist_pv_df <- read_csv("~/Dropbox/ElectionAnalytics_Midterms/Lab sessions/fundamentals II_ incumbency/incumb_dist_1948-2020 (3).csv")
+# dist_pv_df <- dist_pv_df %>%
+#   filter(year == '2018' | year == '2020')
+# 
+# polls_cvap_vp_df <- merge(polls_cvap_df, dist_pv_df, by = c('st_cd_fips', 'year'))
+# #table(polls_cvap_vp_df$st_cd_fips)
+# 
+# PA01 <- polls_cvap_vp_df %>% filter(st_cd_fips == 4201) %>%
+#   # mutate DEM/REP to numeric
+#   mutate(DEM = as.numeric(DEM), REP = as.numeric(REP))
+
+```
+
+```{r,  cache=TRUE, eval=TRUE, message=FALSE, warning=FALSE}
+## Fit D and R models
+# PA_R_glm <- glm(cbind(RepVotes, cvap-RepVotes) ~ REP, PA01, 
+#                 family = binomial)
+# PA_D_glm <- glm(cbind(DemVotes, cvap-DemVotes) ~ DEM, PA01, 
+#                 family = binomial)
+
+```
+
+```{r,  cache=TRUE, eval=TRUE, message=FALSE, warning=FALSE}
+## Get predicted draw probabilities for D and R
+# prob_Rvote_PA_2022 <- predict(PA_R_glm, newdata = 
+#                                 data.frame(REP=44.5), 
+#                               type="response")[[1]]
+# 
+# prob_Dvote_PA_2022 <- predict(PA_D_glm, newdata = 
+#                                 data.frame(DEM=50), 
+#                               type="response")[[1]]
+```
+
+```{r,  cache=TRUE, eval=TRUE, message=FALSE, warning=FALSE}
+## Get predicted distribution of draws from the population
+# sim_Rvotes_PA_2022 <- rbinom(n = 10000, size = CVAP_PA_2022, prob = prob_Rvote_PA_2022)
+# sim_Dvotes_PA_2022 <- rbinom(n = 10000, size = CVAP_PA_2022, prob = prob_Dvote_PA_2022)
+
+```
+
+## Simulating a distribution of election results: Democrat PA01 PV
+
+\scriptsize
+```{r, cache=TRUE, echo=FALSE, fig.width=8, fig.height=5}
+# hist(sim_Dvotes_PA_2022, xlab="predicted turnout draws for Democratic candidate\nfrom 10,000 binomial process simulations", breaks=100)
+```
+
+## Simulating a distribution of election results: Republican PA01 PV
+
+\scriptsize
+```{r, echo=FALSE, fig.width=8, fig.height=5}
+# hist(sim_Rvotes_PA_2022, xlab="predicted turnout draws for Republican candidate\nfrom 10,000 binomial process simulations", breaks=100)
+```
+
+## Simulating a distribution of election results: Republican win margin in PA01
+
+\tiny
+```{r, echo=TRUE}
+# sim_elxns_PA_2022 <- ((sim_Rvotes_PA_2022-sim_Dvotes_PA_2022)/(sim_Dvotes_PA_2022+sim_Rvotes_PA_2022))*100
+```
+
+```{r, fig.width=8, fig.height=5, echo=FALSE}
+# hist(sim_elxns_PA_2022, xlab="predicted draws of Republican win margin (% pts)\nfrom 10,000 binomial process simulations", xlim=c(2, 7.5))
+```
+
+\normalsize
+\textbf{Q:} Does this seem plausible? How could we improve this?
+
+## Reading and interpreting GLMs
+\tiny
+```{r, echo=TRUE, eval=TRUE}
+# # linear regression for PA01
+# PA01_lm <- lm(DemVotesMajorPercent ~ DEM, data = PA01)
+# summary(PA01_lm)
+```
+
+## Reading and interpreting GLMs
+\tiny
+```{r, echo=TRUE, eval=TRUE}
+# # binomial logit
+# PA01_glm <- glm(cbind(DemVotes, cvap-DemVotes) ~ 
+#                   DEM, PA01, family = binomial)
+# summary(PA01_glm)
+```
+
+## Reading and interpreting GLM predictions
+
+```{r, echo=TRUE, eval=TRUE}
+# predict lm
+# prob_PA01_lm <- predict(PA01_lm, newdata = 
+#                           data.frame(DEM=46))
+# prob_PA01_lm
+```
+
+## Reading and interpreting GLM predictions
+
+```{r, echo=TRUE, eval=TRUE}
+# # predict glm
+# prob_PA01_glm <- predict(PA01_glm, newdata = 
+#                            data.frame(DEM=46), type="response")[[1]]
+# prob_PA01_glm
+```
+
+## Summary of probabilistic models
+
+* Explicitly capture a random or probabilistic process of the world 
+    * ex: some draw of voters from CVAP turning out 
+
+* Models like binomial logit (\textbf{generalized linear models}) use
+a link function to bound the outcome to a probability value
+    * \textcolor{red}{link functions like the inverse logistic function allow us to \textbf{non-linearly} predict DV from IVs (solving another problem of linear regression)}  
+    
+* \underline{Workflow}: estimate the parameters of a probabilistic model $\rightsquigarrow$ obtain distributions from repeated simulations of probabilistic process
+    * ex: in binomial logit, we repeatedly draw voters from a binomial process based on predicted probability of one voter turning out Dem
+    * $\sim$ how [The Economist](https://projects.economist.com/us-2020-forecast/president) simulates elections 
+    
+* \underline{Diagnostics}: can still use out-of-sample evaluation tools; see \href{http://had.co.nz/notes/modelling/logistic-regression.html}{\texttt{had.co.nz/notes/modelling/logistic-regression.html}} for other diagnostics.
+
+## Blog tip 2
+
+Recall our conversation with Prof. Vavreck $\rightarrow$
+\textbf{Should \texttt{log()} a "skewed" variable like ad spend. Why?} \newline
+<!-- don't include this code in the code .R ... it's a fake example, and may confuse students -->
+
+##  1. \textbf{modeling}: diminishing returns of \$1 $\rightsquigarrow$ log-transformation linearizes the relationship. 
+
+```{r, echo=FALSE, fig.height=2.75, fig.width=4.5}
+  # par(mfrow=c(1,2))
+  # X <- seq(1, 1000000, by=10000)
+  # plot(X, 0.000001*log(X), type="l", lwd=3, xaxt='n', yaxt='n', ylab="",xlab="")
+  # title(ylab="PV", mgp=c(1,1,0), cex.lab=0.5)
+  # title(xlab="ad spending", mgp=c(1,1,0), cex.lab=0.5)
+  # plot(X, 0.000001*X, type="l", lwd=3, xaxt='n', yaxt='n', ylab="",xlab="")
+  # title(ylab="PV", mgp=c(1,1,0), cex.lab=0.5)
+  # title(xlab="log(ad spending)", mgp=c(1,1,0), cex.lab=0.5)
+```
+
+##  2. \textbf{description}: when most ad spends small, few ad spends huge $\rightsquigarrow$ log-transformation makes it easier to see/count these outliers. \pause
+```{r, echo=FALSE, fig.height=2.5, fig.width=6, warning=FALSE, message=FALSE}
+  # par(mfrow=c(1,2))
+  # hist(exp(rnorm(1000, 1)+5), type="l", lwd=3, xaxt='n', yaxt='n', cex=0.5, main="", ylab="",xlab="")
+  # title(ylab="count", mgp=c(1,1,0), cex.lab=0.65)
+  # title(xlab="ad spending", mgp=c(1,1,0), cex.lab=0.65)
+  # hist(rnorm(1000, 1, 0.9), type="l", lwd=3, xaxt='n', yaxt='n', cex=0.5, main="", ylab="",xlab="")
+  # title(ylab="count", mgp=c(1,1,0), cex.lab=0.65)
+  # title(xlab="log(ad spending)", mgp=c(1,1,0), cex.lab=0.65)
+```
+
+## Blog tip 3
+
+\textbf{District $s$ has too little poll data to fit a model. What do I do?} 
+
+  * \underline{no model}: predict PV as literal 2022 poll value, but report the out-of-sample error of raw polls 
+  * \underline{non-poll model}: use other data (e.g. local economy) for district, but report the out-of-sample error of model 
+  * \underline{\textcolor{purple}{pooled model}}: rather than running district by district regression, use district-level poll model that's fit \textit{across} all districts (more on this today!) 
+  * \underline{no polls whatsoever}: use previous election results, generic ballot polls, polls from districts with similar characteristics, as we've done in past weeks 
+
+## Turnout
+
+Our weeks on campaigns are trying to understand how voters respond to ads and on-the-ground campaigning efforts. From our readings, we know that campaigns try to do two things: \newline
+  * (1) mobilize - turning people out to vote 
+  * (2) persuade - convincing people out to vote for a particular candidate/party 
+
+First, let's look at turnout at the district-level to identify any interesting patterns across time and geography.\newline
+Then, let's turn back to last week's ad data to see whether there is a relationship between turnout and ad spends. 
+
+## How do we calculate turnout?
+\small
+ *$turnout_{district_i} = \frac{totalvotes}{CVAP}$ where $totalvotes$ is the number of two-party votes cast in a given district in a given year and CVAP is the citizen voting-age population in a given district in a given year. Note the differences between CVAP, voting-age population (VAP), voting eligible population (VEP) 
+ 
+  * CVAP = total population that is age 18+ and a citizen 
+  
+  * VAP = total population that is age 18+
+  
+  * VEP = all U.S. citizens age 18+, who are not excluded from voter eligibility due to criminal status (felony convictions, incarceration, or parole)
+
+  *The data we're working with comes from the American Community Survey's 5-Year Estimates. The 5-year estimates are "period" estimates that represent data collected over a period of time. The primary advantage of using multiyear estimates is the increased statistical reliability of the data for less populated areas and small population subgroups.
+  
+  *This means that when a CVAP estimate exists for 2018, we can use that estimate for all years between 2012-2018.
+
+```{r, eval = TRUE, echo = FALSE, warning=FALSE, message=FALSE}
+# read in district-level voting data
+# library(readr)
+# library(tidyverse)
+# dist_pv_df <- read_csv("~/Dropbox/ElectionAnalytics_Midterms/Lab sessions/fundamentals II_ incumbency/incumb_dist_1948-2020 (3).csv")
+# # read in cvap
+# cvap_district <- read_csv("~/Dropbox/ElectionAnalytics_Midterms/Lab sessions/campaigns II_ ground game/cvap_district_2012-2020_clean.csv")
+# # mutate geoid for merging
+# cvap_district <- cvap_district %>%
+#   rename(st_cd_fips = geoid)
+# 
+# # select relevant years from voting data
+# table(dist_pv_df$year)
+# # 2012 - from 2018
+# # 2014, 2016, 2018, 2020 - from 2020
+# dist_pv_df <- dist_pv_df %>%
+#   filter(year == 2012 | year == 2014 | year == 2016 | year == 2018 | year == 2020)
+# 
+# table(dist_pv_df$st_cd_fips)
+# 
+# # merge
+# dist_pv_cvap <- dist_pv_df %>%
+#   inner_join(cvap_district, by = c('st_cd_fips', 'year'))
+# 
+# # mutate turnout
+# dist_pv_cvap <- dist_pv_cvap %>%
+#   mutate(totalvotes = RepVotes + DemVotes,
+#          turnout = totalvotes/cvap)
+# # save
+# 
+# # mutate votes percent for glm
+# dist_pv_cvap <- dist_pv_cvap %>%
+#   mutate(DemVotesMajorPct = DemVotesMajorPercent/100,
+#          RepVotesMajorPct = RepVotesMajorPercent/100)
+# 
+# # drop uncontested seats
+# dist_pv_cvap_closed <- dist_pv_cvap %>%
+#   filter(!is.na(DemCandidate), !is.na(RepCandidate)) %>%
+#   mutate(DemVotesMajorPct = DemVotesMajorPercent/100,
+#          RepVotesMajorPct = RepVotesMajorPercent/100)
+# 
+# # basic lm
+# fit1 <- lm(DemVotesMajorPercent ~ turnout,
+#               data = dist_pv_cvap_closed)
+# summary(fit1)
+# 
+# fit1_glm <- glm(DemVotesMajorPct ~ turnout,
+#               data = dist_pv_cvap_closed, family = binomial(link="logit"))
+# summary(fit1_glm)
+
+# qplot(x = turnout, y = DemVotesMajorPct, data = dist_pv_cvap_closed) + 
+#   #geom_point() +
+#   geom_smooth(method = "glm", formula = y ~ x, family = binomial(link="logit"))
+
+```
+
+## Turnout and Democratic voteshare
+
+```{r, warning=FALSE, echo = TRUE, eval = FALSE, message=FALSE}
+# visualize
+# ggplot(dist_pv_cvap_closed, aes(x = turnout, y = DemVotesMajorPercent)) + 
+#   geom_point() +
+#   stat_smooth(method = "lm")
+```
+
+## Turnout and Democratic voteshare
+\tiny
+```{r, warning=FALSE, echo = FALSE, eval = TRUE, message=FALSE}
+# visualize
+# ggplot(dist_pv_cvap_closed, aes(x = turnout, y = DemVotesMajorPercent)) + 
+#   geom_point() +
+#   stat_smooth(method = "lm")
+```
+
+# What other relationships related to turnout would you be interested in exploring?
+
+* Aggregate changes in turnout over time
+* District-level changes in turnout over time
+* ____?
+* Spend some time talking in small groups and (if we have time) beginning to explore what you come up with.
+
+<!--
+Is this causal? potential problems?
+baseline turnout in battleground states could be higher, the effect size can be different across states
+expected returns-->
+
+## Blog Extensions
+
+\small
+**Turnout model**: Incorporate turnout, incumbency and expert predictions into your district-level two-party voteshare predictions.
+
+**Close Elections**: (i) Do expert predictions predict turnout? Fit a model and discuss your results, thinking specifically about whether your results provide evidence for the effect of ground campaigns on turnout. \newline
+(ii) Do ad spends predict turnout? Merge last week's WMP data with this week's data on turnout at the district level. What can we infer, if anything, about the relationship between the "air war" and voter persuasion/mobilization?
+
+**Probabilistic Simulation of District-Level Races.** Update your working forecasting model from one that is based on linear regression to one that is modeled as a GLM.
+
+Extend the binomial regression-based 
+simulation we did of the Pennsylvania 2022 race to all 2022 races based on the most recent
+poll numbers for the Democratic and Republican candidate (in districts for which district-level polling data is available). Make a \texttt{geofacet} map of the \underline{distribution}
+of your predictions. Do they make sense? Speculate as to why or why not.
+
+
+

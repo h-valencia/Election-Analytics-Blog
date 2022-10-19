@@ -118,6 +118,11 @@ gp1 <- generic_polls %>%
          gen_avg_rep = mean(rep)) %>%
   select(year, gen_avg_dem, gen_avg_rep)
 
+# fix the CVAP data to match format of master df
+cvap_1 <- cvap_2012_2020 %>%
+  filter(year >= 2014) %>%
+  select(year, geoid, cvap, moe)
+
 ```
 
 
@@ -138,10 +143,13 @@ data <- left_join(data, econ1, by = c("year" = "year"))
 data <- left_join(data, expert_rating1, by = c("year" = "year", "state" = "state", "district_num" = "district"))
 data <- left_join(data, ratings2018_1, by = c("year" = "year", "state" = "state", "district_num" = "district"))
 data <- left_join(data, gp1, by = c("year" = "year"))
+data <- left_join(data, cvap_1, by = c("year" = "year", "st_cd_fips" = "geoid"))
 
 # adding a variable for if the district is solid D/R in the form of a yes/no variable
+# adding a variable for turnout: coded as the sum of Rep/Dem Votes dividied by CVAP - limitation: this does not account for third party voters
 data <- data %>%
-  mutate(party_solid = ifelse((avg_rating >= 6 | avg_rating <= 2 | avg_rating_2018 >= 6 | avg_rating_2018 <= 2), "Yes", NA))
+  mutate(party_solid = ifelse((avg_rating >= 6 | avg_rating <= 2 | avg_rating_2018 >= 6 | avg_rating_2018 <= 2), "Yes", NA),
+         dist_turnout = ((RepVotes + DemVotes)/cvap))
 
 # creating two new dataframes: one for if the district is solid D or R, and another for districts that are not solid D/R
 # coded solid as a score if either of the average ratings columns are greater than or equal to 6 (solid R) or less than or equal to 2 (solid D)
@@ -156,9 +164,28 @@ battle_dist_data <- data %>%
 
 ```
 
+So far, we have compiled data on election outcomes, generic ballot polls, expert district-level polls, advertising campaigns, and more. When thinking about elections, however, one of the first things that may come to mind are the on-the-ground campaigns. This week we add this "Ground Game" data to our models, specifically with voter turnout at the district level. 
+
+For starters, below we have a basic regression of a district's turnout percentage on the Democratic party's major vote percentage in a district. The turnout percentage is coded as the sum of Democratic votes and Republican votes, divided by the district's citizen voting age population (CVAP).
+
 ```{r}
+x <- data %>%
+  distinct(year, st_cd_fips, DemVotesMajorPercent, dist_turnout)
+
+fit1 <- lm(data = x, DemVotesMajorPercent ~ dist_turnout)
+summary(fit1)
 
 ```
+
+In this regression, we can see that the intercept is 54.63 percent major vote share for Democrats, representing that when voter turnout is zero, we estimate an average Democratic major vote percentage of 54.63%. When voter turnout is 100%, the Democratic major vote percentage decreases by 5.99 percentage points, to 48.64%. While we do not expect a turnout of 0%, and can only one day hope for a voter turnout of 100%, this model shows us the overall relationship between party vote share and voter turnout. While it is common to think that high voter turnout would benefit Democrats, as they often stress the importance of voting more so than the Republican party, this regression model suggests that higher voter turnout actually *hurts* Democrats. It is worth noting, however, that the R-squared for this model is extremely low, at only 0.0015, essentially stating that there is no relationship between the values of turnout that affect the democratic two party vote percentage. The coefficient on turnout is also not statistically significant, so we don't take much away from this model in terms of prediction power.
+
+```{r}
+# add incumbency
+
+
+```
+
+
 
 where I left off:
 - figuring out how to incorporate generic ballot
@@ -173,11 +200,33 @@ where I left off:
 
 
 
+```{r}
 
+# code from section
 
+cvap_district <- cvap_2012_2020 %>%
+  rename(st_cd_fips = geoid) 
 
+# merge with district-level polls
+polls_df <- house_polls_long %>%
+  filter(year == '2018' | year == '2020')
+table(polls_df$year)
+# join
+cvap_district <- cvap_district %>%
+  # filter to relevant years 
+  filter(year == '2018' | year == '2020')
 
+polls_cvap_df <- merge(polls_df, cvap_district, by = c('st_cd_fips', 'year'))
 
+# merge with district-level voteshares
+dist_pv_df <- incumb_dist
+dist_pv_df <- dist_pv_df %>%
+  filter(year == '2018' | year == '2020')
+
+polls_cvap_vp_df <- merge(polls_cvap_df, dist_pv_df, by = c('st_cd_fips', 'year'))
+table(polls_cvap_vp_df$st_cd_fips)
+
+```
 
 
 
