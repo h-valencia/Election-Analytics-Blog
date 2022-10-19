@@ -180,6 +180,7 @@ summary(fit1)
 In this regression, we can see that the intercept is 54.63 percent major vote share for Democrats, representing that when voter turnout is zero, we estimate an average Democratic major vote percentage of 54.63%. When voter turnout is 100%, the Democratic major vote percentage decreases by 5.99 percentage points, to 48.64%. While we do not expect a turnout of 0%, and can only one day hope for a voter turnout of 100%, this model shows us the overall relationship between party vote share and voter turnout. While it is common to think that high voter turnout would benefit Democrats, as they often stress the importance of voting more so than the Republican party, this regression model suggests that higher voter turnout actually *hurts* Democrats. It is worth noting, however, that the R-squared for this model is extremely low, at only 0.0015, essentially stating that there is no relationship between the values of turnout that affect the democratic two party vote percentage. The coefficient on turnout is also not statistically significant, so we don't take much away from this model in terms of prediction power.
 
 ```{r}
+
 # add incumbency
 
 

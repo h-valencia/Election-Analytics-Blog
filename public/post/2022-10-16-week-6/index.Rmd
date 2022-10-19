@@ -166,7 +166,7 @@ battle_dist_data <- data %>%
 
 So far, we have compiled data on election outcomes, generic ballot polls, expert district-level polls, advertising campaigns, and more. When thinking about elections, however, one of the first things that may come to mind are the on-the-ground campaigns. This week we add this "Ground Game" data to our models, specifically with voter turnout at the district level. 
 
-For starters, below we have a basic regression of a district's turnout percentage on the Democratic party's major vote percentage in a district. The turnout percentage is coded as the sum of Democratic votes and Republican votes, divided by the district's citizen voting age population (CVAP).
+For starters, below we have a basic regression of a district's turnout percentage on the Democratic party's major vote percentage in a district. The turnout percentage is coded as the sum of Democratic votes and Republican votes, divided by the district's citizen voting age population (CVAP). The regression below looks at data from 2014 to 2020, including both presidential and midterm years.
 
 ```{r}
 x <- data %>%
@@ -179,13 +179,30 @@ summary(fit1)
 
 In this regression, we can see that the intercept is 54.63 percent major vote share for Democrats, representing that when voter turnout is zero, we estimate an average Democratic major vote percentage of 54.63%. When voter turnout is 100%, the Democratic major vote percentage decreases by 5.99 percentage points, to 48.64%. While we do not expect a turnout of 0%, and can only one day hope for a voter turnout of 100%, this model shows us the overall relationship between party vote share and voter turnout. While it is common to think that high voter turnout would benefit Democrats, as they often stress the importance of voting more so than the Republican party, this regression model suggests that higher voter turnout actually *hurts* Democrats. It is worth noting, however, that the R-squared for this model is extremely low, at only 0.0015, essentially stating that there is no relationship between the values of turnout that affect the democratic two party vote percentage. The coefficient on turnout is also not statistically significant, so we don't take much away from this model in terms of prediction power.
 
+Now adding to this model, we incorporate whether or not the winning candidate in the district was an incumbent. It is thought that incumbents likely have an edge in an election, especially with house elections where often many people don't even know who their representative is -- it is just easier to vote for the incumbent if there are no real district-level issues. However, if people are unhappy with the government in some capacity at any level, then being an incumbent may be harmful: people just want change, even if the representative did nothing wrong. By regressing the candidate incumbency on the two party vote percentage for both Democrats and Republicans, we can see if there is a relationship between incumbency and vote share and whether it really is positive like we expect it to be. For this regression, incumbency is coded as 1 for an incumbent and 0 for a challenger. Again this model looks at the election years from 2014 to 2020. I will run it for both Republican vote share and Democratic vote share to see if there is a difference between parties.
+
 ```{r}
+
 # add incumbency
 
+data <- data %>%
+  mutate(cand_incumbent = case_when(DemStatus == "Incumbent" ~ 1,
+                                    DemStatus == "Challenger" ~ 0,
+                                    RepStatus == "Incumbent" ~ 1,
+                                    RepStatus == "Challenger" ~ 0))
+
+x2 <- data %>%
+  distinct(year, st_cd_fips, cand_incumbent, DemVotesMajorPercent, RepVotesMajorPercent, dist_turnout)
+  
+fit2 <- lm(data = x2, DemVotesMajorPercent ~  cand_incumbent)
+summary(fit2)
+
+fit3 <- lm(data = x2, RepVotesMajorPercent ~  cand_incumbent)
+summary(fit3)
 
 ```
 
-
+For the Democratic regression, when the candidate is a challenger, they have a predicted democrat two-party vote percentage of 39.64%. When the candidate is an incumbent, however, the vote percentage increases by 25.8 percentage points, to a Democratic vote percentage of 65.44%. The coefficient here is also highly significant, showing us that the relationship between a candidate's status as an incumbent and their democratic vote share is highly correlated. I also ran this regression on Republican vote percentage and found a different outcome. Here, the model shows that when a candidate is a challenger, they receive 60.36% of the two-party vote share. The coefficient on candidate incumbency in this model is highly negative, with a coefficient of -25.80, and highly significant. For the Republican two-party vote share, when a candidate is an incumbent, it actually *hurts* their votes.
 
 ```{r}
 
