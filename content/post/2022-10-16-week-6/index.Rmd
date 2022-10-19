@@ -1,0 +1,200 @@
+---
+title: The Ground Game
+author: Hannah Valencia
+date: '2022-10-16'
+slug: []
+categories: []
+tags: []
+summary: "This week we learned about how election turnout can affect the outcome of races, and how on-the-ground campaigning efforts aim to mobilize and persuade voters. We can look at this data on the district-level to uncover patterns, and compare it to last week's data on ad spending to see how they interact."
+---
+
+*This blog is part of a series related to Gov 1347: Election Analytics, a course at [Harvard University](https://www.harvard.edu/) taught by Professor [Ryan D. Enos](http://ryandenos.com/)*.
+
+*This week we learned about how election turnout can affect the outcome of races, and how on-the-ground campaigning efforts aim to mobilize and persuade voters. We can look at this data on the district-level to uncover patterns, and compare it to last week's data on ad spending to see how they interact.*
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE)
+
+# load libraries
+
+library(tidyverse)
+library(usmap)
+library(plotly)
+library(rmapshaper)
+library(sf)
+library(haven)
+library(stringr)
+library(sjlabelled)
+library(usdata)
+library(stargazer)
+
+```
+
+
+```{r}
+poll <- read_csv("week3_data.csv")
+generic_polls <- read_csv("GenericPolls1942_2020.csv")
+house <- read_csv("house party vote share by district 1948-2020.csv")
+expert_rating <- read_csv("expert_rating.csv")
+house_polls_long <- read_csv("house_polls_long.csv")
+ratings2018 <- read_csv("2018_ratings_share.csv")
+cvap_2012_2020 <- read_csv("cvap_district_2012-2020_clean.csv")[, -c(1:2)]
+dist_polls <- read_csv("dist_polls_2018-2022.csv")
+fund1 <- read_csv("data1.csv")[, -c(1:2)]
+econ <- read_csv("data2.csv", skip = 1)[, -1]
+state_econ <- read_csv("state_df.csv")[, -1]
+incumb_dist <- read_csv("incumb_dist_1948-2020 (3).csv")[, -c(1:2)]
+```
+
+```{r}
+
+# FIXING DATA FROM OTHER WEEKS TO ADD TO MASTER
+
+# mutating the state-level economic variables to get a Q3 mean unemployment rate for each state from 2014-2021
+
+state_econ1 <- state_econ %>%
+  filter(Year >= 2014,
+         Month %in% c(7:9)) %>%
+  select(`FIPS Code`, `State and area`, Month, Year, Unemployed_prct) %>%
+  group_by(`State and area`, Year) %>%
+  pivot_wider(names_from = Month, values_from = Unemployed_prct) %>%
+  mutate(Q3_unemployed = sum(`7`, `8`, `9`)/3)
+
+
+# mutating the national economic data for House incumbent and House winner from 2014-2020
+
+econ1 <- econ %>%
+  filter(year >= 2014) %>%
+  select(year, winner_party, H_incumbent_party) %>%
+  rename(H_winner_party = winner_party)
+
+
+# mutating the pollster expert ratings at the district level for average poll rankings on the 1-7 scale
+
+expert_rating1 <- expert_rating %>%
+  filter(year >= 2014) %>%
+  select(year, state, district, cook, rothenberg, sabatos_crystal_ball) %>%
+  group_by(year, state, district) %>%
+  mutate(avg_rating = sum(cook, rothenberg, sabatos_crystal_ball)/3) %>%
+  select(year, state, district, avg_rating)
+
+# formatting the district to match the master df
+expert_rating1$district[expert_rating1$district == "AL"] <- "00"
+expert_rating1$district[expert_rating1$district == "1"] <- "01"
+expert_rating1$district[expert_rating1$district == "2"] <- "02"
+expert_rating1$district[expert_rating1$district == "3"] <- "03"
+expert_rating1$district[expert_rating1$district == "4"] <- "04"
+expert_rating1$district[expert_rating1$district == "5"] <- "05"
+expert_rating1$district[expert_rating1$district == "6"] <- "06"
+expert_rating1$district[expert_rating1$district == "7"] <- "07"
+expert_rating1$district[expert_rating1$district == "8"] <- "08"
+expert_rating1$district[expert_rating1$district == "9"] <- "09"
+
+# adding 2018 ratings
+
+ratings2018_1 <- ratings2018 %>%
+  select(District, avg) %>%
+  separate(District, c("state_abb", "district"), "-")
+
+# changing the state from abbreviations to names
+ratings2018_1$state <- state.name[match(ratings2018_1$state_abb, state.abb)]
+ratings2018_1$year <- 2018
+
+ratings2018_1 <- ratings2018_1 %>%
+  select(year, state, district, avg) %>%
+  rename(avg_rating_2018 = avg)
+
+
+# mutating generic ballot data - want only polls conducted in the 30 days until the election -> average those polls
+# gives us the average support for the party in the month leading up to the election
+
+gp1 <- generic_polls %>%
+  filter(year >= 2014,
+         days_until_election <= 31) %>%
+  select(pollster, dem, rep, year) %>%
+  group_by(year) %>%
+  mutate(gen_avg_dem = mean(dem),
+         gen_avg_rep = mean(rep)) %>%
+  select(year, gen_avg_dem, gen_avg_rep)
+
+```
+
+
+```{r}
+
+# CREATING MASTER DF
+
+# creating a master df for district-level modeling, starting with the incumb_dist df as a base
+# will only use 2014 to present for model (for now)
+
+data <- incumb_dist %>%
+  filter(year >= 2014)
+
+# adding relevant variables from other dfs we have seen over the weeks to the master df
+
+data <- left_join(data, state_econ1, by = c("state" = "State and area", "year" = "Year"))
+data <- left_join(data, econ1, by = c("year" = "year"))
+data <- left_join(data, expert_rating1, by = c("year" = "year", "state" = "state", "district_num" = "district"))
+data <- left_join(data, ratings2018_1, by = c("year" = "year", "state" = "state", "district_num" = "district"))
+data <- left_join(data, gp1, by = c("year" = "year"))
+
+# adding a variable for if the district is solid D/R in the form of a yes/no variable
+data <- data %>%
+  mutate(party_solid = ifelse((avg_rating >= 6 | avg_rating <= 2 | avg_rating_2018 >= 6 | avg_rating_2018 <= 2), "Yes", NA))
+
+# creating two new dataframes: one for if the district is solid D or R, and another for districts that are not solid D/R
+# coded solid as a score if either of the average ratings columns are greater than or equal to 6 (solid R) or less than or equal to 2 (solid D)
+
+solid_dist_data <- data %>%
+  filter(party_solid == "Yes") %>%
+  select(!c(`7`, `8`, `9`))
+
+battle_dist_data <- data %>%
+  filter(is.na(party_solid)) %>%
+  select(!c(`7`, `8`, `9`))
+
+```
+
+```{r}
+
+```
+
+where I left off:
+- figuring out how to incorporate generic ballot
+- generic ballot is national level data, BUT we have many observations for each year because so many pollsters measuring
+- looking at `poll` df, can either average across years OR pick top grade pollsters then average ? any other options?
+- from here, for extension #1 just need to add district turnout to complete
+- should also go back to using the `data` df for now, don't need the `solid_dist_data` / `battle_dist_data` quite yet
+- add CVAP data to `data`
+- is there a way to incorporate `house_polls_long`? This is the df with DEM / REP - is this a different kind of polling? does this have to do with this week's discussion of the ground game? a little confused on the difference between this df and the other dfs...
+- still need to figure out how to combine everything into a model that gives RESULTS and can PREDICT vote pctg or seat share... make a MAP with each
+- is predicting each district the equivalent of predicting seat share?
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,5 +1,5 @@
 ---
-title: Week 5
+title: The Air War
 author: Hannah Valencia
 date: '2022-10-09'
 slug: []
@@ -10,7 +10,7 @@ summary: "This week we learned about the effect of advertising on election outco
 
 *This blog is part of a series related to Gov 1347: Election Analytics, a course at [Harvard University](https://www.harvard.edu/) taught by Professor [Ryan D. Enos](http://ryandenos.com/)*.
 
-This week we learned about the effect of advertising on election outcomes at the district level. There is some conflicting literature about the effects of advertising on informing, mobilizing, and persuading voters. In this blog, I will look at trends between advertising data and vote shares in previous elections, then add to my model predicting the 2022 House election.
+*This week we learned about the effect of advertising on election outcomes at the district level. There is some conflicting literature about the effects of advertising on informing, mobilizing, and persuading voters. In this blog, I will look at trends between advertising data and vote shares in previous elections, then add to my model predicting the 2022 House election.*
 
 This week we learned about how advertising can affect the outcomes of elections, with campaigns running ads on social media, radio, and television, with different goals in mind. Advertisements can be used to promote a candidate, attack the opposition, or both. Ads can also highlight important political issues for each party, from health care and abortion to taxes and government spending. While advertising campaigns do have an impact on voter knowledge and interest, we are curious if they imapct the actual results of the election in the form of who voters choose to vote for. [Huber and Arceneaux (2007)](https://hollis.harvard.edu/primo-explore/fulldisplay?docid=TN_cdi_proquest_miscellaneous_59786011&context=PC&vid=HVD2&search_scope=everything&tab=everything&lang=en_US), find that contrary to previous research in this area, "Advertising does a little to inform, next to nothing to mobilize, and a great deal to persuade potential voters". In analyzing this data, we can hope to find some relationships that are useful to our prediction models and good predictors for house election outcomes in each district.
 
@@ -875,20 +875,11 @@ ad18a %>%
 
 This graph shows us that there is a positive relationship between the percent of a district's total ad cost that was spent by Democrats and the Democrat major vote percent. Here, the total ad cost for a district -- that is used to calculate the percent value we see on the x-axis -- is defined as the sum of estimated costs for Republican ads in a district plus the sum of estimated costs for Democratic ads in the same district. The positive relationship we see means that on average, when democrats spend a greater percentage of the district's total ad costs, they have a higher major vote percent. In this graph we can also see that districts where democrats made up a higher percent of the district's total ad costs were more competitive, shown by the points on the right falling close to the 50% major vote. We also can see that in districts where the percent of ad costs was split pretty evenly between democrats and republicans, there are vote shares that also fall around 50%. In these competitive districts, we can imagine that campaigning and the running of advertisements is rather important.
 
-```{r}
+In terms of incorporating ad data into my final model, I do not believe I will use any of it. There are multiple pitfalls with respect to using ad data: (1) we are missing 2022 ad data, as ads are still being purchased, (2) we have a limited number of years with data we can use to create our model, and (3) the relevance of television ad data is in question, given the rise of social media and changing nature of advertisement data.
 
-# mapping plots above
-
-
-
-
-```
 
 ### GRPs
 According to [Huber and Arceneaux (2007)](https://hollis.harvard.edu/primo-explore/fulldisplay?docid=TN_cdi_proquest_miscellaneous_59786011&context=PC&vid=HVD2&search_scope=everything&tab=everything&lang=en_US), GRPs or Gross Point Ratings are a measure of "the percentage of households viewing the show on which an advertisement was shown". In their research, they measure advertising as the cumulative GRPs of ads in the four weeks leading up to a respondent's interview and use the unit of GRPs/1000. In [Gerber et al. (2011)](https://hollis.harvard.edu/primo-explore/fulldisplay?docid=TN_cdi_proquest_miscellaneous_881466543&context=PC&vid=HVD2&search_scope=everything&tab=everything&lang=en_US), the authors randomly assign the quantity of GRPs to be purchased, with either 250, 500, or 1000 GRPs. The lower GRP meant that the ad would play on a morning show or news show, and the higher GRP meant that the ad would play during a more quality entertainment such as late night entertainment or more prime-time news. GRP is very important in elections because the ad spending budget is so large, however is only impactful if people are seeing the ads -- and even more importantly, if the *right* people are seeing the ads. In order to approximate advertising effects at either the national-level or district level, in addition to knowing how many households the ad aired to, it would also be helpful to know the demographic information of the viewers. For example, there may be a morning news show that engages a lot of working professionals, or a cable show that is watched by lots of older people. Knowing the demographic information of the channels on which the ads are played, in addition with the GRPs, would be very helpful in assessing the advertising effect on elections. This look into demographics may also be able to capture a difference between regular television users and streaming service users. Streaming services are very mainstream these days with people "cutting the cord" for ad-free television experiences. While this innately attracts households with more disposable income, we could possibly obtain even more specific demographic information on these viewers and use it to better measure the effect of advertising on people, as well as make more accurate predictions. With the prevalence of social media these days, I believe it would be fairly easy to target specific demographics with advertising. For example, we have seen Joe Biden use young influencers and pop culture celebrities on TikTok to reach a certain demographic. Using various social media platforms makes it easy to target specific people and compare voting results to a time before these targeted ads were used.
-
-
-
 
 
 

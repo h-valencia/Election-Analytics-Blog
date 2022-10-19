@@ -66,6 +66,16 @@
 
 <p><em>This blog is part of a series related to Gov 1347: Election Analytics, a course at <a href="https://www.harvard.edu/">Harvard University</a> taught by Professor <a href="http://ryandenos.com/">Ryan D. Enos</a></em>.</p>
 <p><em>This week we learned about how election turnout can affect the outcome of races, and how on-the-ground campaigning efforts aim to mobilize and persuade voters. We can look at this data on the district-level to uncover patterns, and compare it to last week’s data on ad spending to see how they interact.</em></p>
+<p>where I left off:
+- figuring out how to incorporate generic ballot
+- generic ballot is national level data, BUT we have many observations for each year because so many pollsters measuring
+- looking at <code>poll</code> df, can either average across years OR pick top grade pollsters then average ? any other options?
+- from here, for extension #1 just need to add district turnout to complete
+- should also go back to using the <code>data</code> df for now, don’t need the <code>solid_dist_data</code> / <code>battle_dist_data</code> quite yet
+- add CVAP data to <code>data</code>
+- is there a way to incorporate <code>house_polls_long</code>? This is the df with DEM / REP - is this a different kind of polling? does this have to do with this week’s discussion of the ground game? a little confused on the difference between this df and the other dfs…
+- still need to figure out how to combine everything into a model that gives RESULTS and can PREDICT vote pctg or seat share… make a MAP with each
+- is predicting each district the equivalent of predicting seat share?</p>
 
 
 		
@@ -82,7 +92,7 @@
         		<footer>
 			
 			<span>
-			&copy; <time datetime="2022-10-17 13:38:36.336033 -0400 EDT m=&#43;5.748271059">2022</time> . Made with <a href='https://gohugo.io'>Hugo</a> using the <a href='https://github.com/EmielH/tale-hugo/'>Tale</a> theme.
+			&copy; <time datetime="2022-10-18 21:27:04.675416 -0400 EDT m=&#43;5.353269820">2022</time> . Made with <a href='https://gohugo.io'>Hugo</a> using the <a href='https://github.com/EmielH/tale-hugo/'>Tale</a> theme.
 			</span>
 		</footer>
 
