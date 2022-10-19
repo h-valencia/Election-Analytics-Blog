@@ -240,6 +240,8 @@ summary(fit6)
 
 As seen above, president's party is a significant variable in predicting the Democratic party's vote percentage. Interestingly enough, when the President's party is a Republican, it increases the Democratic vote percentage. Since the president's party was a strong predictor in my fundamental model, it is reassuring to see that it is also a significant predictor here.
 
+I am hoping to fix these models in the coming weeks by adjusting the model to a glm, mapping the models to each district, and picking variables that I think will be better predictors. I also will be separating the data into two data sets: one with solid Democratic or Republican districts, and another with all the others to better incorporate expert predictions.
+
 
 ```{r, eval = FALSE}
 
