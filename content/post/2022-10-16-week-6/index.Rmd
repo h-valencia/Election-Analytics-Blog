@@ -187,19 +187,6 @@ In this regression, we can see that the intercept is 54.63 percent major vote sh
 
 
 
-where I left off:
-- figuring out how to incorporate generic ballot
-- generic ballot is national level data, BUT we have many observations for each year because so many pollsters measuring
-- looking at `poll` df, can either average across years OR pick top grade pollsters then average ? any other options?
-- from here, for extension #1 just need to add district turnout to complete
-- should also go back to using the `data` df for now, don't need the `solid_dist_data` / `battle_dist_data` quite yet
-- add CVAP data to `data`
-- is there a way to incorporate `house_polls_long`? This is the df with DEM / REP - is this a different kind of polling? does this have to do with this week's discussion of the ground game? a little confused on the difference between this df and the other dfs...
-- still need to figure out how to combine everything into a model that gives RESULTS and can PREDICT vote pctg or seat share... make a MAP with each
-- is predicting each district the equivalent of predicting seat share?
-
-
-
 ```{r}
 
 # code from section
