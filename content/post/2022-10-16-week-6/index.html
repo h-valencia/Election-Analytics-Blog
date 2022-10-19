@@ -12,13 +12,88 @@ summary: "This week we learned about how election turnout can affect the outcome
 
 <p><em>This blog is part of a series related to Gov 1347: Election Analytics, a course at <a href="https://www.harvard.edu/">Harvard University</a> taught by Professor <a href="http://ryandenos.com/">Ryan D. Enos</a></em>.</p>
 <p><em>This week we learned about how election turnout can affect the outcome of races, and how on-the-ground campaigning efforts aim to mobilize and persuade voters. We can look at this data on the district-level to uncover patterns, and compare it to last week’s data on ad spending to see how they interact.</em></p>
-<p>where I left off:
-- figuring out how to incorporate generic ballot
-- generic ballot is national level data, BUT we have many observations for each year because so many pollsters measuring
-- looking at <code>poll</code> df, can either average across years OR pick top grade pollsters then average ? any other options?
-- from here, for extension #1 just need to add district turnout to complete
-- should also go back to using the <code>data</code> df for now, don’t need the <code>solid_dist_data</code> / <code>battle_dist_data</code> quite yet
-- add CVAP data to <code>data</code>
-- is there a way to incorporate <code>house_polls_long</code>? This is the df with DEM / REP - is this a different kind of polling? does this have to do with this week’s discussion of the ground game? a little confused on the difference between this df and the other dfs…
-- still need to figure out how to combine everything into a model that gives RESULTS and can PREDICT vote pctg or seat share… make a MAP with each
-- is predicting each district the equivalent of predicting seat share?</p>
+<p>So far, we have compiled data on election outcomes, generic ballot polls, expert district-level polls, advertising campaigns, and more. When thinking about elections, however, one of the first things that may come to mind are the on-the-ground campaigns. This week we add this “Ground Game” data to our models, specifically with voter turnout at the district level.</p>
+<p>For starters, below we have a basic regression of a district’s turnout percentage on the Democratic party’s major vote percentage in a district. The turnout percentage is coded as the sum of Democratic votes and Republican votes, divided by the district’s citizen voting age population (CVAP). The regression below looks at data from 2014 to 2020, including both presidential and midterm years.</p>
+<pre><code>## 
+## Call:
+## lm(formula = DemVotesMajorPercent ~ dist_turnout, data = x)
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -54.629 -15.673  -2.765  14.912  48.823 
+## 
+## Coefficients:
+##              Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept)    54.629      1.928   28.34   &lt;2e-16 ***
+## dist_turnout   -5.991      3.722   -1.61    0.108    
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 23.5 on 1743 degrees of freedom
+## Multiple R-squared:  0.001484,   Adjusted R-squared:  0.0009114 
+## F-statistic: 2.591 on 1 and 1743 DF,  p-value: 0.1077</code></pre>
+<p>In this regression, we can see that the intercept is 54.63 percent major vote share for Democrats, representing that when voter turnout is zero, we estimate an average Democratic major vote percentage of 54.63%. When voter turnout is 100%, the Democratic major vote percentage decreases by 5.99 percentage points, to 48.64%. While we do not expect a turnout of 0%, and can only one day hope for a voter turnout of 100%, this model shows us the overall relationship between party vote share and voter turnout. While it is common to think that high voter turnout would benefit Democrats, as they often stress the importance of voting more so than the Republican party, this regression model suggests that higher voter turnout actually <em>hurts</em> Democrats. It is worth noting, however, that the R-squared for this model is extremely low, at only 0.0015, essentially stating that there is no relationship between the values of turnout that affect the democratic two party vote percentage. The coefficient on turnout is also not statistically significant, so we don’t take much away from this model in terms of prediction power.</p>
+<p>Now adding to this model, we incorporate whether or not the winning candidate in the district was an incumbent. It is thought that incumbents likely have an edge in an election, especially with house elections where often many people don’t even know who their representative is – it is just easier to vote for the incumbent if there are no real district-level issues. However, if people are unhappy with the government in some capacity at any level, then being an incumbent may be harmful: people just want change, even if the representative did nothing wrong. By regressing the candidate incumbency on the two party vote percentage for both Democrats and Republicans, we can see if there is a relationship between incumbency and vote share and whether it really is positive like we expect it to be. For this regression, incumbency is coded as 1 for an incumbent and 0 for a challenger. Again this model looks at the election years from 2014 to 2020. I will run it for both Republican vote share and Democratic vote share to see if there is a difference between parties.</p>
+<pre><code>## 
+## Call:
+## lm(formula = DemVotesMajorPercent ~ cand_incumbent, data = x2)
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -65.439  -7.749  -0.643   8.007  60.357 
+## 
+## Coefficients:
+##                Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept)     39.6435     0.6448   61.48   &lt;2e-16 ***
+## cand_incumbent  25.7953     0.9446   27.31   &lt;2e-16 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 19.68 on 1743 degrees of freedom
+## Multiple R-squared:  0.2996, Adjusted R-squared:  0.2992 
+## F-statistic: 745.7 on 1 and 1743 DF,  p-value: &lt; 2.2e-16</code></pre>
+<pre><code>## 
+## Call:
+## lm(formula = RepVotesMajorPercent ~ cand_incumbent, data = x2)
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -60.357  -8.007   0.643   7.749  65.439 
+## 
+## Coefficients:
+##                Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept)     60.3565     0.6448   93.61   &lt;2e-16 ***
+## cand_incumbent -25.7953     0.9446  -27.31   &lt;2e-16 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 19.68 on 1743 degrees of freedom
+## Multiple R-squared:  0.2996, Adjusted R-squared:  0.2992 
+## F-statistic: 745.7 on 1 and 1743 DF,  p-value: &lt; 2.2e-16</code></pre>
+<p>For the Democratic regression, when the candidate is a challenger, they have a predicted democrat two-party vote percentage of 39.64%. When the candidate is an incumbent, however, the vote percentage increases by 25.8 percentage points, to a Democratic vote percentage of 65.44%. The coefficient here is also highly significant, showing us that the relationship between a candidate’s status as an incumbent and their democratic vote share is highly correlated. I also ran this regression on Republican vote percentage and found a different outcome. Here, the model shows that when a candidate is a challenger, they receive 60.36% of the two-party vote share. The coefficient on candidate incumbency in this model is highly negative, with a coefficient of -25.80, and highly significant. For the Republican two-party vote share, when a candidate is an incumbent, it actually <em>hurts</em> their votes.</p>
+<pre><code>## 
+## 2018 2020 
+##  760  371</code></pre>
+<pre><code>## 
+## 0401 0402 0404 0406 0408 0501 0502 0503 0504 0601 0604 0607 0608 0610 0616 0621 
+##    4    3    1    8    8    1   11    1    1    2    4    1    1    4    1    3 
+## 0622 0624 0625 0639 0645 0648 0649 0650 0653 0803 0806 1201 1204 1206 1207 1209 
+##   10    1   15   12   13   13   11   14    3    5   12    1    2    3    2    1 
+## 1212 1213 1215 1216 1218 1219 1221 1225 1226 1227 1303 1306 1307 1601 1602 1703 
+##    1    3   13   14    7    1    1    2   12   10    1   10    4    1    1    2 
+## 1706 1712 1713 1714 1716 1717 1803 1805 1809 1901 1902 1903 1904 2001 2002 2003 
+##   10    8    9    6    1    3    1    6    1   18    8   14   16    6   10    9 
+## 2004 2106 2203 2301 2302 2601 2602 2603 2606 2607 2608 2611 2701 2702 2703 2707 
+##    4   14    4    8   30    1    3    7    9    1   11    8    7   11    6    2 
+## 2708 2801 2803 2804 2902 3101 3102 3201 3202 3203 3204 3301 3302 3402 3403 3405 
+##    5    1    1    1    6    1   16    2    2    2    6   14   13   11   15    2 
+## 3407 3411 3501 3502 3503 3601 3603 3611 3618 3619 3621 3622 3623 3624 3625 3627 
+##   10    7    7   18    5    9    1    5    1   10    1   10    3   13    3   11 
+## 3702 3707 3708 3709 3711 3713 3901 3902 3904 3907 3910 3912 3916 4001 4002 4003 
+##    3    1    3    9    4    7   16    1    1    3    2   14    1    2    1    1 
+## 4004 4005 4102 4105 4201 4207 4208 4209 4210 4211 4213 4216 4217 4218 4501 4802 
+##    1   12    1    1   19   12    5    1   12    2    1    7    6   12    5    1 
+## 4803 4806 4807 4810 4812 4817 4821 4822 4823 4824 4825 4831 4832 4901 4902 4903 
+##    4    3    9    5    1    2    6    5    8    3    3    6    7    4    5    4 
+## 4904 5102 5105 5107 5109 5110 5303 5305 5308 5310 5401 5402 5403 5501 5503 5506 
+##   21   13   10   10    1   17    8    4    6    1    4    4   10    7    1    2</code></pre>

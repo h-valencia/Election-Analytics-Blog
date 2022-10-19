@@ -1,0 +1,200 @@
+---
+title: The Ground Game
+author: "Kiara Hernandez"
+date: \today
+institute: Harvard University
+fontsize: 10pt
+output:
+ beamer_presentation:
+    keep_tex: true
+    theme: metropolis
+    latex_engine: pdflatex
+    slide_level: 2
+    highlight: zenburn
+    incremental: false
+classoption: "handout"
+header-includes:
+  \setbeamercolor{frametitle}{bg=purple}
+  \hypersetup{colorlinks,citecolor=orange,filecolor=red,linkcolor=brown,urlcolor=blue}
+subtitle: 'Gov 1347: Election Analytics'
+---
+
+
+
+
+<p><img src="imgs/poll%20diffs" height="550" />
+What’s wrong with these plots?</p>
+<div id="solution-probabilistic-models" class="section level2">
+<h2>Solution: probabilistic models</h2>
+<p>: outcome can be any value in a continuous range (-<span class="math inline">\(\infty\)</span>, +<span class="math inline">\(\infty\)</span>)
+<span class="math display">\[\%DemPV_{district} = \alpha + \beta_1 x_1 + \ldots + \beta_k x_k \quad \text{or}\]</span> and modeled as
+<span class="math display">\[ \textcolor{red}{DemPV_{district} = \alpha + \beta_1 x_1 + \ldots + \beta_k x_k},\]</span>
+but the true outcome is bounded to (0, 100) </p>
+<p>: election outcome for Democrats is of voters from the citizen voting age (<span class="math inline">\(CVAP_{district}\)</span>) turning out to vote Democrat (a ) modeled as
+<span class="math display">\[ \begin{aligned}
+Pr(\underbrace{\text{Vote for Dem}_{district,i}}_{voter \ i \ in \ district}) &amp;= f(\alpha + \beta_1 x_1 + \ldots + \beta_k x_k) \\
+&amp;= \frac{exp(\alpha + \beta_1 x_1 + \ldots + \beta_k x_k)}{1 + exp(\alpha + \beta_1 x_1 + \ldots + \beta_k x_k)} \scriptsize{\text{ (for i = 1, ..., $CVAP_{district}$)}}
+\end{aligned}\]</span>
+where bounds (-<span class="math inline">\(\infty\)</span>, +<span class="math inline">\(\infty\)</span>) to (0, 1)</p>
+</div>
+<div id="example-of-a-probabilistic-model-binomial-logistic-regression" class="section level2">
+<h2>Example of a probabilistic model: binomial logistic regression</h2>
+Supposing we have (a single IV), (a DV) as Dem’s popular vote share (%):
+</div>
+<div id="simulating-a-distribution-of-election-results-extension-2" class="section level2">
+<h2>Simulating a distribution of election results: Extension #2</h2>
+<p>Instead of (i) a probability for a single D voter or (ii) single
+expected number of D voters from , <span class="math inline">\(\widehat{\texttt{draws}}\)</span>, we can predict a (iii)
+</p>
+<pre class="r"><code>## Fit D and R models
+# PA_R_glm &lt;- glm(cbind(RepVotes, cvap-RepVotes) ~ REP, PA01, 
+#                 family = binomial)
+# PA_D_glm &lt;- glm(cbind(DemVotes, cvap-DemVotes) ~ DEM, PA01, 
+#                 family = binomial)</code></pre>
+<pre class="r"><code>## Get predicted draw probabilities for D and R
+# prob_Rvote_PA_2022 &lt;- predict(PA_R_glm, newdata = 
+#                                 data.frame(REP=44.5), 
+#                               type=&quot;response&quot;)[[1]]
+# 
+# prob_Dvote_PA_2022 &lt;- predict(PA_D_glm, newdata = 
+#                                 data.frame(DEM=50), 
+#                               type=&quot;response&quot;)[[1]]</code></pre>
+<pre class="r"><code>## Get predicted distribution of draws from the population
+# sim_Rvotes_PA_2022 &lt;- rbinom(n = 10000, size = CVAP_PA_2022, prob = prob_Rvote_PA_2022)
+# sim_Dvotes_PA_2022 &lt;- rbinom(n = 10000, size = CVAP_PA_2022, prob = prob_Dvote_PA_2022)</code></pre>
+</div>
+<div id="simulating-a-distribution-of-election-results-democrat-pa01-pv" class="section level2">
+<h2>Simulating a distribution of election results: Democrat PA01 PV</h2>
+
+</div>
+<div id="simulating-a-distribution-of-election-results-republican-pa01-pv" class="section level2">
+<h2>Simulating a distribution of election results: Republican PA01 PV</h2>
+
+</div>
+<div id="simulating-a-distribution-of-election-results-republican-win-margin-in-pa01" class="section level2">
+<h2>Simulating a distribution of election results: Republican win margin in PA01</h2>
+<pre class="r"><code># sim_elxns_PA_2022 &lt;- ((sim_Rvotes_PA_2022-sim_Dvotes_PA_2022)/(sim_Dvotes_PA_2022+sim_Rvotes_PA_2022))*100</code></pre>
+<p> Does this seem plausible? How could we improve this?</p>
+</div>
+<div id="reading-and-interpreting-glms" class="section level2">
+<h2>Reading and interpreting GLMs</h2>
+<pre class="r"><code># # linear regression for PA01
+# PA01_lm &lt;- lm(DemVotesMajorPercent ~ DEM, data = PA01)
+# summary(PA01_lm)</code></pre>
+</div>
+<div id="reading-and-interpreting-glms-1" class="section level2">
+<h2>Reading and interpreting GLMs</h2>
+<pre class="r"><code># # binomial logit
+# PA01_glm &lt;- glm(cbind(DemVotes, cvap-DemVotes) ~ 
+#                   DEM, PA01, family = binomial)
+# summary(PA01_glm)</code></pre>
+</div>
+<div id="reading-and-interpreting-glm-predictions" class="section level2">
+<h2>Reading and interpreting GLM predictions</h2>
+<pre class="r"><code># predict lm
+# prob_PA01_lm &lt;- predict(PA01_lm, newdata = 
+#                           data.frame(DEM=46))
+# prob_PA01_lm</code></pre>
+</div>
+<div id="reading-and-interpreting-glm-predictions-1" class="section level2">
+<h2>Reading and interpreting GLM predictions</h2>
+<pre class="r"><code># # predict glm
+# prob_PA01_glm &lt;- predict(PA01_glm, newdata = 
+#                            data.frame(DEM=46), type=&quot;response&quot;)[[1]]
+# prob_PA01_glm</code></pre>
+</div>
+<div id="summary-of-probabilistic-models" class="section level2">
+<h2>Summary of probabilistic models</h2>
+<ul>
+<li>Explicitly capture a random or probabilistic process of the world
+<ul>
+<li>ex: some draw of voters from CVAP turning out</li>
+</ul></li>
+<li>Models like binomial logit () use
+a link function to bound the outcome to a probability value
+<ul>
+<li></li>
+</ul></li>
+<li>: estimate the parameters of a probabilistic model <span class="math inline">\(\rightsquigarrow\)</span> obtain distributions from repeated simulations of probabilistic process
+<ul>
+<li>ex: in binomial logit, we repeatedly draw voters from a binomial process based on predicted probability of one voter turning out Dem</li>
+<li><span class="math inline">\(\sim\)</span> how <a href="https://projects.economist.com/us-2020-forecast/president">The Economist</a> simulates elections</li>
+</ul></li>
+<li>: can still use out-of-sample evaluation tools; see for other diagnostics.</li>
+</ul>
+</div>
+<div id="blog-tip-2" class="section level2">
+<h2>Blog tip 2</h2>
+<p>Recall our conversation with Prof. Vavreck <span class="math inline">\(\rightarrow\)</span>
+<!-- don't include this code in the code .R ... it's a fake example, and may confuse students --></p>
+</div>
+<div id="diminishing-returns-of-1-rightsquigarrow-log-transformation-linearizes-the-relationship." class="section level2">
+<h2>1. : diminishing returns of $1 <span class="math inline">\(\rightsquigarrow\)</span> log-transformation linearizes the relationship.</h2>
+</div>
+<div id="when-most-ad-spends-small-few-ad-spends-huge-rightsquigarrow-log-transformation-makes-it-easier-to-seecount-these-outliers." class="section level2">
+<h2>2. : when most ad spends small, few ad spends huge <span class="math inline">\(\rightsquigarrow\)</span> log-transformation makes it easier to see/count these outliers. </h2>
+</div>
+<div id="blog-tip-3" class="section level2">
+<h2>Blog tip 3</h2>
+<p></p>
+<ul>
+<li>: predict PV as literal 2022 poll value, but report the out-of-sample error of raw polls</li>
+<li>: use other data (e.g. local economy) for district, but report the out-of-sample error of model</li>
+<li>: rather than running district by district regression, use district-level poll model that’s fit all districts (more on this today!)</li>
+<li>: use previous election results, generic ballot polls, polls from districts with similar characteristics, as we’ve done in past weeks</li>
+</ul>
+</div>
+<div id="turnout" class="section level2">
+<h2>Turnout</h2>
+<p>Our weeks on campaigns are trying to understand how voters respond to ads and on-the-ground campaigning efforts. From our readings, we know that campaigns try to do two things:
+* (1) mobilize - turning people out to vote
+* (2) persuade - convincing people out to vote for a particular candidate/party</p>
+<p>First, let’s look at turnout at the district-level to identify any interesting patterns across time and geography.
+Then, let’s turn back to last week’s ad data to see whether there is a relationship between turnout and ad spends.</p>
+</div>
+<div id="how-do-we-calculate-turnout" class="section level2">
+<h2>How do we calculate turnout?</h2>
+<p>*<span class="math inline">\(turnout_{district_i} = \frac{totalvotes}{CVAP}\)</span> where <span class="math inline">\(totalvotes\)</span> is the number of two-party votes cast in a given district in a given year and CVAP is the citizen voting-age population in a given district in a given year. Note the differences between CVAP, voting-age population (VAP), voting eligible population (VEP)</p>
+<ul>
+<li><p>CVAP = total population that is age 18+ and a citizen</p></li>
+<li><p>VAP = total population that is age 18+</p></li>
+<li><p>VEP = all U.S. citizens age 18+, who are not excluded from voter eligibility due to criminal status (felony convictions, incarceration, or parole)</p></li>
+</ul>
+<p>*The data we’re working with comes from the American Community Survey’s 5-Year Estimates. The 5-year estimates are “period” estimates that represent data collected over a period of time. The primary advantage of using multiyear estimates is the increased statistical reliability of the data for less populated areas and small population subgroups.</p>
+<p>*This means that when a CVAP estimate exists for 2018, we can use that estimate for all years between 2012-2018.</p>
+</div>
+<div id="turnout-and-democratic-voteshare" class="section level2">
+<h2>Turnout and Democratic voteshare</h2>
+<pre class="r"><code># visualize
+# ggplot(dist_pv_cvap_closed, aes(x = turnout, y = DemVotesMajorPercent)) + 
+#   geom_point() +
+#   stat_smooth(method = &quot;lm&quot;)</code></pre>
+</div>
+<div id="turnout-and-democratic-voteshare-1" class="section level2">
+<h2>Turnout and Democratic voteshare</h2>
+
+</div>
+<div id="what-other-relationships-related-to-turnout-would-you-be-interested-in-exploring" class="section level1">
+<h1>What other relationships related to turnout would you be interested in exploring?</h1>
+<ul>
+<li>Aggregate changes in turnout over time</li>
+<li>District-level changes in turnout over time</li>
+<li>____?</li>
+<li>Spend some time talking in small groups and (if we have time) beginning to explore what you come up with.</li>
+</ul>
+<!--
+Is this causal? potential problems?
+baseline turnout in battleground states could be higher, the effect size can be different across states
+expected returns-->
+<div id="blog-extensions" class="section level2">
+<h2>Blog Extensions</h2>
+<p><strong>Turnout model</strong>: Incorporate turnout, incumbency and expert predictions into your district-level two-party voteshare predictions.</p>
+<p><strong>Close Elections</strong>: (i) Do expert predictions predict turnout? Fit a model and discuss your results, thinking specifically about whether your results provide evidence for the effect of ground campaigns on turnout.
+(ii) Do ad spends predict turnout? Merge last week’s WMP data with this week’s data on turnout at the district level. What can we infer, if anything, about the relationship between the “air war” and voter persuasion/mobilization?</p>
+<p><strong>Probabilistic Simulation of District-Level Races.</strong> Update your working forecasting model from one that is based on linear regression to one that is modeled as a GLM.</p>
+<p>Extend the binomial regression-based
+simulation we did of the Pennsylvania 2022 race to all 2022 races based on the most recent
+poll numbers for the Democratic and Republican candidate (in districts for which district-level polling data is available). Make a map of the
+of your predictions. Do they make sense? Speculate as to why or why not.</p>
+</div>
+</div>
