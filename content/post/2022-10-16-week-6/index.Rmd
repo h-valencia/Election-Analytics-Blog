@@ -225,11 +225,23 @@ summary(fit5)
 
 ```
 
-Oh no... Looking at this we can immediately see that the intercept is negative, which as we spent a long time discussing this past week, is not possible! The democratic two-party vote share percentage only exists in the 0-100% range -- it cannot be a negative value. And on top of that, the district's turnout is a negative number as well with a high magnitude relative to the intercept coefficient. Something is seriously wrong here.
+Oh no... Looking at this we can immediately see that the intercept is negative, which as we spent a long time discussing this past week, is not possible! The democratic two-party vote share percentage only exists in the 0-100% range -- it cannot be a negative value. And on top of that, the district's turnout is a negative number as well with a high magnitude relative to the intercept coefficient. Something is seriously wrong here. As we discussed in class, this can be addressed by using a glm logit model rather than an lm model, as this would limit the range of dependent variables from 0 to 1. I'm not sure if this would solve all the issues going on with this model, as it just seems a little off in general, but it would probably help...
 
-
+Rather than using the house representative's incumbency, I am interested to see if the President's party will make a difference. 
 
 ```{r}
+x4 <- data %>%
+  distinct(year, st_cd_fips, cand_incumbent, DemVotesMajorPercent, RepVotesMajorPercent, president_party, dist_turnout, gen_avg_dem)
+
+fit6 <- lm(data = x4, DemVotesMajorPercent ~  dist_turnout + cand_incumbent + gen_avg_dem + president_party)
+summary(fit6)
+
+```
+
+As seen above, president's party is a significant variable in predicting the Democratic party's vote percentage. Interestingly enough, when the President's party is a Republican, it increases the Democratic vote percentage. Since the president's party was a strong predictor in my fundamental model, it is reassuring to see that it is also a significant predictor here.
+
+
+```{r, eval = FALSE}
 
 # code from section
 
