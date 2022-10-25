@@ -243,6 +243,15 @@ As seen above, president's party is a significant variable in predicting the Dem
 I am hoping to fix these models in the coming weeks by adjusting the model to a glm, mapping the models to each district, and picking variables that I think will be better predictors. I also will be separating the data into two data sets: one with solid Democratic or Republican districts, and another with all the others to better incorporate expert predictions.
 
 
+```{r}
+
+fit7 <- glm(cbind(RepVotes, cvap-RepVotes) ~  dist_turnout + cand_incumbent + gen_avg_dem, data = data, family = binomial)
+summary(fit7)
+
+```
+
+
+
 ```{r, eval = FALSE}
 
 # code from section

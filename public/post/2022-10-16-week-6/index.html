@@ -195,6 +195,31 @@
 ## F-statistic: 204.1 on 4 and 1740 DF,  p-value: &lt; 2.2e-16</code></pre>
 <p>As seen above, president’s party is a significant variable in predicting the Democratic party’s vote percentage. Interestingly enough, when the President’s party is a Republican, it increases the Democratic vote percentage. Since the president’s party was a strong predictor in my fundamental model, it is reassuring to see that it is also a significant predictor here.</p>
 <p>I am hoping to fix these models in the coming weeks by adjusting the model to a glm, mapping the models to each district, and picking variables that I think will be better predictors. I also will be separating the data into two data sets: one with solid Democratic or Republican districts, and another with all the others to better incorporate expert predictions.</p>
+<pre><code>## 
+## Call:
+## glm(formula = cbind(RepVotes, cvap - RepVotes) ~ dist_turnout + 
+##     cand_incumbent + gen_avg_dem, family = binomial, data = data)
+## 
+## Deviance Residuals: 
+##     Min       1Q   Median       3Q      Max  
+## -540.12   -71.31    -0.95    61.60   648.48  
+## 
+## Coefficients:
+##                  Estimate Std. Error z value Pr(&gt;|z|)    
+## (Intercept)    -1.112e+00  4.480e-04   -2482   &lt;2e-16 ***
+## dist_turnout    2.986e+00  1.759e-04   16974   &lt;2e-16 ***
+## cand_incumbent -7.537e-01  3.995e-05  -18868   &lt;2e-16 ***
+## gen_avg_dem    -2.651e-02  1.027e-05   -2580   &lt;2e-16 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## (Dispersion parameter for binomial family taken to be 1)
+## 
+##     Null deviance: 1614644024  on 30543  degrees of freedom
+## Residual deviance:  788511463  on 30540  degrees of freedom
+## AIC: 788883064
+## 
+## Number of Fisher Scoring iterations: 5</code></pre>
 
 
 		
@@ -202,6 +227,7 @@
 
 	<div class="pagination">
 		<a href="/post/2022-10-09-week-5/" class="left arrow">&#8592;</a>
+		<a href="/post/2022-10-24-shocks/" class="right arrow">&#8594;</a>
 
 		<a href="#" class="top">Top</a>
 	</div>
@@ -211,7 +237,7 @@
         		<footer>
 			
 			<span>
-			&copy; <time datetime="2022-10-19 19:50:25.27723 -0400 EDT m=&#43;3.270960276">2022</time> . Made with <a href='https://gohugo.io'>Hugo</a> using the <a href='https://github.com/EmielH/tale-hugo/'>Tale</a> theme.
+			&copy; <time datetime="2022-10-25 11:40:48.245907 -0400 EDT m=&#43;14.211681398">2022</time> . Made with <a href='https://gohugo.io'>Hugo</a> using the <a href='https://github.com/EmielH/tale-hugo/'>Tale</a> theme.
 			</span>
 		</footer>
 

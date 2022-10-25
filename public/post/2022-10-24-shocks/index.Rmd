@@ -1,0 +1,189 @@
+---
+title: Shocks
+author: Hannah Valencia
+date: '2022-10-24'
+slug: []
+categories: []
+tags: []
+summary: "This week we learned about how the things we cannot predict happening can end up affecting election outcomes. Shocks capture everything from natural disasters and Supreme Court decisions to e-mail scandals and sports outcomes. While no one expects these events to happen, voters sometimes blame candidate losses on these shocks. We will look to explore the true effect of these political shocks, or lack thereof, on elections."
+---
+
+*This blog is part of a series related to Gov 1347: Election Analytics, a course at [Harvard University](https://www.harvard.edu/) taught by Professor [Ryan D. Enos](http://ryandenos.com/)*.
+
+*This week we learned about how the things we cannot predict happening can end up affecting election outcomes. Shocks capture everything from natural disasters and Supreme Court decisions to e-mail scandals and sports outcomes. While no one expects these events to happen, voters sometimes blame candidate losses on these shocks. We will look to explore the true effect of these political shocks, or lack thereof, on elections.*
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE)
+
+# load libraries
+
+library(tidyverse)
+library(usmap)
+library(plotly)
+library(rmapshaper)
+library(sf)
+library(haven)
+library(stringr)
+library(sjlabelled)
+library(usdata)
+library(stargazer)
+
+```
+
+
+```{r, echo=FALSE, eval=TRUE, message=FALSE, warning=FALSE}
+library(dotenv)
+library(jsonlite)
+library(tidyverse)
+library(lubridate)
+
+# # load up hidden api key
+# article_api <- "dVwjYGqCiI59JcmfelSCnvnR6eK5Ltzy"
+# #semantic_api <- Sys.getenv("SEMANTIC_API")
+# 
+# # set base url
+# base_url_art <- "http://api.nytimes.com/svc/search/v2/articlesearch.json?fq="
+# #base_url_sem <- "http://api.nytimes.com/svc/semantic/v2/concept/name"w
+# 
+# # set parameters
+# term <- "inflation"
+# facet_field <- "day_of_week"
+# facet <- "true"
+# begin_date <- "20220101"
+# end_date <- "20221024"
+# complete_url <- "https://api.nytimes.com/svc/search/v2/articlesearch.json?fq=inflation&facet_field=day_of_week&facet=true&begin_date=20220101&end_date=20221015&api-key=dVwjYGqCiI59JcmfelSCnvnR6eK5Ltzy"
+# 
+# 
+# complete_url2 <-paste0(base_url_art,fq =term,"&facet_field=",facet_field,"&facet=",facet,"&begin_date=",begin_date,"&end_date=",end_date,"&api-key=",article_api,sep = "")
+# 
+# # import dataset to R
+# sus <- fromJSON(complete_url2)
+# 
+# # view how many hits
+# sus$response$meta$hits
+# 
+# hits <- sus$response$meta$hits
+# cat("There were ",hits," hits for the search term Inflation during 2022 to date",sep = "")
+# 
+# max_pages <- round((hits / 10) - 1)
+# 
+# pages <- list()
+# Sys.sleep(1)
+# for(i in 0:24){
+#   mydata <- fromJSON(paste0(complete_url2, "&page=", i))
+#   message("Retrieving page ", i)
+#   pages[[i+1]] <- mydata$response$docs
+#   Sys.sleep(6)
+# }
+# 
+# #combine all into one
+# organizations <- rbind_pages(pages)
+# 
+# #check output
+# nrow(organizations)
+# 
+# colnames(organizations)
+# 
+# 
+# # trying with hits
+# sus0 <- fromJSON(paste0(complete_url2, "&page=0"), flatten = TRUE)
+# nrow(sus0$response)
+# sus1 <- fromJSON(paste0(complete_url2, "&page=1"), flatten = TRUE)
+# nrow(sus1$response$docs)
+# sus2 <- fromJSON(paste0(complete_url2, "&page=2"), flatten = TRUE)
+# nrow(sus2$response$docs)
+# 
+# 
+# #combine all into one
+# mydata <- rbind_pages(pages)
+# 
+# #check output
+# nrow(mydata)
+# 
+# # save df
+# saveRDS(mydata, file = "inflation_2022.RDS")
+
+# reload
+mydata <- readRDS("inflation_2022.RDS")
+
+# check colnames
+# colnames(mydata)
+
+# visualization by month
+library(dplyr)
+month <- mydata %>% 
+  group_by(month = month(pub_date, label = T)) %>% 
+  dplyr::summarize(count = n()) %>% 
+  ggplot(aes(month, count, group = 1, color = count)) +
+    geom_line() +
+    labs(y = "Article Count", x = "",
+         title = "NYT Articles mentioning Inflation in 2022",
+         color = "")
+
+# visualization by day
+day <- mydata %>% 
+  group_by(month_day = paste0(month(pub_date, label = T),
+           day = day(pub_date))) %>% 
+  dplyr::summarize(count = n()) %>% 
+  ggplot(aes(month_day, count, group = 1, color = count)) +
+    geom_line() +
+    labs(y = "Article Count", x = "",
+         title = "NYT Articles mentioning Inflation in 2022",
+         color = "")
+
+# how about visualization by week
+# extract raw date
+mydata <- mydata %>% 
+  mutate(publ_date = substr(pub_date, 1, 10))
+
+# mutate week variable
+mydata <- mydata %>% 
+  mutate(week = strftime(publ_date, format = "%V"))
+
+# plot
+week <- mydata %>% 
+  group_by(week) %>% 
+  dplyr::summarize(count = n()) %>% 
+  ggplot(aes(week, count, group = 1, color = count)) +
+    geom_line() +
+    labs(y = "Article Count", x = "Week",
+         title = "NYT Articles mentioning Inflation in 2022",
+         color = "") + # now add line for when decision was leaked
+      geom_segment(x=("28"), xend=("28"),y=0,yend=37, lty=2, color="purple", alpha=0.4) +
+      annotate("text", x=("18"), y=35, label="Highest Inflation Released", size=3)
+
+```
+
+```{r, eval=TRUE, echo=FALSE}
+# plot
+mydata %>% 
+  group_by(week) %>% 
+  dplyr::summarize(count = n()) %>% 
+  ggplot(aes(week, count, group = 1, color = count)) +
+    geom_line() +
+    labs(y = "Article Count", x = "Week",
+         title = "NYT Articles mentioning Inflation in 2022",
+         color = "") + # now add line for when decision was leaked
+      geom_segment(x=("28"), xend=("28"),y=0,yend=37, lty=2, color="purple", alpha=0.4) +
+      annotate("text", x=("22"), y=35, label="Highest Inflation Released", size=3) +
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
