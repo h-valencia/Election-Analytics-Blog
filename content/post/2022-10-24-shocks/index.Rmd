@@ -264,7 +264,14 @@ We can see that when the report of inflation reaching 9.1% in June was released,
 From this analysis in addition to class to class discussion, it does not seem like we can accurately measure the effect of a single shock on party sentiments or election predictions. There will always be shocks and they occur frequently, but their effect is temporary. News outlets may place blame on a shock for the outcome of an election to stir up a story, but it is impossible to determine whether or not a shock cost a candidate an election.
 
 
+### Model
 
+Over the past few weeks, we have tested out adding different pieces of election data to our models to see if they will yield more significant results and improve our predictions for this year's election. Some of these attempts showed real predictive power, like the generic ballot and real disposable income changes, while some of the data fell short of what we had hoped, such as that on advertising. In adjusting my model this week, I will stick to the fundamentals of incumbency, economic variables, and turnout to see if my model has improved. I will try new combinations of variables, weights, and methods to hopefully improve upon this model.
+
+```{r}
+data <- read.csv("data.csv")
+fulldata <- read.csv("fulldata.csv")
+```
 
 
 
