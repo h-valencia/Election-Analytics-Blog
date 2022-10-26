@@ -268,9 +268,40 @@ From this analysis in addition to class to class discussion, it does not seem li
 
 Over the past few weeks, we have tested out adding different pieces of election data to our models to see if they will yield more significant results and improve our predictions for this year's election. Some of these attempts showed real predictive power, like the generic ballot and real disposable income changes, while some of the data fell short of what we had hoped, such as that on advertising. In adjusting my model this week, I will stick to the fundamentals of incumbency, economic variables, and turnout to see if my model has improved. I will try new combinations of variables, weights, and methods to hopefully improve upon this model.
 
+Throughout my models in previous weeks, I have found a few variables to be consistently significant and therefore will keep them in my model. Similar to in previous weeks, Democratic vote share will be the dependent variable of the model. We will also use democratic vote share from the previous election as an independent variable, along with unemployment rate in Quarter 7, the President's party, the House's majority party, the generic ballot, and voter turnout.
+
 ```{r}
+
+# load in master data frames created in Week 6: Ground Game
+
 data <- read.csv("data.csv")
 fulldata <- read.csv("fulldata.csv")
+
+
+```
+
+```{r}
+# df1 <- fulldata %>%
+#   select(year, st_cd_fips, DemVotesMajorPercent) %>%
+#   distinct(year, st_cd_fips, .keep_all = TRUE) %>%
+#   mutate(DemVS_lag = NA)
+# 
+# x <- df1 %>%
+#   filter(st_cd_fips == 101) %>%
+#   arrange(year)
+# 
+# x$DemVS_lag <- lag(x$DemVotesMajorPercent, 1)
+# 
+# x <- x %>% select(!DemVotesMajorPercent)
+# 
+# data$DemVS_lag <- left_join(data, x, by = c(year, st_cd_fips))
+# 
+# for (i in 100:max(df1$st_cd_fips)){
+#   x <- df1 %>%
+#   filter(st_cd_fips == i) %>%
+#   arrange(year)
+#   df1$DemVS_lag <- lag(x$DemVotesMajorPercent,  1)
+# }
 ```
 
 
