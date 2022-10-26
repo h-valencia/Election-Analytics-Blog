@@ -31,6 +31,12 @@ library(stargazer)
 ```
 
 
+During an election year, there are always unexpected stories to come out about candidates, business cycle swings, or other shocks that can influence voters at the polls. Incumbents can get blamed when things in the world are going wrong, regardless of whether or not they have anything to do with it. In class we discussed how things like weather and sports team outcomes can affect voter decisions, while these things both obviously have nothing to do with the candidates or their campaigns. While the effects of these shocks on candidate support may bear more meaning during a national election, they may also affect sentiments toward each party in terms of a generic ballot. We know from previous analyses that the generic ballot is a decent predictor for House elections, so exploring how shocks influence house elections with the thought of possibly accounting for them in our predictive models is a reasonable inquiry.
+
+There have been several shocks so far in 2022, some very political, such as the Dobbs Supreme Court decision on abortion, historic levels of inflation, a student-loan forgiveness plan introduction, and more. In class we saw how the Dobbs decision was covered in the news and how it affected party sentiments, with Republican support declining and Democratic support increasing in the aftermath. In an extension on this, I want to see how the economic shocks we experienced in the US this past summer influenced party support. On July 13th, the Bureau of Labor Statistics reported inflation data from June, recording a consumer price index (CPI) of 9.1% from the year prior - a figure that hadn't been seen since 1981. With a Democratic president in office, some people placed the blame of this increased cost of living on President Biden and his party.
+
+By scraping the New York Times articles, we can see below the number of articles that used the word "inflation", with the vertical line marking the day that the BLS reported the inflation statistic to the public.
+
 ```{r, echo=FALSE, eval=TRUE, message=FALSE, warning=FALSE}
 library(dotenv)
 library(jsonlite)
@@ -166,11 +172,14 @@ mydata %>%
          color = "") + # now add line for when decision was leaked
       geom_segment(x=("28"), xend=("28"),y=0,yend=37, lty=2, color="purple", alpha=0.4) +
       annotate("text", x=("22"), y=35, label="Highest Inflation Released", size=3) +
+      geom_segment(x=("30"), xend=("30"),y=0,yend=37, lty=2, color="red", alpha=0.4) +
+      annotate("text", x=("33"), y=35, label="Fed Rate Hike", size=3) +
   theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
 ```
 
+We can see a spike in the number of articles on that day, but we also see other spikes falling at regular intervals earlier in the year as well - weeks 8, 14, and 20. After some further investigation, it seems that these were also around the times when the BLS released the prior month's CPI. The spike of articles during the week of July 13th, when the high inflation was first reported, is not that much higher than in the year's prior spikes, we see another spike almost immediately following, in week 30, or July 24th-30th. This was the week when the Fed announced their interest rate hike that was to curb inflation. In analyzing the frequency of the word "inflation" in articles, we not only capture the shock of the summer's high CPI, but also the shock of the Fed's decision.
 
-
+Now in looking at how both of these impacted party sentiments: below we mark these dates on the generic ballot. 
 
 
 
