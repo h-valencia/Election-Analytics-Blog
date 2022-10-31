@@ -281,29 +281,45 @@ fulldata <- read.csv("fulldata.csv")
 ```
 
 ```{r}
-# df1 <- fulldata %>%
-#   select(year, st_cd_fips, DemVotesMajorPercent) %>%
-#   distinct(year, st_cd_fips, .keep_all = TRUE) %>%
-#   mutate(DemVS_lag = NA)
-# 
-# x <- df1 %>%
-#   filter(st_cd_fips == 101) %>%
-#   arrange(year)
-# 
-# x$DemVS_lag <- lag(x$DemVotesMajorPercent, 1)
-# 
-# x <- x %>% select(!DemVotesMajorPercent)
-# 
-# data$DemVS_lag <- left_join(data, x, by = c(year, st_cd_fips))
-# 
-# for (i in 100:max(df1$st_cd_fips)){
-#   x <- df1 %>%
-#   filter(st_cd_fips == i) %>%
-#   arrange(year)
-#   df1$DemVS_lag <- lag(x$DemVotesMajorPercent,  1)
-# }
+
+# creating a lagged vote percentage variable to create a variable for vote percentage from the prior election
+
+df1 <- fulldata %>%
+  select(year, st_cd_fips, DemVotesMajorPercent) %>%
+  distinct(year, st_cd_fips, .keep_all = TRUE) %>%
+  mutate(year = year + 2,
+         lag_DemVS = DemVotesMajorPercent) %>%
+  select(!DemVotesMajorPercent)
+
+fulldata <- left_join(fulldata, df1, by = c("year" = "year", "st_cd_fips" = "st_cd_fips"))
+
+# creating a variable for whether the seat was previously occupied by a democrat or republican (incumbent party by district)
+
+fulldata <- fulldata %>%
+  mutate(inc_party = ifelse(winner_party == "R" & winner_candidate_inc == "Incumbent", "R", "D"))
+  
+
 ```
 
+```{r}
+fit1 <- lm(data = fulldata, DemVotesMajorPercent ~ lag_DemVS + inc_party + president_party + Q3_unemployed + gen_avg_dem + H_incumbent_party + dist_turnout)
+
+summary(fit1)
+```
+
+```{r}
+library(corrplot)
+corrplotdata <- fulldata %>% 
+  select(lag_DemVS, inc_party, president_party, Q3_unemployed, gen_avg_dem, H_incumbent_party, dist_turnout) %>% 
+  mutate(inc_party = ifelse(inc_party == "R", 0, 1),
+         president_party = ifelse(president_party == "R", 0, 1),
+         H_incumbent_party = ifelse(H_incumbent_party == "R", 0, 1)) %>%
+  drop_na()
+
+res <- cor(corrplotdata)
+corrplot(res, type = "upper", order = "hclust", method = "number",
+         tl.col = "black", tl.srt = 45, addCoef.col = "grey70")
+```
 
 
 
