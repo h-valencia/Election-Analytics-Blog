@@ -301,10 +301,31 @@ fulldata <- fulldata %>%
 
 ```
 
-```{r}
-fit1 <- lm(data = fulldata, DemVotesMajorPercent ~ lag_DemVS + inc_party + president_party + Q3_unemployed + gen_avg_dem + H_incumbent_party + dist_turnout)
+```{r, results = 'asis', message=FALSE, warning = FALSE}
 
-summary(fit1)
+fit1 <- lm(data = fulldata, DemVotesMajorPercent ~ gen_avg_dem)
+#summary(fit1)
+
+fit2 <- lm(data = fulldata, DemVotesMajorPercent ~ gen_avg_dem + inc_party)
+#summary(fit2)
+
+fit2 <- lm(data = fulldata, DemVotesMajorPercent ~ gen_avg_dem + inc_party + president_party)
+#summary(fit2)
+
+fit3 <- lm(data = fulldata, DemVotesMajorPercent ~ gen_avg_dem + inc_party + president_party + dist_turnout)
+#summary(fit3)
+
+fit4 <- lm(data = fulldata, DemVotesMajorPercent ~ gen_avg_dem + inc_party + president_party + dist_turnout + lag_DemVS)
+#summary(fit4)
+
+fit5 <- lm(data = fulldata, DemVotesMajorPercent ~  gen_avg_dem + inc_party + president_party + dist_turnout + lag_DemVS + Q3_unemployed)
+#summary(fit5)
+
+fit6 <- lm(data = fulldata, DemVotesMajorPercent ~  gen_avg_dem + inc_party + president_party + dist_turnout + lag_DemVS + Q3_unemployed + H_incumbent_party)
+#summary(fit6)
+
+stargazer(fit1, fit2, fit3, fit4, fit5, fit6, type = "html")
+
 ```
 
 ```{r}

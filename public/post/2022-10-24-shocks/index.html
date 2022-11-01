@@ -80,33 +80,645 @@
 <h3>Model</h3>
 <p>Over the past few weeks, we have tested out adding different pieces of election data to our models to see if they will yield more significant results and improve our predictions for this year’s election. Some of these attempts showed real predictive power, like the generic ballot and real disposable income changes, while some of the data fell short of what we had hoped, such as that on advertising. In adjusting my model this week, I will stick to the fundamentals of incumbency, economic variables, and turnout to see if my model has improved. I will try new combinations of variables, weights, and methods to hopefully improve upon this model.</p>
 <p>Throughout my models in previous weeks, I have found a few variables to be consistently significant and therefore will keep them in my model. Similar to in previous weeks, Democratic vote share will be the dependent variable of the model. We will also use democratic vote share from the previous election as an independent variable, along with unemployment rate in Quarter 7, the President’s party, the House’s majority party, the generic ballot, and voter turnout.</p>
-<pre><code>## 
-## Call:
-## lm(formula = DemVotesMajorPercent ~ lag_DemVS + inc_party + president_party + 
-##     Q3_unemployed + gen_avg_dem + H_incumbent_party + dist_turnout, 
-##     data = fulldata)
-## 
-## Residuals:
-##     Min      1Q  Median      3Q     Max 
-## -81.286  -4.950   0.210   5.234  68.593 
-## 
-## Coefficients:
-##                     Estimate Std. Error t value Pr(&gt;|t|)    
-## (Intercept)          8.79525    1.72541   5.097 3.46e-07 ***
-## lag_DemVS            0.57177    0.00372 153.699  &lt; 2e-16 ***
-## inc_partyR         -15.44690    0.17937 -86.116  &lt; 2e-16 ***
-## president_partyR     0.65153    0.29505   2.208  0.02724 *  
-## Q3_unemployed        0.14998    0.05111   2.934  0.00335 ** 
-## gen_avg_dem          0.42476    0.03992  10.641  &lt; 2e-16 ***
-## H_incumbent_partyR   5.11433    0.22779  22.452  &lt; 2e-16 ***
-## dist_turnout        -7.51814    0.59328 -12.672  &lt; 2e-16 ***
-## ---
-## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
-## 
-## Residual standard error: 12.85 on 35879 degrees of freedom
-##   (170882 observations deleted due to missingness)
-## Multiple R-squared:  0.7032, Adjusted R-squared:  0.7031 
-## F-statistic: 1.214e+04 on 7 and 35879 DF,  p-value: &lt; 2.2e-16</code></pre>
+<table style="text-align:center">
+<tr>
+<td colspan="7" style="border-bottom: 1px solid black">
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td colspan="6">
+<em>Dependent variable:</em>
+</td>
+</tr>
+<tr>
+<td>
+</td>
+<td colspan="6" style="border-bottom: 1px solid black">
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td colspan="6">
+DemVotesMajorPercent
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+(1)
+</td>
+<td>
+(2)
+</td>
+<td>
+(3)
+</td>
+<td>
+(4)
+</td>
+<td>
+(5)
+</td>
+<td>
+(6)
+</td>
+</tr>
+<tr>
+<td colspan="7" style="border-bottom: 1px solid black">
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+gen_avg_dem
+</td>
+<td>
+0.636<sup>***</sup>
+</td>
+<td>
+0.445<sup>***</sup>
+</td>
+<td>
+0.587<sup>***</sup>
+</td>
+<td>
+0.232<sup>***</sup>
+</td>
+<td>
+0.182<sup>***</sup>
+</td>
+<td>
+0.425<sup>***</sup>
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+(0.015)
+</td>
+<td>
+(0.010)
+</td>
+<td>
+(0.049)
+</td>
+<td>
+(0.038)
+</td>
+<td>
+(0.039)
+</td>
+<td>
+(0.040)
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+</td>
+<td>
+</td>
+<td>
+</td>
+<td>
+</td>
+<td>
+</td>
+<td>
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+inc_partyR
+</td>
+<td>
+</td>
+<td>
+-36.312<sup>***</sup>
+</td>
+<td>
+-33.163<sup>***</sup>
+</td>
+<td>
+-15.649<sup>***</sup>
+</td>
+<td>
+-15.613<sup>***</sup>
+</td>
+<td>
+-15.447<sup>***</sup>
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+</td>
+<td>
+(0.074)
+</td>
+<td>
+(0.177)
+</td>
+<td>
+(0.181)
+</td>
+<td>
+(0.180)
+</td>
+<td>
+(0.179)
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+</td>
+<td>
+</td>
+<td>
+</td>
+<td>
+</td>
+<td>
+</td>
+<td>
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+president_partyR
+</td>
+<td>
+</td>
+<td>
+3.205<sup>***</sup>
+</td>
+<td>
+2.263<sup>***</sup>
+</td>
+<td>
+3.714<sup>***</sup>
+</td>
+<td>
+4.916<sup>***</sup>
+</td>
+<td>
+0.652<sup>**</sup>
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+</td>
+<td>
+(0.076)
+</td>
+<td>
+(0.185)
+</td>
+<td>
+(0.145)
+</td>
+<td>
+(0.227)
+</td>
+<td>
+(0.295)
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+</td>
+<td>
+</td>
+<td>
+</td>
+<td>
+</td>
+<td>
+</td>
+<td>
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+dist_turnout
+</td>
+<td>
+</td>
+<td>
+</td>
+<td>
+-9.802<sup>***</sup>
+</td>
+<td>
+-4.566<sup>***</sup>
+</td>
+<td>
+-5.400<sup>***</sup>
+</td>
+<td>
+-7.518<sup>***</sup>
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+</td>
+<td>
+</td>
+<td>
+(0.736)
+</td>
+<td>
+(0.578)
+</td>
+<td>
+(0.590)
+</td>
+<td>
+(0.593)
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+</td>
+<td>
+</td>
+<td>
+</td>
+<td>
+</td>
+<td>
+</td>
+<td>
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+lag_DemVS
+</td>
+<td>
+</td>
+<td>
+</td>
+<td>
+</td>
+<td>
+0.567<sup>***</sup>
+</td>
+<td>
+0.565<sup>***</sup>
+</td>
+<td>
+0.572<sup>***</sup>
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+</td>
+<td>
+</td>
+<td>
+</td>
+<td>
+(0.004)
+</td>
+<td>
+(0.004)
+</td>
+<td>
+(0.004)
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+</td>
+<td>
+</td>
+<td>
+</td>
+<td>
+</td>
+<td>
+</td>
+<td>
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+Q3_unemployed
+</td>
+<td>
+</td>
+<td>
+</td>
+<td>
+</td>
+<td>
+</td>
+<td>
+0.348<sup>***</sup>
+</td>
+<td>
+0.150<sup>***</sup>
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+</td>
+<td>
+</td>
+<td>
+</td>
+<td>
+</td>
+<td>
+(0.051)
+</td>
+<td>
+(0.051)
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+</td>
+<td>
+</td>
+<td>
+</td>
+<td>
+</td>
+<td>
+</td>
+<td>
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+H_incumbent_partyR
+</td>
+<td>
+</td>
+<td>
+</td>
+<td>
+</td>
+<td>
+</td>
+<td>
+</td>
+<td>
+5.114<sup>***</sup>
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+</td>
+<td>
+</td>
+<td>
+</td>
+<td>
+</td>
+<td>
+</td>
+<td>
+(0.228)
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+</td>
+<td>
+</td>
+<td>
+</td>
+<td>
+</td>
+<td>
+</td>
+<td>
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+Constant
+</td>
+<td>
+22.907<sup>***</sup>
+</td>
+<td>
+44.884<sup>***</sup>
+</td>
+<td>
+42.274<sup>***</sup>
+</td>
+<td>
+19.509<sup>***</sup>
+</td>
+<td>
+19.656<sup>***</sup>
+</td>
+<td>
+8.795<sup>***</sup>
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+(0.701)
+</td>
+<td>
+(0.485)
+</td>
+<td>
+(2.125)
+</td>
+<td>
+(1.669)
+</td>
+<td>
+(1.668)
+</td>
+<td>
+(1.725)
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+</td>
+<td>
+</td>
+<td>
+</td>
+<td>
+</td>
+<td>
+</td>
+<td>
+</td>
+</tr>
+<tr>
+<td colspan="7" style="border-bottom: 1px solid black">
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+Observations
+</td>
+<td>
+206,336
+</td>
+<td>
+206,336
+</td>
+<td>
+36,212
+</td>
+<td>
+35,887
+</td>
+<td>
+35,887
+</td>
+<td>
+35,887
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+R<sup>2</sup>
+</td>
+<td>
+0.009
+</td>
+<td>
+0.543
+</td>
+<td>
+0.503
+</td>
+<td>
+0.699
+</td>
+<td>
+0.699
+</td>
+<td>
+0.703
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+Adjusted R<sup>2</sup>
+</td>
+<td>
+0.009
+</td>
+<td>
+0.543
+</td>
+<td>
+0.503
+</td>
+<td>
+0.699
+</td>
+<td>
+0.699
+</td>
+<td>
+0.703
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+Residual Std. Error
+</td>
+<td>
+24.327 (df = 206334)
+</td>
+<td>
+16.510 (df = 206332)
+</td>
+<td>
+16.585 (df = 36207)
+</td>
+<td>
+12.948 (df = 35881)
+</td>
+<td>
+12.940 (df = 35880)
+</td>
+<td>
+12.850 (df = 35879)
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+F Statistic
+</td>
+<td>
+1,816.863<sup>***</sup> (df = 1; 206334)
+</td>
+<td>
+81,861.170<sup>***</sup> (df = 3; 206332)
+</td>
+<td>
+9,168.786<sup>***</sup> (df = 4; 36207)
+</td>
+<td>
+16,634.830<sup>***</sup> (df = 5; 35881)
+</td>
+<td>
+13,888.080<sup>***</sup> (df = 6; 35880)
+</td>
+<td>
+12,142.990<sup>***</sup> (df = 7; 35879)
+</td>
+</tr>
+<tr>
+<td colspan="7" style="border-bottom: 1px solid black">
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+<em>Note:</em>
+</td>
+<td colspan="6" style="text-align:right">
+<sup><em></sup>p&lt;0.1; <sup><strong></sup>p&lt;0.05; <sup></strong></em></sup>p&lt;0.01
+</td>
+</tr>
+</table>
 <p><img src="http://example.org/post/2022-10-24-shocks/index_files/figure-html/unnamed-chunk-7-1.png" width="672" /></p>
 </div>
 
@@ -125,7 +737,7 @@
         		<footer>
 			
 			<span>
-			&copy; <time datetime="2022-10-31 16:36:46.224799 -0400 EDT m=&#43;1.859373247">2022</time> . Made with <a href='https://gohugo.io'>Hugo</a> using the <a href='https://github.com/EmielH/tale-hugo/'>Tale</a> theme.
+			&copy; <time datetime="2022-11-01 17:25:20.223919 -0400 EDT m=&#43;1.701177980">2022</time> . Made with <a href='https://gohugo.io'>Hugo</a> using the <a href='https://github.com/EmielH/tale-hugo/'>Tale</a> theme.
 			</span>
 		</footer>
 
