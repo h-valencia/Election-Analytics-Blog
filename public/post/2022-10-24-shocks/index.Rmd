@@ -328,6 +328,10 @@ stargazer(fit1, fit2, fit3, fit4, fit5, fit6, type = "html")
 
 ```
 
+Looking at the R-squared and adjusted R-squared values of each of these models, we see that they increases when we add the lag of Democratic vote share in Model 4, however in Models 5 and 6 that follow both add variables that barely have any affect on the R-squared, raising it only by 0.001. These variables are unemployment in Q3 before an election, and whether the house was controlled by a democrat or a republican majority. While these two variables do not have much impact on the R-squares, they are shown in the model as being statistically significant at the highest level.
+
+To test for multicollinearity between these independent variables, I have created the correlation plot below.
+
 ```{r}
 library(corrplot)
 corrplotdata <- fulldata %>% 
@@ -341,6 +345,11 @@ res <- cor(corrplotdata)
 corrplot(res, type = "upper", order = "hclust", method = "number",
          tl.col = "black", tl.srt = 45, addCoef.col = "grey70")
 ```
+
+We can see that, for the most part, the variables have very low correlation with one another. We do see a high correlation of 0.74 between the President's party and the Q3 unemployment rate, and a correlation of 0.72 between the president's party and the house incumbent party. In both of these highly correlated relationships, it is hard to believe that there are unaccounted for variables that explain this phenomenon. For example, while presidents can have some impact on the economic climate, their party is wholly uncorrelated with the business cycle swings that are a strong determinant of unemployment rates. Looking at the second relationship, we learned in class that there exists a phenomenon where the house majority party will switch at the midterm after the president party switches, therefore they may exist a linear relationship between these two variables. As I discussed earlier, the variables of the House's incumbent party and the Q3 unemployment do not improve the predictive power of the model, so to eliminate this multicollinearity, we can shift to only looking at Model 4.
+
+We also see a somewhat high correlation between the lag of democratic vote share in the district and the seat's incumbent party. It makes sense that a relationship exists between these two because they are both looking at the outcome of the previous election cycle. If the district's incumbent was a democrat, we can expect that the district would also have a higher democratic vote share. Adding the lag democratic vote share variable did increase the R-squared value by a decent amount, as did the seat's incumbent party. In future weeks I will look into this relationship further to determine if one of these variables should be eliminated from the model.
+
 
 
 
