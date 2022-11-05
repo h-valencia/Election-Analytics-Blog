@@ -6,7 +6,16 @@
     <description>Recent content on My New Hugo Site</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Mon, 24 Oct 2022 00:00:00 +0000</lastBuildDate><atom:link href="http://example.org/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Fri, 04 Nov 2022 00:00:00 +0000</lastBuildDate><atom:link href="http://example.org/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Final Prediction</title>
+      <link>http://example.org/post/2022-11-04-final-prediction/</link>
+      <pubDate>Fri, 04 Nov 2022 00:00:00 +0000</pubDate>
+      
+      <guid>http://example.org/post/2022-11-04-final-prediction/</guid>
+      <description>Over the past nine weeks, we have explored a multitude of variables that may impact election outcomes in an attempt to forecast the 2022 midterm election. We have learned about economic forces, polling, expert predictions, incumbency, advertising, campaigning, and more to find if they hold any predictive power, and how together in a model they may foreshadow what is to come in the results next week. In this blog, I will create a final prediction model for the House of Representatives and share its results, with the intention of reflecting on it after the election.</description>
+    </item>
+    
     <item>
       <title>Shocks</title>
       <link>http://example.org/post/2022-10-24-shocks/</link>

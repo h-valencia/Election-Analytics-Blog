@@ -1,0 +1,140 @@
+---
+title: Final Prediction
+author: Hannah Valencia
+date: '2022-11-04'
+slug: []
+categories: []
+tags: []
+summary: "Over the past nine weeks, we have explored a multitude of variables that may impact election outcomes in an attempt to forecast the 2022 midterm election. We have learned about economic forces, polling, expert predictions, incumbency, advertising, campaigning, and more to find if they hold any predictive power, and how together in a model they may foreshadow what is to come in the results next week. In this blog, I will create a final prediction model for the House of Representatives and share its results, with the intention of reflecting on it after the election." 
+---
+
+*This blog is part of a series related to Gov 1347: Election Analytics, a course at [Harvard University](https://www.harvard.edu/) taught by Professor [Ryan D. Enos](http://ryandenos.com/)*.
+
+*Over the past nine weeks, we have explored a multitude of variables that may impact election outcomes in an attempt to forecast the 2022 midterm election. We have learned about economic forces, polling, expert predictions, incumbency, advertising, campaigning, and more to find if they hold any predictive power, and how together in a model they may foreshadow what is to come in the results next week. In this blog, I will create a final prediction model for the House of Representatives and share its results, with the intention of reflecting on it after the election.*
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE)
+
+# load libraries
+
+library(tidyverse)
+library(usmap)
+library(plotly)
+library(rmapshaper)
+library(sf)
+library(haven)
+library(stringr)
+library(sjlabelled)
+library(usdata)
+library(stargazer)
+
+```
+
+Since this class first convened in the beginning of September, we have time and time again been reminded of the shortcomings of election forecasting. Elections are fickle and there is no way to know for certain how voters will vote on election day. The experts oftentimes cannot predict what will happen, if an election will be toss-up or a landslide. There are shocks that no one sees coming, costs of voting that may be unanticipated, various biases with polling, and ever-changing political opinions that result from all sorts of issues and news. While these unknowns make forecasting very difficult, we have gained the tools over the last nine weeks that give us a good foundation to create predictions of our own for the House of Representatives midterm election.
+
+In the first week of class, we looked at how Real Disposable Income (RDI) on its own does a decent job of predicting elections. 
+
+```{r}
+distdata <- read_csv("fulldata.csv")
+natldata <- read_csv("data2.csv", skip = 1)
+popvote_df <- read_csv("popvote_df.csv", skip = 1, col_types = cols(...1 = col_skip(), ...2 = col_skip()))
+rdi_df <- read_csv("RDI_quarterly.csv") %>% select(!`...1`)
+```
+
+
+```{r}
+
+# recreating Professor Enos's graph from week 1 illustrating the relationship between percent change RDI and the seat change in the president's party
+
+# adding seat share and president party to the data frame with national-level data
+
+a <- distdata %>%
+  distinct(year, president_party)
+
+b <- popvote_df %>%
+  select(year, R_seats, D_seats, Other_seats)
+
+natldata1 <- left_join(natldata, a, by = c("year" = "year"))
+natldata1 <- left_join(natldata1, b, by = c("year" = "year")) %>% select(!`...1`)
+
+# lagging the seats to create a variable that has the seat change for the President's party
+
+c <- b %>%
+  mutate(year = year + 2) %>%
+  rename(R_seats_previous = R_seats,
+         D_seats_previous = D_seats,
+         Other_seats_previous = Other_seats)
+
+natldata1 <- left_join(natldata1, c, by = c("year" = "year"))
+
+natldata1 <- natldata1 %>%
+  mutate(pres_party_seat_change = ifelse(president_party == "R", (R_seats - R_seats_previous), (D_seats - D_seats_previous)))
+
+# creating a variable for the percent change in RDI for each election year
+# coded as the percent change in RDI from Q3 of the election year (aka Q7) from the RDI from Q3 of the previous year
+
+rdi_df1 <- rdi_df %>%
+  mutate(election_year = 1:nrow(rdi_df) %/% 8,
+         election_year = lag(election_year, default = 0)) %>%
+  group_by(election_year) %>%
+  filter(election_year != 31) %>%
+  mutate(pct_rdi_election = (DSPIC_qt[quarter_cycle == 7] - DSPIC_qt[quarter_cycle == 3])/DSPIC_qt[quarter_cycle == 3]*100)
+
+rdi_df1 <- rdi_df1 %>%
+  distinct(year, pct_rdi_election)
+
+natldata1 <- left_join(natldata1, rdi_df1, by = c("year" = "year"))
+
+# For some reason the graph I produce is different than that of Professor Enos's, likely to slight differences in the way we coded the variables.
+# Even though I will not include the recreated graph in this post, I have the same data.
+
+# x <- natldata1 %>% select(year, pres_party_seat_change, pct_rdi_election)
+
+# natldata1 %>%
+#   ggplot(aes(x = pct_rdi_election, y = pres_party_seat_change, label = year)) +
+#   geom_point() +
+#   geom_smooth(method = "lm", se = TRUE, alpha = .25,size = 2) +
+#   labs(title = "Descriptive Relationship Between RDI Change and \n President's Party Seat Change in House",
+#        x = "Percent Change in RDI",
+#        y = "President's Party Seat Change",
+#        caption = "RDI = Real Disposable Income, Midterm years in black, \n change from Q3 of election year - 1 year") +
+#   scale_color_manual(values=c("darkgrey","black")) +
+#   scale_y_continuous(breaks = seq(-60, 40, by = 10)) +
+#   theme(legend.position = "none")
+```
+
+```{r}
+
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
