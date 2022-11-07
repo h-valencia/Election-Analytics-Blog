@@ -720,34 +720,11 @@ F Statistic
 </td>
 </tr>
 </table>
-<pre><code>## 
-## Call:
-## lm(formula = D_majorvote_pct ~ gen_avg_dem + DemVS_prev + president_party + 
-##     approval_rating + midterm * president_party + unrate + unrate * 
-##     president_party, data = natldata2)
-## 
-## Residuals:
-##     Min      1Q  Median      3Q     Max 
-## -4.0603 -1.0010  0.2003  1.0220  2.8136 
-## 
-## Coefficients:
-##                          Estimate Std. Error t value Pr(&gt;|t|)    
-## (Intercept)               27.2380     7.0419   3.868 0.000832 ***
-## gen_avg_dem                0.2286     0.0821   2.784 0.010813 *  
-## DemVS_prev                 0.4259     0.1185   3.593 0.001617 ** 
-## president_partyR          -6.3394     2.8795  -2.202 0.038480 *  
-## approval_rating           -5.4353     3.1550  -1.723 0.098965 .  
-## midterm                   -4.6436     1.0531  -4.409 0.000222 ***
-## unrate                    -0.6904     0.3072  -2.248 0.034952 *  
-## president_partyR:midterm   6.7931     1.5652   4.340 0.000263 ***
-## president_partyR:unrate    0.7929     0.4240   1.870 0.074872 .  
-## ---
-## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
-## 
-## Residual standard error: 1.83 on 22 degrees of freedom
-## Multiple R-squared:  0.767,  Adjusted R-squared:  0.6822 
-## F-statistic: 9.051 on 8 and 22 DF,  p-value: 1.95e-05</code></pre>
 <p>Model 6 is my final model for the Democratic Vote Share, the other models in this regression table simply show how each variable impacts and improves the model one step at a time. In this model, we see that all the variables are significant at the 0.1 significance level, and most at the 0.05 level. While approval rating and the lag of the House democratic vote share are the only variables that were not immediately significant when first added to the model, they both increased the R-squared and adjusted R-squared values, and eventually found a level of significance by the final model. Model 6 has an R-squared of 0.767 and an adjusted R-squared of 0.6822. I did some testing with other variables, but adding any of the other variables I was considering (such as percent change RDI) ended up decreasing the adjusted R-squared. The most significant variables in this model are the indicator variable for whether the election is a midterm election and the interaction between this indicator and the president’s party.</p>
+<p>In this model, every one percentage point support in the generic ballot for democrats increases the Democratic vote share percent by 0.229. This positive relationship makes sense, as we expect democratic vote share to be higher in years when people feel more favorably towards the party all around. Every additional percentage point in the previous year’s democratic vote percentage for the house predicts a 0.426 percentage point increase in the democratic vote share. Again, this positive relationship is very intuitive.</p>
+<p>When the President is a Republican, this negatively impacts democratic vote share for the house, lowering democratic vote share by -6.339. The relationship that we have discussed with the president’s party losing seats in the house was mainly in midterm years, which we see in the interaction term between president’s party and midterm year. The coefficient on this interaction term is a <em>positive</em> 6.793, which tells us in midterm years when the President is a Republican, democratic vote share increases slightly from this interaction. When we first added the president’s party variable to Model 3, prior to any interaction, we see it was significant and positive. In this simplified model we can interpret the coefficient to tell us that across all years, a Republican president is predicted to positively impact House democratic vote share. When it is not a midterm year, however, the president’s party aligns with the way voters vote for House representatives: a Republican president hurts democratic vote share.</p>
+<p>While Presidential approval rating was not significant in either Model 4 or 5, it found significance in Model 6. The approval rating is on a scale from 0-1, with the percentages represented as decimals rather than whole numbers like some of the other variables. When a president has an approval of 1, or 100%, this <em>decreases</em> democratic vote share by 5.435% in the model. This variable would be easier to explain if the dependent variable was president party’s vote share, rather than democratic vote share, as it would be independent of party. Approval ratings do not often fall at either extreme, with most falling between 40-50%. With this in mind, the magnitude of the decrease in vote share decreases, but the intuition behind the sign of the coefficient remains ambiguous.</p>
+<p>Looking at the unemployment rate coefficient and the interaction between it and the president’s party there are a few things to note. First, it is important to know that the variable is coded as the unemployment rate in Quarter 3 (July to September) as reported by the Bureau of Labor Statistics. The unemployment rate coefficient is -0.690, telling us that for every percentage point increase in the unemployment rate, the democratic vote share percentage declines by 0.69 when the president is a Democrat. When the President is a Republican, however, the interaction term of 0.793 comes into play and creates a 0.103 percentage point <em>increase</em> in democratic vote share. This tells us that when unemployment is high, people likely blame the party of the president in power, and thus vote in opposition to that party.</p>
 </div>
 <div id="deomcratic-seat-share" class="section level4">
 <h4>Deomcratic Seat Share</h4>
@@ -1438,7 +1415,14 @@ F Statistic
 </td>
 </tr>
 </table>
-<p>Running the same regression again, but replacing vote share with seat share for both the dependent variable as well as the lagged independent variable, I found similar results. However, there were a couple of variables whose significance did not hold in the seat share model. We see that the variable for the president’s approval rating does not have any significance across any of the three models it is incorporated into and has very high standard errors. Additionally, the interaction between the President’s party and the unemployment rate do not hold significance in this model either. Despite these insignificant variables, their presence improves the adjusted R-squared so I have decided to leave them in. Similar to the vote share model, we again find the most significant variables to be the indicator variable for whether the election is a midterm election and the interaction between this indicator and the president’s party. In addition, this model also shows the lag of seat share to be a highly significant variable.</p>
+<p>Running the same regression again, but replacing vote share with seat share for both the dependent variable as well as the lagged independent variable, I found similar results. However, there were a couple of variables whose significance did not hold in the seat share model. We see that the variable for the president’s approval rating does not have any significance across any of the three models it is incorporated into and has very high standard errors. Additionally, the interaction between the President’s party and the unemployment rate do not hold significance in this model either. Despite these insignificant variables, their presence improves the adjusted R-squared so I have decided to leave them in. Similar to the vote share model, we again find the most significant variables to be the indicator variable for whether the election is a midterm election and the interaction between this indicator and the president’s party. In addition, this model also shows the lag of seat share to be a highly significant variable. Slightly improving on the r-squared and adjusted r-squared of the vote share model, my final model here has an r-squared of 0.807 and an adjusted r-squared of 0.736.</p>
+<p>In changing the dependent variable, we do not see any changes in the signs of the final model coefficients. Even though the magnitudes of the coefficients vary slightly, the overall effects of each variable on the democratic seat share percentage remain.</p>
+</div>
+</div>
+<div id="midterm-models" class="section level1">
+<h1>Midterm Models</h1>
+<p>After looking at both of those models that use data across all elections from 1960-2020, I wanted to see how these models would change if I limited the data to only midterm election years. As previously discussed, there is a different voting body in midterm elections versus presidential elections. In limiting the years I model on, I am hoping to improve their predictive power.</p>
+<p>I removed the midterm indicator variable since the filter takes care of that, and also removed unemployment rate due to it causing a significant decrease in the adjusted r-squared. This left me with just the generic ballot support for democrats, the president’s party, and the previous democratic vote/seat share as independent variables. I ran this model on both vote share and seat share, and below are the results of this inquiry.</p>
 <table style="text-align:center">
 <tr>
 <td colspan="4" style="border-bottom: 1px solid black">
@@ -1981,17 +1965,28 @@ F Statistic
 </td>
 </tr>
 </table>
+<p>Both of these models have higher R-squared and adjusted R-squared values than their all-elections counterpart, with the vote share model boasting a 0.801 r-squared, and the seat share model having a 0.840.</p>
+<p>The lag of Democratic house vote share in the vote share model is insignificant, but improves the R-squared and adjusted r-squared so I kept it in - as well as for consistency.</p>
+<div id="predictions" class="section level4">
+<h4>2022 Predictions</h4>
+<p>Using generic ballot data from FiveThirtyEight, Biden approval ratings from Gallup, and the 2022 Q3 unemployment rate from the BLS, I have predictions for each of the four models:</p>
+<p>Democratic Vote Share using all years</p>
 <pre><code>##        fit      lwr     upr
 ## 1 50.20221 47.86202 52.5424</code></pre>
+<p>Democratic Seat Share using all years</p>
 <pre><code>##        fit     lwr      upr
 ## 1 50.50952 45.7082 55.31085</code></pre>
+<p>Democratic Vote Share using midterm years</p>
 <pre><code>##        fit      lwr      upr
 ## 1 47.85624 45.81439 49.89809</code></pre>
+<p>Democratic Seat Share using midterm years</p>
 <pre><code>##        fit      lwr      upr
 ## 1 46.38345 42.94734 49.81955</code></pre>
-<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-11-1.png" width="672" /></p>
-<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-12-1.png" width="672" /></p>
+<p>The predictions for the first two models that used data across all years are slightly higher than I would expect, specifically for the seat share. The seat share here is predicted to be split just about 50/50, which most experts do <em>not</em> believe will be the case this year. The models using data only from midterm elections, however, seem like they will more accurately predict this years election, at least in terms of being closer to what the experts are saying.</p>
+<p>The model of Democratic Seat Share using midterm years predicts that Democrats will win 202 seats in the House, thus losing their majority, compared to the 219 that are predicted in the model that goes across all years.</p>
 <p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-13-1.png" width="672" /></p>
 <p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-14-1.png" width="672" /></p>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-15-1.png" width="672" /></p>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-16-1.png" width="672" /></p>
 </div>
 </div>
