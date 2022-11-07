@@ -13,29 +13,31 @@ summary: "Over the past nine weeks, we have explored a multitude of variables th
 <p><em>This blog is part of a series related to Gov 1347: Election Analytics, a course at <a href="https://www.harvard.edu/">Harvard University</a> taught by Professor <a href="http://ryandenos.com/">Ryan D. Enos</a></em>.</p>
 <p><em>Over the past nine weeks, we have explored a multitude of variables that may impact election outcomes in an attempt to forecast the 2022 midterm election. We have learned about economic forces, polling, expert predictions, incumbency, advertising, campaigning, and more to find if they hold any predictive power, and how together in a model they may foreshadow what is to come in the results next week. In this blog, I will create a final prediction model for the House of Representatives and share its results, with the intention of reflecting on it after the election.</em></p>
 <p>Since this class first convened in the beginning of September, we have time and time again been reminded of the shortcomings of election forecasting. Elections are fickle and there is no way to know for certain how voters will vote on election day. The experts oftentimes cannot predict what will happen, if an election will be toss-up or a landslide. There are shocks that no one sees coming, costs of voting that may be unanticipated, various biases with polling, and ever-changing political opinions that result from all sorts of issues and news. While these unknowns make forecasting very difficult, we have gained the tools over the last nine weeks that give us a good foundation to create predictions of our own for the House of Representatives midterm election.</p>
-<p>In the first week of class, we looked at how Real Disposable Income (RDI) on its own does a decent job of predicting elections.</p>
+<p>In building my model, the first choice I had was what to use as my dependent variable and the level on which to predict on. For my dependent variable, I decided to run models for both Democratic seat share and Democratic vote share to see the results of both and how they may unveil different stories about the election. I also created variables putting the vote share and seat share in terms of the incumbent party to see how incumbents perform without paying specific attention to their party affiliation, but I decided that this approach would complicate interpreting results. While we spent multiple weeks working with district-level data and forecasting each of the 435 districts, in the end I have decided to predict vote share and seat share on the national level. We have more data for these variables and do not have to rely upon things like pooling, that may produce greater margins for error. Given the insufficient district-level data, a pooled model would have allowed us to take data from neighboring, similar districts and count it as its own. My national model was heading in the right direction in terms of improving predictability and the lack of district data led me to this decision.</p>
+<p>In the first week of class, we looked at the fundamentals of election forecasting models, with predictors like the president’s party. We learned about the phenomenon that takes place in most midterms where the president’s party tends to lose seats. Following these basics, in week two we looked at how Real Disposable Income (RDI) on its own does a decent job of predicting elections. We also took a look at a slew of other economic variables, such as the Consumer Price Index (CPI), GDP growth rate, unemployment, and more. Despite the overlap between the government and the economy, most of these variables proved to be insignificant and poor predictors for the House elections. The one economic variable I will be using in my final model the unemployment rate, as it is typically a decent indicator of the health of the economy. In addition to using it on its own, I have also decided to interact it with the president’s party. The most important topics to voters vary based on their political party affiliation, and Republicans are known to weigh economic factors more heavily. Therefore, an interaction term between party and unemployment rate can provide us with more significant results than the two can separately on their own.</p>
+<p>We continued on from the fundamentals and economic variables onto polling, looking at the generic ballot as well as district-level polls.</p>
 <table style="text-align:center">
 <tr>
-<td colspan="8" style="border-bottom: 1px solid black">
-</td>
-</tr>
-<tr>
-<td style="text-align:left">
-</td>
-<td colspan="7">
-<em>Dependent variable:</em>
-</td>
-</tr>
-<tr>
-<td>
-</td>
 <td colspan="7" style="border-bottom: 1px solid black">
 </td>
 </tr>
 <tr>
 <td style="text-align:left">
 </td>
-<td colspan="7">
+<td colspan="6">
+<em>Dependent variable:</em>
+</td>
+</tr>
+<tr>
+<td>
+</td>
+<td colspan="6" style="border-bottom: 1px solid black">
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td colspan="6">
 D_majorvote_pct
 </td>
 </tr>
@@ -60,38 +62,32 @@ D_majorvote_pct
 <td>
 (6)
 </td>
-<td>
-(7)
-</td>
 </tr>
 <tr>
-<td colspan="8" style="border-bottom: 1px solid black">
+<td colspan="7" style="border-bottom: 1px solid black">
 </td>
 </tr>
 <tr>
 <td style="text-align:left">
-gen_avg_dem
+Generic Ballot Support - D
 </td>
 <td>
 0.386<sup>***</sup>
 </td>
 <td>
-0.213<sup>**</sup>
+0.354<sup>***</sup>
 </td>
 <td>
-0.231<sup>**</sup>
+0.366<sup>***</sup>
 </td>
 <td>
-0.254<sup>***</sup>
+0.389<sup>***</sup>
 </td>
 <td>
-0.206<sup>***</sup>
+0.272<sup>***</sup>
 </td>
 <td>
-0.145<sup>*</sup>
-</td>
-<td>
-0.114
+0.229<sup>**</sup>
 </td>
 </tr>
 <tr>
@@ -101,22 +97,19 @@ gen_avg_dem
 (0.099)
 </td>
 <td>
-(0.084)
+(0.098)
 </td>
 <td>
-(0.085)
+(0.093)
 </td>
 <td>
-(0.080)
+(0.093)
 </td>
 <td>
-(0.073)
+(0.083)
 </td>
 <td>
-(0.075)
-</td>
-<td>
-(0.072)
+(0.082)
 </td>
 </tr>
 <tr>
@@ -134,32 +127,27 @@ gen_avg_dem
 </td>
 <td>
 </td>
-<td>
-</td>
 </tr>
 <tr>
 <td style="text-align:left">
-H_incumbent_party_majorvote_pct
+Lag House Dem VS
 </td>
 <td>
 </td>
 <td>
-0.562<sup>***</sup>
+0.237
 </td>
 <td>
-0.540<sup>***</sup>
+0.320<sup>**</sup>
 </td>
 <td>
-0.547<sup>***</sup>
+0.296<sup>**</sup>
 </td>
 <td>
-0.827<sup>***</sup>
+0.405<sup>***</sup>
 </td>
 <td>
-0.850<sup>***</sup>
-</td>
-<td>
-0.860<sup>***</sup>
+0.426<sup>***</sup>
 </td>
 </tr>
 <tr>
@@ -168,22 +156,19 @@ H_incumbent_party_majorvote_pct
 <td>
 </td>
 <td>
-(0.121)
+(0.147)
 </td>
 <td>
-(0.121)
+(0.144)
 </td>
 <td>
-(0.113)
+(0.142)
 </td>
 <td>
-(0.143)
+(0.119)
 </td>
 <td>
-(0.162)
-</td>
-<td>
-(0.152)
+(0.119)
 </td>
 </tr>
 <tr>
@@ -201,31 +186,26 @@ H_incumbent_party_majorvote_pct
 </td>
 <td>
 </td>
-<td>
-</td>
 </tr>
 <tr>
 <td style="text-align:left">
-president_partyR
+President Party - R
 </td>
 <td>
 </td>
 <td>
 </td>
 <td>
-0.902
+1.965<sup>**</sup>
 </td>
 <td>
-0.871
+1.905<sup>**</sup>
 </td>
 <td>
-27.599<sup>***</sup>
+-0.811
 </td>
 <td>
-29.164<sup>***</sup>
-</td>
-<td>
-25.736<sup>**</sup>
+-6.339<sup>**</sup>
 </td>
 </tr>
 <tr>
@@ -236,19 +216,16 @@ president_partyR
 <td>
 </td>
 <td>
-(0.742)
+(0.922)
 </td>
 <td>
-(0.693)
+(0.909)
 </td>
 <td>
-(9.639)
+(1.042)
 </td>
 <td>
-(10.380)
-</td>
-<td>
-(9.902)
+(2.879)
 </td>
 </tr>
 <tr>
@@ -266,12 +243,10 @@ president_partyR
 </td>
 <td>
 </td>
-<td>
-</td>
 </tr>
 <tr>
 <td style="text-align:left">
-approval_rating
+President Approval Rating
 </td>
 <td>
 </td>
@@ -280,16 +255,13 @@ approval_rating
 <td>
 </td>
 <td>
--6.874<sup>**</sup>
+-5.416
 </td>
 <td>
--7.227<sup>**</sup>
+-3.627
 </td>
 <td>
--6.435<sup>**</sup>
-</td>
-<td>
--9.704<sup>***</sup>
+-5.435<sup>*</sup>
 </td>
 </tr>
 <tr>
@@ -302,16 +274,13 @@ approval_rating
 <td>
 </td>
 <td>
-(3.090)
+(3.970)
 </td>
 <td>
-(2.758)
+(3.256)
 </td>
 <td>
-(2.617)
-</td>
-<td>
-(2.948)
+(3.155)
 </td>
 </tr>
 <tr>
@@ -329,12 +298,10 @@ approval_rating
 </td>
 <td>
 </td>
-<td>
-</td>
 </tr>
 <tr>
 <td style="text-align:left">
-midterm
+Midterm Year
 </td>
 <td>
 </td>
@@ -345,12 +312,10 @@ midterm
 <td>
 </td>
 <td>
+-3.837<sup>***</sup>
 </td>
 <td>
--0.373
-</td>
-<td>
--0.592
+-4.644<sup>***</sup>
 </td>
 </tr>
 <tr>
@@ -365,12 +330,10 @@ midterm
 <td>
 </td>
 <td>
+(1.046)
 </td>
 <td>
-(0.995)
-</td>
-<td>
-(0.941)
+(1.053)
 </td>
 </tr>
 <tr>
@@ -388,12 +351,10 @@ midterm
 </td>
 <td>
 </td>
-<td>
-</td>
 </tr>
 <tr>
 <td style="text-align:left">
-pct_rdi_election
+Unemployment Rate
 </td>
 <td>
 </td>
@@ -406,9 +367,7 @@ pct_rdi_election
 <td>
 </td>
 <td>
-</td>
-<td>
-0.368<sup>*</sup>
+-0.690<sup>**</sup>
 </td>
 </tr>
 <tr>
@@ -425,9 +384,7 @@ pct_rdi_election
 <td>
 </td>
 <td>
-</td>
-<td>
-(0.183)
+(0.307)
 </td>
 </tr>
 <tr>
@@ -445,12 +402,10 @@ pct_rdi_election
 </td>
 <td>
 </td>
-<td>
-</td>
 </tr>
 <tr>
 <td style="text-align:left">
-H_incumbent_party_majorvote_pct:president_partyR
+President Party - R * Midterm Year
 </td>
 <td>
 </td>
@@ -461,13 +416,10 @@ H_incumbent_party_majorvote_pct:president_partyR
 <td>
 </td>
 <td>
--0.516<sup>**</sup>
+5.851<sup>***</sup>
 </td>
 <td>
--0.569<sup>***</sup>
-</td>
-<td>
--0.507<sup>**</sup>
+6.793<sup>***</sup>
 </td>
 </tr>
 <tr>
@@ -482,13 +434,10 @@ H_incumbent_party_majorvote_pct:president_partyR
 <td>
 </td>
 <td>
-(0.186)
+(1.564)
 </td>
 <td>
-(0.198)
-</td>
-<td>
-(0.188)
+(1.565)
 </td>
 </tr>
 <tr>
@@ -506,12 +455,10 @@ H_incumbent_party_majorvote_pct:president_partyR
 </td>
 <td>
 </td>
-<td>
-</td>
 </tr>
 <tr>
 <td style="text-align:left">
-president_partyR:midterm
+President Party - R * Unemployment
 </td>
 <td>
 </td>
@@ -524,10 +471,7 @@ president_partyR:midterm
 <td>
 </td>
 <td>
-2.349<sup>*</sup>
-</td>
-<td>
-3.117<sup>**</sup>
+0.793<sup>*</sup>
 </td>
 </tr>
 <tr>
@@ -544,16 +488,11 @@ president_partyR:midterm
 <td>
 </td>
 <td>
-(1.294)
-</td>
-<td>
-(1.275)
+(0.424)
 </td>
 </tr>
 <tr>
 <td style="text-align:left">
-</td>
-<td>
 </td>
 <td>
 </td>
@@ -576,22 +515,19 @@ Constant
 33.616<sup>***</sup>
 </td>
 <td>
-12.742<sup>**</sup>
+22.757<sup>***</sup>
 </td>
 <td>
-12.574<sup>**</sup>
+16.775<sup>*</sup>
 </td>
 <td>
-14.549<sup>**</sup>
+19.685<sup>**</sup>
 </td>
 <td>
-2.617
+20.475<sup>***</sup>
 </td>
 <td>
-4.135
-</td>
-<td>
-5.429
+27.238<sup>***</sup>
 </td>
 </tr>
 <tr>
@@ -601,22 +537,19 @@ Constant
 (4.809)
 </td>
 <td>
-(5.798)
+(8.182)
 </td>
 <td>
-(5.751)
+(8.204)
 </td>
 <td>
-(5.445)
+(8.353)
 </td>
 <td>
-(6.481)
+(6.756)
 </td>
 <td>
-(7.535)
-</td>
-<td>
-(7.111)
+(7.042)
 </td>
 </tr>
 <tr>
@@ -634,19 +567,14 @@ Constant
 </td>
 <td>
 </td>
-<td>
-</td>
 </tr>
 <tr>
-<td colspan="8" style="border-bottom: 1px solid black">
+<td colspan="7" style="border-bottom: 1px solid black">
 </td>
 </tr>
 <tr>
 <td style="text-align:left">
 Observations
-</td>
-<td>
-31
 </td>
 <td>
 31
@@ -675,22 +603,19 @@ R<sup>2</sup>
 0.344
 </td>
 <td>
-0.630
+0.400
 </td>
 <td>
-0.649
+0.487
 </td>
 <td>
-0.705
+0.521
 </td>
 <td>
-0.775
+0.711
 </td>
 <td>
-0.818
-</td>
-<td>
-0.846
+0.767
 </td>
 </tr>
 <tr>
@@ -701,22 +626,19 @@ Adjusted R<sup>2</sup>
 0.322
 </td>
 <td>
-0.604
+0.357
 </td>
 <td>
-0.610
+0.430
 </td>
 <td>
-0.660
+0.447
 </td>
 <td>
-0.730
+0.639
 </td>
 <td>
-0.762
-</td>
-<td>
-0.790
+0.682
 </td>
 </tr>
 <tr>
@@ -727,22 +649,19 @@ Residual Std. Error
 2.674 (df = 29)
 </td>
 <td>
-2.043 (df = 28)
+2.602 (df = 28)
 </td>
 <td>
-2.026 (df = 27)
+2.452 (df = 27)
 </td>
 <td>
-1.893 (df = 26)
+2.414 (df = 26)
 </td>
 <td>
-1.687 (df = 25)
+1.951 (df = 24)
 </td>
 <td>
-1.583 (df = 23)
-</td>
-<td>
-1.488 (df = 22)
+1.830 (df = 22)
 </td>
 </tr>
 <tr>
@@ -753,59 +672,56 @@ F Statistic
 15.217<sup>***</sup> (df = 1; 29)
 </td>
 <td>
-23.862<sup>***</sup> (df = 2; 28)
+9.343<sup>***</sup> (df = 2; 28)
 </td>
 <td>
-16.671<sup>***</sup> (df = 3; 27)
+8.530<sup>***</sup> (df = 3; 27)
 </td>
 <td>
-15.568<sup>***</sup> (df = 4; 26)
+7.067<sup>***</sup> (df = 4; 26)
 </td>
 <td>
-17.217<sup>***</sup> (df = 5; 25)
+9.849<sup>***</sup> (df = 6; 24)
 </td>
 <td>
-14.739<sup>***</sup> (df = 7; 23)
-</td>
-<td>
-15.107<sup>***</sup> (df = 8; 22)
+9.051<sup>***</sup> (df = 8; 22)
 </td>
 </tr>
 <tr>
-<td colspan="8" style="border-bottom: 1px solid black">
+<td colspan="7" style="border-bottom: 1px solid black">
 </td>
 </tr>
 <tr>
 <td style="text-align:left">
 <em>Note:</em>
 </td>
-<td colspan="7" style="text-align:right">
+<td colspan="6" style="text-align:right">
 <sup><em></sup>p&lt;0.1; <sup><strong></sup>p&lt;0.05; <sup></strong></em></sup>p&lt;0.01
 </td>
 </tr>
 </table>
 <table style="text-align:center">
 <tr>
-<td colspan="8" style="border-bottom: 1px solid black">
-</td>
-</tr>
-<tr>
-<td style="text-align:left">
-</td>
-<td colspan="7">
-<em>Dependent variable:</em>
-</td>
-</tr>
-<tr>
-<td>
-</td>
 <td colspan="7" style="border-bottom: 1px solid black">
 </td>
 </tr>
 <tr>
 <td style="text-align:left">
 </td>
-<td colspan="7">
+<td colspan="6">
+<em>Dependent variable:</em>
+</td>
+</tr>
+<tr>
+<td>
+</td>
+<td colspan="6" style="border-bottom: 1px solid black">
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td colspan="6">
 DemSeatShare
 </td>
 </tr>
@@ -830,63 +746,54 @@ DemSeatShare
 <td>
 (6)
 </td>
-<td>
-(7)
-</td>
 </tr>
 <tr>
-<td colspan="8" style="border-bottom: 1px solid black">
+<td colspan="7" style="border-bottom: 1px solid black">
 </td>
 </tr>
 <tr>
 <td style="text-align:left">
-gen_avg_dem
+Generic Ballot Support - D
 </td>
 <td>
-0.009<sup>***</sup>
+0.876<sup>***</sup>
 </td>
 <td>
-0.005<sup>***</sup>
+0.635<sup>***</sup>
 </td>
 <td>
-0.005<sup>***</sup>
+0.655<sup>***</sup>
 </td>
 <td>
-0.005<sup>***</sup>
+0.690<sup>***</sup>
 </td>
 <td>
-0.004<sup>**</sup>
+0.500<sup>***</sup>
 </td>
 <td>
-0.003<sup>**</sup>
-</td>
-<td>
-0.002<sup>*</sup>
+0.417<sup>**</sup>
 </td>
 </tr>
 <tr>
 <td style="text-align:left">
 </td>
 <td>
-(0.002)
+(0.214)
 </td>
 <td>
-(0.002)
+(0.179)
 </td>
 <td>
-(0.002)
+(0.169)
 </td>
 <td>
-(0.002)
+(0.170)
 </td>
 <td>
-(0.002)
+(0.172)
 </td>
 <td>
-(0.002)
-</td>
-<td>
-(0.001)
+(0.173)
 </td>
 </tr>
 <tr>
@@ -904,32 +811,27 @@ gen_avg_dem
 </td>
 <td>
 </td>
-<td>
-</td>
 </tr>
 <tr>
 <td style="text-align:left">
-H_incumbent_party_majorvote_pct
+Lag House Dem Seat Share
 </td>
 <td>
 </td>
 <td>
-0.014<sup>***</sup>
+51.248<sup>***</sup>
 </td>
 <td>
-0.014<sup>***</sup>
+55.966<sup>***</sup>
 </td>
 <td>
-0.014<sup>***</sup>
+54.969<sup>***</sup>
 </td>
 <td>
-0.018<sup>***</sup>
+62.422<sup>***</sup>
 </td>
 <td>
-0.022<sup>***</sup>
-</td>
-<td>
-0.023<sup>***</sup>
+63.277<sup>***</sup>
 </td>
 </tr>
 <tr>
@@ -938,22 +840,19 @@ H_incumbent_party_majorvote_pct
 <td>
 </td>
 <td>
-(0.002)
+(12.071)
 </td>
 <td>
-(0.002)
+(11.585)
 </td>
 <td>
-(0.002)
+(11.496)
 </td>
 <td>
-(0.003)
+(10.776)
 </td>
 <td>
-(0.003)
-</td>
-<td>
-(0.003)
+(11.204)
 </td>
 </tr>
 <tr>
@@ -971,31 +870,26 @@ H_incumbent_party_majorvote_pct
 </td>
 <td>
 </td>
-<td>
-</td>
 </tr>
 <tr>
 <td style="text-align:left">
-president_partyR
+President Party - R
 </td>
 <td>
 </td>
 <td>
 </td>
 <td>
-0.007
+3.403<sup>**</sup>
 </td>
 <td>
-0.006
+3.347<sup>**</sup>
 </td>
 <td>
-0.427<sup>**</sup>
+-0.713
 </td>
 <td>
-0.659<sup>***</sup>
-</td>
-<td>
-0.566<sup>***</sup>
+-10.078<sup>*</sup>
 </td>
 </tr>
 <tr>
@@ -1006,19 +900,16 @@ president_partyR
 <td>
 </td>
 <td>
-(0.015)
+(1.596)
 </td>
 <td>
-(0.014)
+(1.580)
 </td>
 <td>
-(0.203)
+(2.070)
 </td>
 <td>
-(0.222)
-</td>
-<td>
-(0.199)
+(5.857)
 </td>
 </tr>
 <tr>
@@ -1036,12 +927,10 @@ president_partyR
 </td>
 <td>
 </td>
-<td>
-</td>
 </tr>
 <tr>
 <td style="text-align:left">
-approval_rating
+President Approval Rating
 </td>
 <td>
 </td>
@@ -1050,16 +939,13 @@ approval_rating
 <td>
 </td>
 <td>
--0.122<sup>*</sup>
+-8.731
 </td>
 <td>
--0.127<sup>**</sup>
+-6.249
 </td>
 <td>
--0.131<sup>**</sup>
-</td>
-<td>
--0.220<sup>***</sup>
+-9.768
 </td>
 </tr>
 <tr>
@@ -1072,16 +958,13 @@ approval_rating
 <td>
 </td>
 <td>
-(0.062)
+(7.009)
 </td>
 <td>
-(0.058)
+(6.410)
 </td>
 <td>
-(0.056)
-</td>
-<td>
-(0.059)
+(6.311)
 </td>
 </tr>
 <tr>
@@ -1099,12 +982,10 @@ approval_rating
 </td>
 <td>
 </td>
-<td>
-</td>
 </tr>
 <tr>
 <td style="text-align:left">
-midterm
+Midterm Year
 </td>
 <td>
 </td>
@@ -1115,12 +996,10 @@ midterm
 <td>
 </td>
 <td>
+-5.101<sup>**</sup>
 </td>
 <td>
-0.041<sup>*</sup>
-</td>
-<td>
-0.035<sup>*</sup>
+-6.607<sup>***</sup>
 </td>
 </tr>
 <tr>
@@ -1135,12 +1014,10 @@ midterm
 <td>
 </td>
 <td>
+(2.064)
 </td>
 <td>
-(0.021)
-</td>
-<td>
-(0.019)
+(2.088)
 </td>
 </tr>
 <tr>
@@ -1158,12 +1035,10 @@ midterm
 </td>
 <td>
 </td>
-<td>
-</td>
 </tr>
 <tr>
 <td style="text-align:left">
-pct_rdi_election
+Unemployment Rate
 </td>
 <td>
 </td>
@@ -1176,9 +1051,7 @@ pct_rdi_election
 <td>
 </td>
 <td>
-</td>
-<td>
-0.010<sup>**</sup>
+-1.314<sup>**</sup>
 </td>
 </tr>
 <tr>
@@ -1195,9 +1068,7 @@ pct_rdi_election
 <td>
 </td>
 <td>
-</td>
-<td>
-(0.004)
+(0.610)
 </td>
 </tr>
 <tr>
@@ -1215,12 +1086,10 @@ pct_rdi_election
 </td>
 <td>
 </td>
-<td>
-</td>
 </tr>
 <tr>
 <td style="text-align:left">
-H_incumbent_party_majorvote_pct:president_partyR
+President Party - R * Midterm Year
 </td>
 <td>
 </td>
@@ -1231,13 +1100,10 @@ H_incumbent_party_majorvote_pct:president_partyR
 <td>
 </td>
 <td>
--0.008<sup>**</sup>
+8.521<sup>**</sup>
 </td>
 <td>
--0.012<sup>***</sup>
-</td>
-<td>
--0.011<sup>***</sup>
+10.355<sup>***</sup>
 </td>
 </tr>
 <tr>
@@ -1252,13 +1118,10 @@ H_incumbent_party_majorvote_pct:president_partyR
 <td>
 </td>
 <td>
-(0.004)
+(3.119)
 </td>
 <td>
-(0.004)
-</td>
-<td>
-(0.004)
+(3.153)
 </td>
 </tr>
 <tr>
@@ -1276,12 +1139,10 @@ H_incumbent_party_majorvote_pct:president_partyR
 </td>
 <td>
 </td>
-<td>
-</td>
 </tr>
 <tr>
 <td style="text-align:left">
-president_partyR:midterm
+President Party - R * Unemployment
 </td>
 <td>
 </td>
@@ -1294,10 +1155,7 @@ president_partyR:midterm
 <td>
 </td>
 <td>
--0.022
-</td>
-<td>
--0.001
+1.294
 </td>
 </tr>
 <tr>
@@ -1314,16 +1172,11 @@ president_partyR:midterm
 <td>
 </td>
 <td>
-(0.028)
-</td>
-<td>
-(0.026)
+(0.875)
 </td>
 </tr>
 <tr>
 <td style="text-align:left">
-</td>
-<td>
 </td>
 <td>
 </td>
@@ -1343,50 +1196,44 @@ president_partyR:midterm
 Constant
 </td>
 <td>
-0.127
+12.723
 </td>
 <td>
--0.384<sup>***</sup>
+-4.066
 </td>
 <td>
--0.385<sup>***</sup>
+-9.406
 </td>
 <td>
--0.350<sup>***</sup>
+-6.202
 </td>
 <td>
--0.538<sup>***</sup>
+-0.016
 </td>
 <td>
--0.724<sup>***</sup>
-</td>
-<td>
--0.688<sup>***</sup>
+14.566
 </td>
 </tr>
 <tr>
 <td style="text-align:left">
 </td>
 <td>
-(0.104)
+(10.406)
 </td>
 <td>
-(0.111)
+(9.158)
 </td>
 <td>
-(0.113)
+(8.983)
 </td>
 <td>
-(0.109)
+(9.257)
 </td>
 <td>
-(0.137)
+(8.649)
 </td>
 <td>
-(0.161)
-</td>
-<td>
-(0.143)
+(10.662)
 </td>
 </tr>
 <tr>
@@ -1404,19 +1251,14 @@ Constant
 </td>
 <td>
 </td>
-<td>
-</td>
 </tr>
 <tr>
-<td colspan="8" style="border-bottom: 1px solid black">
+<td colspan="7" style="border-bottom: 1px solid black">
 </td>
 </tr>
 <tr>
 <td style="text-align:left">
 Observations
-</td>
-<td>
-31
 </td>
 <td>
 31
@@ -1445,22 +1287,19 @@ R<sup>2</sup>
 0.365
 </td>
 <td>
-0.719
+0.614
 </td>
 <td>
-0.721
+0.670
 </td>
 <td>
-0.758
+0.688
 </td>
 <td>
-0.793
+0.766
 </td>
 <td>
-0.828
-</td>
-<td>
-0.872
+0.807
 </td>
 </tr>
 <tr>
@@ -1471,22 +1310,19 @@ Adjusted R<sup>2</sup>
 0.344
 </td>
 <td>
-0.699
+0.586
 </td>
 <td>
-0.690
+0.633
 </td>
 <td>
-0.720
+0.640
 </td>
 <td>
-0.752
+0.707
 </td>
 <td>
-0.776
-</td>
-<td>
-0.825
+0.736
 </td>
 </tr>
 <tr>
@@ -1494,25 +1330,22 @@ Adjusted R<sup>2</sup>
 Residual Std. Error
 </td>
 <td>
-0.058 (df = 29)
+5.786 (df = 29)
 </td>
 <td>
-0.039 (df = 28)
+4.593 (df = 28)
 </td>
 <td>
-0.040 (df = 27)
+4.327 (df = 27)
 </td>
 <td>
-0.038 (df = 26)
+4.284 (df = 26)
 </td>
 <td>
-0.036 (df = 25)
+3.865 (df = 24)
 </td>
 <td>
-0.034 (df = 23)
-</td>
-<td>
-0.030 (df = 22)
+3.668 (df = 22)
 </td>
 </tr>
 <tr>
@@ -1523,34 +1356,581 @@ F Statistic
 16.704<sup>***</sup> (df = 1; 29)
 </td>
 <td>
-35.881<sup>***</sup> (df = 2; 28)
+22.269<sup>***</sup> (df = 2; 28)
 </td>
 <td>
-23.307<sup>***</sup> (df = 3; 27)
+18.242<sup>***</sup> (df = 3; 27)
 </td>
 <td>
-20.324<sup>***</sup> (df = 4; 26)
+14.349<sup>***</sup> (df = 4; 26)
 </td>
 <td>
-19.184<sup>***</sup> (df = 5; 25)
+13.074<sup>***</sup> (df = 6; 24)
 </td>
 <td>
-15.847<sup>***</sup> (df = 7; 23)
-</td>
-<td>
-18.701<sup>***</sup> (df = 8; 22)
+11.464<sup>***</sup> (df = 8; 22)
 </td>
 </tr>
 <tr>
-<td colspan="8" style="border-bottom: 1px solid black">
+<td colspan="7" style="border-bottom: 1px solid black">
 </td>
 </tr>
 <tr>
 <td style="text-align:left">
 <em>Note:</em>
 </td>
-<td colspan="7" style="text-align:right">
+<td colspan="6" style="text-align:right">
 <sup><em></sup>p&lt;0.1; <sup><strong></sup>p&lt;0.05; <sup></strong></em></sup>p&lt;0.01
 </td>
 </tr>
 </table>
+<table style="text-align:center">
+<tr>
+<td colspan="4" style="border-bottom: 1px solid black">
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td colspan="3">
+<em>Dependent variable:</em>
+</td>
+</tr>
+<tr>
+<td>
+</td>
+<td colspan="3" style="border-bottom: 1px solid black">
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td colspan="3">
+D_majorvote_pct
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+(1)
+</td>
+<td>
+(2)
+</td>
+<td>
+(3)
+</td>
+</tr>
+<tr>
+<td colspan="4" style="border-bottom: 1px solid black">
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+Generic Ballot Support - D
+</td>
+<td>
+0.671<sup>***</sup>
+</td>
+<td>
+0.568<sup>***</sup>
+</td>
+<td>
+0.515<sup>***</sup>
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+(0.152)
+</td>
+<td>
+(0.122)
+</td>
+<td>
+(0.130)
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+</td>
+<td>
+</td>
+<td>
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+President Party - R
+</td>
+<td>
+</td>
+<td>
+3.290<sup>***</sup>
+</td>
+<td>
+4.165<sup>***</sup>
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+</td>
+<td>
+(1.058)
+</td>
+<td>
+(1.310)
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+</td>
+<td>
+</td>
+<td>
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+Lag House Dem VS
+</td>
+<td>
+</td>
+<td>
+</td>
+<td>
+0.268
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+</td>
+<td>
+</td>
+<td>
+(0.241)
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+</td>
+<td>
+</td>
+<td>
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+Constant
+</td>
+<td>
+19.272<sup>**</sup>
+</td>
+<td>
+22.578<sup>***</sup>
+</td>
+<td>
+10.626
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+(7.461)
+</td>
+<td>
+(5.876)
+</td>
+<td>
+(12.225)
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+</td>
+<td>
+</td>
+<td>
+</td>
+</tr>
+<tr>
+<td colspan="4" style="border-bottom: 1px solid black">
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+Observations
+</td>
+<td>
+15
+</td>
+<td>
+15
+</td>
+<td>
+15
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+R<sup>2</sup>
+</td>
+<td>
+0.600
+</td>
+<td>
+0.779
+</td>
+<td>
+0.801
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+Adjusted R<sup>2</sup>
+</td>
+<td>
+0.569
+</td>
+<td>
+0.742
+</td>
+<td>
+0.747
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+Residual Std. Error
+</td>
+<td>
+2.540 (df = 13)
+</td>
+<td>
+1.967 (df = 12)
+</td>
+<td>
+1.948 (df = 11)
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+F Statistic
+</td>
+<td>
+19.513<sup>***</sup> (df = 1; 13)
+</td>
+<td>
+21.100<sup>***</sup> (df = 2; 12)
+</td>
+<td>
+14.755<sup>***</sup> (df = 3; 11)
+</td>
+</tr>
+<tr>
+<td colspan="4" style="border-bottom: 1px solid black">
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+<em>Note:</em>
+</td>
+<td colspan="3" style="text-align:right">
+<sup><em></sup>p&lt;0.1; <sup><strong></sup>p&lt;0.05; <sup></strong></em></sup>p&lt;0.01
+</td>
+</tr>
+</table>
+<table style="text-align:center">
+<tr>
+<td colspan="4" style="border-bottom: 1px solid black">
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td colspan="3">
+<em>Dependent variable:</em>
+</td>
+</tr>
+<tr>
+<td>
+</td>
+<td colspan="3" style="border-bottom: 1px solid black">
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td colspan="3">
+DemSeatShare
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+(1)
+</td>
+<td>
+(2)
+</td>
+<td>
+(3)
+</td>
+</tr>
+<tr>
+<td colspan="4" style="border-bottom: 1px solid black">
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+Generic Ballot Support - D
+</td>
+<td>
+1.309<sup>***</sup>
+</td>
+<td>
+1.206<sup>***</sup>
+</td>
+<td>
+0.923<sup>***</sup>
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+(0.287)
+</td>
+<td>
+(0.290)
+</td>
+<td>
+(0.224)
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+</td>
+<td>
+</td>
+<td>
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+President Party - R
+</td>
+<td>
+</td>
+<td>
+3.266
+</td>
+<td>
+6.320<sup>***</sup>
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+</td>
+<td>
+(2.511)
+</td>
+<td>
+(2.010)
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+</td>
+<td>
+</td>
+<td>
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+Lag House Dem Seat Share
+</td>
+<td>
+</td>
+<td>
+</td>
+<td>
+49.348<sup>***</sup>
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+</td>
+<td>
+</td>
+<td>
+(14.171)
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+</td>
+<td>
+</td>
+<td>
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+Constant
+</td>
+<td>
+-9.051
+</td>
+<td>
+-5.769
+</td>
+<td>
+-20.835<sup>*</sup>
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+(14.076)
+</td>
+<td>
+(13.947)
+</td>
+<td>
+(10.938)
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+</td>
+<td>
+</td>
+<td>
+</td>
+</tr>
+<tr>
+<td colspan="4" style="border-bottom: 1px solid black">
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+Observations
+</td>
+<td>
+15
+</td>
+<td>
+15
+</td>
+<td>
+15
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+R<sup>2</sup>
+</td>
+<td>
+0.616
+</td>
+<td>
+0.663
+</td>
+<td>
+0.840
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+Adjusted R<sup>2</sup>
+</td>
+<td>
+0.586
+</td>
+<td>
+0.607
+</td>
+<td>
+0.796
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+Residual Std. Error
+</td>
+<td>
+4.792 (df = 13)
+</td>
+<td>
+4.669 (df = 12)
+</td>
+<td>
+3.364 (df = 11)
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+F Statistic
+</td>
+<td>
+20.851<sup>***</sup> (df = 1; 13)
+</td>
+<td>
+11.826<sup>***</sup> (df = 2; 12)
+</td>
+<td>
+19.236<sup>***</sup> (df = 3; 11)
+</td>
+</tr>
+<tr>
+<td colspan="4" style="border-bottom: 1px solid black">
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+<em>Note:</em>
+</td>
+<td colspan="3" style="text-align:right">
+<sup><em></sup>p&lt;0.1; <sup><strong></sup>p&lt;0.05; <sup></strong></em></sup>p&lt;0.01
+</td>
+</tr>
+</table>
+<pre><code>##        fit      lwr     upr
+## 1 50.20221 47.86202 52.5424</code></pre>
+<pre><code>##        fit      lwr      upr
+## 1 3254.871 2079.485 4430.256</code></pre>
+<pre><code>##        fit      lwr      upr
+## 1 47.85624 45.81439 49.89809</code></pre>
+<pre><code>##       fit      lwr      upr
+## 1 2545.38 967.6134 4123.146</code></pre>

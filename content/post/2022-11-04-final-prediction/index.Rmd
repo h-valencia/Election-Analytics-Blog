@@ -32,7 +32,11 @@ library(stargazer)
 
 Since this class first convened in the beginning of September, we have time and time again been reminded of the shortcomings of election forecasting. Elections are fickle and there is no way to know for certain how voters will vote on election day. The experts oftentimes cannot predict what will happen, if an election will be toss-up or a landslide. There are shocks that no one sees coming, costs of voting that may be unanticipated, various biases with polling, and ever-changing political opinions that result from all sorts of issues and news. While these unknowns make forecasting very difficult, we have gained the tools over the last nine weeks that give us a good foundation to create predictions of our own for the House of Representatives midterm election.
 
-In the first week of class, we looked at how Real Disposable Income (RDI) on its own does a decent job of predicting elections. 
+In building my model, the first choice I had was what to use as my dependent variable and the level on which to predict on. For my dependent variable, I decided to run models for both Democratic seat share and Democratic vote share to see the results of both and how they may unveil different stories about the election. I also created variables putting the vote share and seat share in terms of the incumbent party to see how incumbents perform without paying specific attention to their party affiliation, but I decided that this approach would complicate interpreting results. While we spent multiple weeks working with district-level data and forecasting each of the 435 districts, in the end I have decided to predict vote share and seat share on the national level. We have more data for these variables and do not have to rely upon things like pooling, that may produce greater margins for error. Given the insufficient district-level data, a pooled model would have allowed us to take data from neighboring, similar districts and count it as its own. My national model was heading in the right direction in terms of improving predictability and the lack of district data led me to this decision. 
+
+In the first week of class, we looked at the fundamentals of election forecasting models, with predictors like the president's party. We learned about the phenomenon that takes place in most midterms where the president's party tends to lose seats. Following these basics, in week two we looked at how Real Disposable Income (RDI) on its own does a decent job of predicting elections. We also took a look at a slew of other economic variables, such as the Consumer Price Index (CPI), GDP growth rate, unemployment, and more. Despite the overlap between the government and the economy, most of these variables proved to be insignificant and poor predictors for the House elections. The one economic variable I will be using in my final model the unemployment rate, as it is typically a decent indicator of the health of the economy. In addition to using it on its own, I have also decided to interact it with the president's party. The most important topics to voters vary based on their political party affiliation, and Republicans are known to weigh economic factors more heavily. Therefore, an interaction term between party and unemployment rate can provide us with more significant results than the two can separately on their own.
+
+We continued on from the fundamentals and economic variables onto polling, looking at the generic ballot as well as district-level polls. 
 
 ```{r}
 distdata <- read_csv("fulldata.csv")
@@ -134,6 +138,33 @@ natldata2$midterm[natldata2$midterm == 2] <- 0
 
 natldata2 <- left_join(natldata2, gallup_approval, by = c("year" = "year"))
 
+# adding lagged vote share
+f <- natldata2 %>%
+  mutate(year = year + 2,
+         DemVS_prev = D_majorvote_pct) %>%
+  select(year, DemVS_prev)
+
+# googled the seat share for 1958 to fill in for 1960's lag
+
+natldata2 <- left_join(natldata2, f, by = c("year" = "year"))
+natldata2$DemVS_prev[natldata2$year == 1960] <- 56.0
+
+# adding lagged seat share to get same effect as the lagged vote share but for the seat share model
+g <- natldata2 %>%
+  mutate(year = year + 2,
+         DemSeatShare_prev = DemSeatShare) %>%
+  select(year, DemSeatShare_prev)
+
+# googled the seat share for 1958 to fill in for 1960's lag
+
+natldata2 <- left_join(natldata2, g, by = c("year" = "year"))
+natldata2$DemSeatShare_prev[natldata2$year == 1960] <- (283/435)
+
+# changing the format of the seat share variable to match that of vote share (ex. 56 instead of 0.56)
+natldata2 <- natldata2 %>%
+  mutate(DemSeatShare = DemSeatShare * 100)
+
+
 ```
 
 ```{r, results='asis'}
@@ -143,25 +174,22 @@ natldata2 <- left_join(natldata2, gallup_approval, by = c("year" = "year"))
 fit1a <- lm(data = natldata2, D_majorvote_pct ~ gen_avg_dem)
 #summary(fit1a) 
 
-fit1b <- lm(data = natldata2, D_majorvote_pct ~ gen_avg_dem + H_incumbent_party_majorvote_pct)
+fit1b <- lm(data = natldata2, D_majorvote_pct ~ gen_avg_dem + DemVS_prev)
 #summary(fit1b)
 
-fit1c <- lm(data = natldata2, D_majorvote_pct ~ gen_avg_dem + H_incumbent_party_majorvote_pct + president_party)
+fit1c <- lm(data = natldata2, D_majorvote_pct ~ gen_avg_dem + DemVS_prev + president_party)
 #summary(fit1c)
 
-fit1d <- lm(data = natldata2, D_majorvote_pct ~ gen_avg_dem + H_incumbent_party_majorvote_pct + president_party + approval_rating)
+fit1d <- lm(data = natldata2, D_majorvote_pct ~ gen_avg_dem + DemVS_prev + president_party + approval_rating)
 #summary(fit1d)
 
-fit1e <- lm(data = natldata2, D_majorvote_pct ~ gen_avg_dem + H_incumbent_party_majorvote_pct + president_party + approval_rating + president_party*H_incumbent_party_majorvote_pct)
+fit1e <- lm(data = natldata2, D_majorvote_pct ~ gen_avg_dem + DemVS_prev + president_party + approval_rating + midterm*president_party)
 #summary(fit1e)
 
-fit1f <- lm(data = natldata2, D_majorvote_pct ~ gen_avg_dem + H_incumbent_party_majorvote_pct + president_party + approval_rating + president_party*H_incumbent_party_majorvote_pct + midterm*president_party)
-#summary(fit1f)
+fit1f <- lm(data = natldata2, D_majorvote_pct ~ gen_avg_dem + DemVS_prev + president_party + approval_rating + midterm*president_party + unrate + unrate*president_party)
+# summary(fit1f)
 
-fit1g <- lm(data = natldata2, D_majorvote_pct ~ gen_avg_dem + H_incumbent_party_majorvote_pct + president_party + approval_rating + president_party*H_incumbent_party_majorvote_pct + midterm*president_party + pct_rdi_election)
-#summary(fit1g)
-
-stargazer(fit1a, fit1b, fit1c, fit1d, fit1e, fit1f, fit1g, type = "html")
+stargazer(fit1a, fit1b, fit1c, fit1d, fit1e, fit1f, type = "html", covariate.labels = c("Generic Ballot Support - D", "Lag House Dem VS", "President Party - R", "President Approval Rating", "Midterm Year", "Unemployment Rate", "President Party - R * Midterm Year", "President Party - R * Unemployment", "Constant"))
 
 ```
 
@@ -172,31 +200,80 @@ stargazer(fit1a, fit1b, fit1c, fit1d, fit1e, fit1f, fit1g, type = "html")
 fit2a <- lm(data = natldata2, DemSeatShare ~ gen_avg_dem)
 #summary(fit2a) 
 
-fit2b <- lm(data = natldata2, DemSeatShare ~ gen_avg_dem + H_incumbent_party_majorvote_pct)
+fit2b <- lm(data = natldata2, DemSeatShare ~ gen_avg_dem + DemSeatShare_prev)
 #summary(fit2b)
 
-fit2c <- lm(data = natldata2, DemSeatShare ~ gen_avg_dem + H_incumbent_party_majorvote_pct + president_party)
+fit2c <- lm(data = natldata2, DemSeatShare ~ gen_avg_dem + DemSeatShare_prev + president_party)
 #summary(fit2c)
 
-fit2d <- lm(data = natldata2, DemSeatShare ~ gen_avg_dem + H_incumbent_party_majorvote_pct + president_party + approval_rating)
+fit2d <- lm(data = natldata2, DemSeatShare ~ gen_avg_dem + DemSeatShare_prev + president_party + approval_rating)
 #summary(fit2d)
 
-fit2e <- lm(data = natldata2, DemSeatShare ~ gen_avg_dem + H_incumbent_party_majorvote_pct + president_party + approval_rating + president_party*H_incumbent_party_majorvote_pct)
+fit2e <- lm(data = natldata2, DemSeatShare ~ gen_avg_dem + DemSeatShare_prev + president_party + approval_rating + midterm*president_party)
 #summary(fit2e)
 
-fit2f <- lm(data = natldata2, DemSeatShare ~ gen_avg_dem + H_incumbent_party_majorvote_pct + president_party + approval_rating + president_party*H_incumbent_party_majorvote_pct + midterm*president_party)
+fit2f <- lm(data = natldata2, DemSeatShare ~ gen_avg_dem + DemSeatShare_prev + president_party + approval_rating + midterm*president_party + unrate + unrate*president_party)
 #summary(fit2f)
 
-fit2g <- lm(data = natldata2, DemSeatShare ~ gen_avg_dem + H_incumbent_party_majorvote_pct + president_party + approval_rating + president_party*H_incumbent_party_majorvote_pct + midterm*president_party + pct_rdi_election)
-#summary(fit2g)
-
-stargazer(fit2a, fit2b, fit2c, fit2d, fit2e, fit2f, fit2g, type = "html")
+stargazer(fit2a, fit2b, fit2c, fit2d, fit2e, fit2f, type = "html", covariate.labels = c("Generic Ballot Support - D", "Lag House Dem Seat Share", "President Party - R", "President Approval Rating", "Midterm Year", "Unemployment Rate", "President Party - R * Midterm Year", "President Party - R * Unemployment", "Constant"))
 
 ```
 
 
+```{r, results = 'asis'}
+
+# trying new models only using midterm years
+
+midtermdata <- natldata2 %>%
+  filter(midterm == 1)
+
+fit3a <- lm(data = midtermdata, D_majorvote_pct ~ gen_avg_dem)
+#summary(fit3a) 
+
+fit3b <- lm(data = midtermdata, D_majorvote_pct ~ gen_avg_dem + president_party)
+#summary(fit3b)
+
+fit3c <- lm(data = midtermdata, D_majorvote_pct ~ gen_avg_dem + president_party + DemVS_prev)
+#summary(fit3c)
+
+stargazer(fit3a, fit3b, fit3c, type = "html", covariate.labels = c("Generic Ballot Support - D", "President Party - R", "Lag House Dem VS"))
 
 
+# seat share model for only midterm years
+
+fit4a <- lm(data = midtermdata, DemSeatShare ~ gen_avg_dem)
+#summary(fit4a) 
+
+fit4b <- lm(data = midtermdata, DemSeatShare ~ gen_avg_dem + president_party)
+#summary(fit4b)
+
+fit4c <- lm(data = midtermdata, DemSeatShare ~ gen_avg_dem + president_party + DemSeatShare_prev)
+#summary(fit4c)
+
+stargazer(fit4a, fit4b, fit4c, type = "html", covariate.labels = c("Generic Ballot Support - D", "President Party - R", "Lag House Dem Seat Share"))
+
+```
+
+```{r}
+
+# creating a dataframe with the 2022 independent variables data
+
+data2022 <- data.frame(gen_avg_dem = 45.5, # fivethirtyeight
+                       DemVS_prev = natldata2$D_majorvote_pct[natldata2$year == 2020],
+                       DemSeatShare_prev = natldata2$DemSeatShare[natldata2$year == 2020],
+                       president_party = "D",
+                       approval_rating = 0.40, # gallup
+                       midterm = 1,
+                       unrate = 3.7) # bls
+
+```
+
+```{r}
+predict(fit1f, data2022, interval = "confidence")
+predict(fit2f, data2022, interval = "confidence")
+predict(fit3c, data2022, interval = "confidence")
+predict(fit4c, data2022, interval = "confidence")
+```
 
 
 
