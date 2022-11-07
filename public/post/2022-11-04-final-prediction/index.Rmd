@@ -31,14 +31,6 @@ library(stargazer)
 
 ```
 
-Since this class first convened in the beginning of September, we have time and time again been reminded of the shortcomings of election forecasting. Elections are fickle and there is no way to know for certain how voters will vote on election day. The experts oftentimes cannot predict what will happen, if an election will be toss-up or a landslide. There are shocks that no one sees coming, costs of voting that may be unanticipated, various biases with polling, and ever-changing political opinions that result from all sorts of issues and news. While these unknowns make forecasting very difficult, we have gained the tools over the last nine weeks that give us a good foundation to create predictions of our own for the House of Representatives midterm election.
-
-In building my model, the first choice I had was what to use as my dependent variable and the level on which to predict on. For my dependent variable, I decided to run models for both Democratic seat share and Democratic vote share to see the results of both and how they may unveil different stories about the election. I also created variables putting the vote share and seat share in terms of the incumbent party to see how incumbents perform without paying specific attention to their party affiliation, but I decided that this approach would complicate interpreting results. While we spent multiple weeks working with district-level data and forecasting each of the 435 districts, in the end I have decided to predict vote share and seat share on the national level. We have more data for these variables and do not have to rely upon things like pooling, that may produce greater margins for error. Given the insufficient district-level data, a pooled model would have allowed us to take data from neighboring, similar districts and count it as its own. My national model was heading in the right direction in terms of improving predictability and the lack of district data led me to this decision. 
-
-In the first week of class, we looked at the fundamentals of election forecasting models, with predictors like the president's party. We learned about the phenomenon that takes place in most midterms where the president's party tends to lose seats. Following these basics, in week two we looked at how Real Disposable Income (RDI) on its own does a decent job of predicting elections. We also took a look at a slew of other economic variables, such as the Consumer Price Index (CPI), GDP growth rate, unemployment, and more. Despite the overlap between the government and the economy, most of these variables proved to be insignificant and poor predictors for the House elections. The one economic variable I will be using in my final model the unemployment rate, as it is typically a decent indicator of the health of the economy. In addition to using it on its own, I have also decided to interact it with the president's party. The most important topics to voters vary based on their political party affiliation, and Republicans are known to weigh economic factors more heavily. Therefore, an interaction term between party and unemployment rate can provide us with more significant results than the two can separately on their own.
-
-We continued on from the fundamentals and economic variables onto polling, looking at the generic ballot as well as district-level polls. 
-
 ```{r}
 
 # reading in data
@@ -51,6 +43,52 @@ qtnatl <- read_csv("data1.csv") %>% select(!c(`...1`, `...2`))
 gallup_approval <- read_csv("Gallup approval.csv")
 ```
 
+### Background
+
+Since this class first convened in the beginning of September, we have time and time again been reminded of the shortcomings of election forecasting. Elections are fickle and there is no way to know for certain how voters will vote on election day. The experts oftentimes cannot predict what will happen, if an election will be toss-up or a landslide. There are shocks that no one sees coming, costs of voting that may be unanticipated, various biases with polling, and ever-changing political opinions that result from all sorts of issues and news. While these unknowns make forecasting very difficult, we have gained the tools over the last nine weeks that give us a good foundation to create predictions of our own for the House of Representatives midterm election.
+
+### My Model Choices
+
+In building my model, the first choice I had was what to use as my dependent variable and the level on which to predict on. For my dependent variable, I decided to run models for both Democratic seat share and Democratic vote share to see the results of both and how they may unveil different stories about the election. I also created variables putting the vote share and seat share in terms of the incumbent party to see how incumbents perform without paying specific attention to their party affiliation, but I decided that this approach would complicate interpreting results. While we spent multiple weeks working with district-level data and forecasting each of the 435 districts, in the end I have decided to predict vote share and seat share on the national level. We have more data for these variables and do not have to rely upon things like pooling, that may produce greater margins for error. Given the insufficient district-level data, a pooled model would have allowed us to take data from neighboring, similar districts and count it as its own. However, my national model was heading in the right direction in terms of improving predictability, and the lack of district data led me to decide on a national-level final model. 
+
+In the first week of class, we looked at the fundamentals of election forecasting models, with predictors like the president's party. We learned about the phenomenon that takes place in most midterms where the president's party tends to lose seats [(Campbell 2018)](https://www.cambridge.org/core/journals/ps-political-science-and-politics/article/abs/introduction-forecasting-the-2018-us-midterm-elections/6BA191A0140468E022ECCE67D1CDA03B). Following these basics, in week two we looked at how Real Disposable Income (RDI) on its own does a decent job of predicting elections. We also took a look at a slew of other economic variables, such as the Consumer Price Index (CPI), GDP growth rate, unemployment, and more. Despite the overlap between the government and the economy, most of these variables proved to be insignificant and poor predictors for the House elections. The one economic variable I will be using in my final model the unemployment rate, as it is typically a decent indicator of the health of the economy. In addition to using it on its own, I have also decided to interact it with the president's party. The most important topics to voters vary based on their political party affiliation, and Republicans are known to weigh economic factors more heavily. Therefore, an interaction term between party and unemployment rate can provide us with more significant results than the two can separately on their own.
+
+We continued on from the fundamentals and economic variables onto polling, looking at the generic ballot as well as district-level polls. When adding these polls to my model, I had limited the data to 1990 and later, justifying this with the fact that polling methods have greatly changed since 1945 when the data was first captured. It was my hope that in reducing the sample, the model would better predict recent elections. While I think this justification still makes sense, especially for district-level polling where there does not exist much data even today, I will not be limiting the data by year as severely. In my final model, the only polling data I will be using is the generic ballot, measuring which party people support without regard for specific candidates. The data I will be using goes back to 1960, which is when all the variables of my interest have data for. It would still make sense to limit the data to more recent years for the same polling reasons, but since I am only dealing with the generic ballot, I believe the changing polling methods will not hinder the predictability of the model and it will be more useful to have the longer data.
+
+While we did not dedicate much time in class to discussing presidential approval ratings and their impact on elections, some classmates and I spoke about incorporating it as another form of polling that has easily accessible historical data. I gathered data on presidential approval from [Gallup Analytics](https://analyticscampus-gallup-com.ezp-prod1.hul.harvard.edu/Tables) that date back to 1960. Polling dates varied year to year, so I decided pulled the president's approval rating from whichever the last poll right before the election was. A few years in the 1960s and 1970s, this ended up being polls that were taken from June-August of the election year, but for most other years and especially in more recent history, the ratings are from the final weeks of October. While it would have been nice to have a specific date that the approval rating was pulled from consistently every year, I believe using the poll prior to the election will mitigate any issue.
+
+Incumbency has also been a popular word throughout our class, and it is proven as a good predictor for the House of Representatives elections. Looking at the district-level data we have from 1945-2020, we find that the incumbent wins the House race about 84% of the time. Below is a bar graph showing this relationship.
+
+```{r}
+distdata %>%
+  group_by(winner_candidate_inc) %>%
+  summarize(count = n()) %>%
+  mutate(pct_inc = count/sum(count)) %>%
+  ggplot(aes(x = winner_candidate_inc, y = pct_inc, fill = winner_candidate_inc)) +
+  geom_bar(stat = "identity", fill = c("dodgerblue1", "dodgerblue4")) +
+  labs(x = "Winning Candidate Incumbency Status",
+       y = "Percent",
+       title = "Percent of Incumbents That Win House Elections (1945-2020)") +
+  theme(legend.position = "none")
+```
+
+While this data is important at the district level, we learned about other incumbency phenomena that take place at a national level, such as the house flipping at midterm elections and the President's party losing seats. Despite this incumbency data surely boasting high predictive power at the district-level, it does not provide much to us on a national-level. In a similar vein, however, rather than looking at the House majority incumbent from the year before, we can use the previous election's vote share and seat share to predict that of the following election. I created lagged variables for both of these variables and will incorporate them into my final model, along with the President's party variable that I previously mentioned.
+
+The final variable I will be using in my model is an indicator variable for if the election takes place in a midterm year or not. From our discussions and readings, we know that different types of voters come out for midterm elections than presidential elections. We also learned in class that many Americans do not even know who their representative is. Those who vote in a midterm year are likely more involved politically and stay up-to-date with the news. I also will be interacting this term with the president's party variable with the thought that it could account for some of the seat flipping that we historically see. Since 1955, every house flip has been the result of a midterm election [(Reuters)](https://www.reuters.com/graphics/USA-ELECTION/MIDTERMS/gdpzyzowgvw/index.html). This interaction term can account for the additional incumbent losses that occur during midterms but not during election years.
+
+Throughout our time this semester, we have also worked with multiple other district-level variables that I will not be including in my model. We learned about advertising and the amount parties spend on advertising. In [Gerber et al. 2011](https://hollis.harvard.edu/primo-explore/fulldisplay?docid=TN_cdi_proquest_miscellaneous_881466543&context=PC&vid=HVD2&search_scope=everything&tab=everything&lang=en_US) the authors found that "televised ads have strong but short-lived effects on voting preferences". With this in mind, along with in-class discussions about advertising data being unreliable and sometimes unavailable, I decided to forego using it in my model. Other district-level variables such as the cost of voting, ground campaigning efforts, and voter turnout I will not be adjusting to incorporate into my national model.
+
+### Formulas
+
+Given all the data we have considered using this semester, and after many rounds of trial and error, I have created two final models:
+
+$$
+Democratic Vote Share = \beta_0 + Generic Ballot Democrat\beta_1 + Lag House Dem Vote Share\beta_2 + President Party R\beta_3 + President Approval\beta_4 + Midterm\beta_5 + Unemployment Rate\beta_6 + President Party R * Midterm\beta_7 + President Party R * Unemployment\beta_8
+$$
+
+$$
+Democratic Seat Share = \beta_0 + Generic Ballot Democrat\beta_1 + Lag House Dem Seat Share\beta_2 + President Party R\beta_3 + President Approval\beta_4 + Midterm\beta_5 + Unemployment Rate\beta_6 + President Party R * Midterm\beta_7 + President Party R * Unemployment\beta_8
+$$
 
 ```{r}
 
@@ -366,6 +404,16 @@ natldata2 %>%
 
 ```
 
+```{r}
+
+# Maine District 2 prediction ?
+
+maine <- distdata %>%
+  filter(district_id == "ME02") %>%
+  distinct(year, .keep_all = TRUE) %>%
+  filter(year >= 1980)
+  
+```
 
 
 
