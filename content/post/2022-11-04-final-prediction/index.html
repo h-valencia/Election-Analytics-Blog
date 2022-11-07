@@ -14,3 +14,266 @@ summary: "Over the past nine weeks, we have explored a multitude of variables th
 <p><em>Over the past nine weeks, we have explored a multitude of variables that may impact election outcomes in an attempt to forecast the 2022 midterm election. We have learned about economic forces, polling, expert predictions, incumbency, advertising, campaigning, and more to find if they hold any predictive power, and how together in a model they may foreshadow what is to come in the results next week. In this blog, I will create a final prediction model for the House of Representatives and share its results, with the intention of reflecting on it after the election.</em></p>
 <p>Since this class first convened in the beginning of September, we have time and time again been reminded of the shortcomings of election forecasting. Elections are fickle and there is no way to know for certain how voters will vote on election day. The experts oftentimes cannot predict what will happen, if an election will be toss-up or a landslide. There are shocks that no one sees coming, costs of voting that may be unanticipated, various biases with polling, and ever-changing political opinions that result from all sorts of issues and news. While these unknowns make forecasting very difficult, we have gained the tools over the last nine weeks that give us a good foundation to create predictions of our own for the House of Representatives midterm election.</p>
 <p>In the first week of class, we looked at how Real Disposable Income (RDI) on its own does a decent job of predicting elections.</p>
+<pre><code>## 
+## Call:
+## lm(formula = D_majorvote_pct ~ gen_avg_dem, data = natldata2)
+## 
+## Residuals:
+##    Min     1Q Median     3Q    Max 
+## -3.951 -2.037  0.049  1.804  7.096 
+## 
+## Coefficients:
+##             Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept) 33.61635    4.80870   6.991  1.1e-07 ***
+## gen_avg_dem  0.38629    0.09902   3.901 0.000523 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 2.674 on 29 degrees of freedom
+## Multiple R-squared:  0.3441, Adjusted R-squared:  0.3215 
+## F-statistic: 15.22 on 1 and 29 DF,  p-value: 0.0005232</code></pre>
+<pre><code>## 
+## Call:
+## lm(formula = D_majorvote_pct ~ gen_avg_dem + H_incumbent_party_majorvote_pct, 
+##     data = natldata2)
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -4.4626 -1.2799 -0.2088  0.8751  5.4768 
+## 
+## Coefficients:
+##                                 Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept)                      12.7417     5.7980   2.198   0.0364 *  
+## gen_avg_dem                       0.2134     0.0843   2.531   0.0173 *  
+## H_incumbent_party_majorvote_pct   0.5623     0.1208   4.654 7.13e-05 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 2.043 on 28 degrees of freedom
+## Multiple R-squared:  0.6302, Adjusted R-squared:  0.6038 
+## F-statistic: 23.86 on 2 and 28 DF,  p-value: 8.931e-07</code></pre>
+<pre><code>## 
+## Call:
+## lm(formula = D_majorvote_pct ~ gen_avg_dem + H_incumbent_party_majorvote_pct + 
+##     president_party, data = natldata2)
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -4.8280 -1.0572 -0.3542  0.7780  4.8843 
+## 
+## Coefficients:
+##                                 Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept)                     12.57424    5.75094   2.186 0.037625 *  
+## gen_avg_dem                      0.23147    0.08491   2.726 0.011118 *  
+## H_incumbent_party_majorvote_pct  0.53970    0.12122   4.452 0.000133 ***
+## president_partyR                 0.90179    0.74229   1.215 0.234932    
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 2.026 on 27 degrees of freedom
+## Multiple R-squared:  0.6494, Adjusted R-squared:  0.6104 
+## F-statistic: 16.67 on 3 and 27 DF,  p-value: 2.503e-06</code></pre>
+<pre><code>## 
+## Call:
+## lm(formula = D_majorvote_pct ~ gen_avg_dem + H_incumbent_party_majorvote_pct + 
+##     president_party + approval_rating, data = natldata2)
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -3.5597 -1.3312 -0.1978  0.9504  4.4662 
+## 
+## Coefficients:
+##                                 Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept)                     14.54920    5.44454   2.672  0.01283 *  
+## gen_avg_dem                      0.25373    0.07994   3.174  0.00384 ** 
+## H_incumbent_party_majorvote_pct  0.54710    0.11327   4.830 5.27e-05 ***
+## president_partyR                 0.87145    0.69347   1.257  0.22005    
+## approval_rating                 -6.87410    3.09044  -2.224  0.03502 *  
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 1.893 on 26 degrees of freedom
+## Multiple R-squared:  0.7055, Adjusted R-squared:  0.6601 
+## F-statistic: 15.57 on 4 and 26 DF,  p-value: 1.277e-06</code></pre>
+<pre><code>## 
+## Call:
+## lm(formula = D_majorvote_pct ~ gen_avg_dem + H_incumbent_party_majorvote_pct + 
+##     president_party + approval_rating + president_party * H_incumbent_party_majorvote_pct, 
+##     data = natldata2)
+## 
+## Residuals:
+##    Min     1Q Median     3Q    Max 
+## -3.556 -0.780 -0.005  1.203  2.946 
+## 
+## Coefficients:
+##                                                  Estimate Std. Error t value
+## (Intercept)                                       2.61664    6.48063   0.404
+## gen_avg_dem                                       0.20572    0.07332   2.806
+## H_incumbent_party_majorvote_pct                   0.82677    0.14257   5.799
+## president_partyR                                 27.59890    9.63924   2.863
+## approval_rating                                  -7.22677    2.75778  -2.620
+## H_incumbent_party_majorvote_pct:president_partyR -0.51558    0.18556  -2.778
+##                                                  Pr(&gt;|t|)    
+## (Intercept)                                       0.68982    
+## gen_avg_dem                                       0.00958 ** 
+## H_incumbent_party_majorvote_pct                   4.8e-06 ***
+## president_partyR                                  0.00837 ** 
+## approval_rating                                   0.01472 *  
+## H_incumbent_party_majorvote_pct:president_partyR  0.01021 *  
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 1.687 on 25 degrees of freedom
+## Multiple R-squared:  0.7749, Adjusted R-squared:  0.7299 
+## F-statistic: 17.22 on 5 and 25 DF,  p-value: 2.163e-07</code></pre>
+<pre><code>## 
+## Call:
+## lm(formula = D_majorvote_pct ~ gen_avg_dem + H_incumbent_party_majorvote_pct + 
+##     president_party + approval_rating + president_party * H_incumbent_party_majorvote_pct + 
+##     midterm * president_party, data = natldata2)
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -4.8348 -0.5257  0.0281  0.7391  2.3783 
+## 
+## Coefficients:
+##                                                  Estimate Std. Error t value
+## (Intercept)                                        4.1346     7.5355   0.549
+## gen_avg_dem                                        0.1453     0.0748   1.943
+## H_incumbent_party_majorvote_pct                    0.8503     0.1621   5.244
+## president_partyR                                  29.1638    10.3796   2.810
+## approval_rating                                   -6.4355     2.6170  -2.459
+## midterm                                           -0.3731     0.9950  -0.375
+## H_incumbent_party_majorvote_pct:president_partyR  -0.5693     0.1977  -2.879
+## president_partyR:midterm                           2.3489     1.2944   1.815
+##                                                  Pr(&gt;|t|)    
+## (Intercept)                                       0.58851    
+## gen_avg_dem                                       0.06441 .  
+## H_incumbent_party_majorvote_pct                  2.55e-05 ***
+## president_partyR                                  0.00995 ** 
+## approval_rating                                   0.02188 *  
+## midterm                                           0.71112    
+## H_incumbent_party_majorvote_pct:president_partyR  0.00847 ** 
+## president_partyR:midterm                          0.08265 .  
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 1.583 on 23 degrees of freedom
+## Multiple R-squared:  0.8177, Adjusted R-squared:  0.7622 
+## F-statistic: 14.74 on 7 and 23 DF,  p-value: 3.822e-07</code></pre>
+<pre><code>## 
+## Call:
+## lm(formula = D_majorvote_pct ~ gen_avg_dem + H_incumbent_party_majorvote_pct + 
+##     president_party + approval_rating + president_party * H_incumbent_party_majorvote_pct + 
+##     midterm * president_party, data = natldata2)
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -4.8348 -0.5257  0.0281  0.7391  2.3783 
+## 
+## Coefficients:
+##                                                  Estimate Std. Error t value
+## (Intercept)                                        4.1346     7.5355   0.549
+## gen_avg_dem                                        0.1453     0.0748   1.943
+## H_incumbent_party_majorvote_pct                    0.8503     0.1621   5.244
+## president_partyR                                  29.1638    10.3796   2.810
+## approval_rating                                   -6.4355     2.6170  -2.459
+## midterm                                           -0.3731     0.9950  -0.375
+## H_incumbent_party_majorvote_pct:president_partyR  -0.5693     0.1977  -2.879
+## president_partyR:midterm                           2.3489     1.2944   1.815
+##                                                  Pr(&gt;|t|)    
+## (Intercept)                                       0.58851    
+## gen_avg_dem                                       0.06441 .  
+## H_incumbent_party_majorvote_pct                  2.55e-05 ***
+## president_partyR                                  0.00995 ** 
+## approval_rating                                   0.02188 *  
+## midterm                                           0.71112    
+## H_incumbent_party_majorvote_pct:president_partyR  0.00847 ** 
+## president_partyR:midterm                          0.08265 .  
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 1.583 on 23 degrees of freedom
+## Multiple R-squared:  0.8177, Adjusted R-squared:  0.7622 
+## F-statistic: 14.74 on 7 and 23 DF,  p-value: 3.822e-07</code></pre>
+<pre><code>## 
+## Call:
+## lm(formula = D_majorvote_pct ~ gen_avg_dem, data = natldata2)
+## 
+## Residuals:
+##    Min     1Q Median     3Q    Max 
+## -3.951 -2.037  0.049  1.804  7.096 
+## 
+## Coefficients:
+##             Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept) 33.61635    4.80870   6.991  1.1e-07 ***
+## gen_avg_dem  0.38629    0.09902   3.901 0.000523 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 2.674 on 29 degrees of freedom
+## Multiple R-squared:  0.3441, Adjusted R-squared:  0.3215 
+## F-statistic: 15.22 on 1 and 29 DF,  p-value: 0.0005232</code></pre>
+<pre><code>## 
+## Call:
+## lm(formula = D_majorvote_pct ~ gen_avg_dem + H_incumbent_party_majorvote_pct, 
+##     data = natldata2)
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -4.4626 -1.2799 -0.2088  0.8751  5.4768 
+## 
+## Coefficients:
+##                                 Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept)                      12.7417     5.7980   2.198   0.0364 *  
+## gen_avg_dem                       0.2134     0.0843   2.531   0.0173 *  
+## H_incumbent_party_majorvote_pct   0.5623     0.1208   4.654 7.13e-05 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 2.043 on 28 degrees of freedom
+## Multiple R-squared:  0.6302, Adjusted R-squared:  0.6038 
+## F-statistic: 23.86 on 2 and 28 DF,  p-value: 8.931e-07</code></pre>
+<pre><code>## 
+## Call:
+## lm(formula = D_majorvote_pct ~ gen_avg_dem + H_incumbent_party_majorvote_pct + 
+##     president_party, data = natldata2)
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -4.8280 -1.0572 -0.3542  0.7780  4.8843 
+## 
+## Coefficients:
+##                                 Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept)                     12.57424    5.75094   2.186 0.037625 *  
+## gen_avg_dem                      0.23147    0.08491   2.726 0.011118 *  
+## H_incumbent_party_majorvote_pct  0.53970    0.12122   4.452 0.000133 ***
+## president_partyR                 0.90179    0.74229   1.215 0.234932    
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 2.026 on 27 degrees of freedom
+## Multiple R-squared:  0.6494, Adjusted R-squared:  0.6104 
+## F-statistic: 16.67 on 3 and 27 DF,  p-value: 2.503e-06</code></pre>
+<pre><code>## 
+## Call:
+## lm(formula = DemSeatShare ~ gen_avg_dem + H_incumbent_party_majorvote_pct + 
+##     CPI_pct_change + approval_rating, data = natldata2)
+## 
+## Residuals:
+##       Min        1Q    Median        3Q       Max 
+## -0.064547 -0.019723  0.003402  0.023627  0.067918 
+## 
+## Coefficients:
+##                                  Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept)                     -0.294094   0.111735  -2.632 0.014088 *  
+## gen_avg_dem                      0.005099   0.001524   3.347 0.002497 ** 
+## H_incumbent_party_majorvote_pct  0.011420   0.002764   4.132 0.000331 ***
+## CPI_pct_change                   0.023638   0.016611   1.423 0.166610    
+## approval_rating                 -0.037109   0.084408  -0.440 0.663834    
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 0.03651 on 26 degrees of freedom
+## Multiple R-squared:  0.7736, Adjusted R-squared:  0.7387 
+## F-statistic:  22.2 on 4 and 26 DF,  p-value: 4.551e-08</code></pre>

@@ -39,6 +39,8 @@ distdata <- read_csv("fulldata.csv")
 natldata <- read_csv("data2.csv", skip = 1)
 popvote_df <- read_csv("popvote_df.csv", skip = 1, col_types = cols(...1 = col_skip(), ...2 = col_skip()))
 rdi_df <- read_csv("RDI_quarterly.csv") %>% select(!`...1`)
+qtnatl <- read_csv("data1.csv") %>% select(!c(`...1`, `...2`))
+gallup_approval <- read_csv("Gallup approval.csv")
 ```
 
 
@@ -85,8 +87,8 @@ rdi_df1 <- rdi_df1 %>%
 
 natldata1 <- left_join(natldata1, rdi_df1, by = c("year" = "year"))
 
-# For some reason the graph I produce is different than that of Professor Enos's, likely to slight differences in the way we coded the variables.
-# Even though I will not include the recreated graph in this post, I have the same data.
+# For some reason the graph I produce is different than that of Professor Enos's, likely due to slight differences in the way we coded the variables.
+# Even though I will not include the recreated graph in this post, I have the same new variables that I can possibly incorporate into a model or graph later on.
 
 # x <- natldata1 %>% select(year, pres_party_seat_change, pct_rdi_election)
 
@@ -105,9 +107,76 @@ natldata1 <- left_join(natldata1, rdi_df1, by = c("year" = "year"))
 
 ```{r}
 
+d <- distdata %>%
+  select(year, gen_avg_dem, gen_avg_rep) %>%
+  distinct(year, gen_avg_dem, gen_avg_rep)
+
+e <- qtnatl %>%
+  distinct(year, R_majorvote_pct, D_majorvote_pct)
+
+natldata1 <- left_join(natldata1, d, by = c("year" = "year"))
+natldata1 <- left_join(natldata1, e, by = c("year" = "year"))
+
+# creating two new dependent variables in case I want to try them out
+# vote share and seat share for the president's party rather than just the democratic and republican ones
+
+natldata1 <- natldata1 %>%
+  mutate(pres_party_vote_pct = ifelse(president_party == "D", D_majorvote_pct, R_majorvote_pct),
+         pres_party_seat_share = ifelse(president_party == "D", DemSeatShare, RepSeatShare))
+
+# creating a variable for if the year is a midterm election year
+
+natldata2 <- natldata1
+natldata2$midterm <- seq_len(nrow(natldata2)) %% 2L + 1L
+natldata2$midterm[natldata2$midterm == 2] <- 0
+
+# adding presidential approval ratings for each year from Gallup Analytics
+
+natldata2 <- left_join(natldata2, gallup_approval, by = c("year" = "year"))
+
+```
+
+```{r}
+
+# modelling Democratic vote share
+
+fit1a <- lm(data = natldata2, D_majorvote_pct ~ gen_avg_dem)
+summary(fit1a) 
+
+fit1b <- lm(data = natldata2, D_majorvote_pct ~ gen_avg_dem + H_incumbent_party_majorvote_pct)
+summary(fit1b)
+
+fit1c <- lm(data = natldata2, D_majorvote_pct ~ gen_avg_dem + H_incumbent_party_majorvote_pct + president_party)
+summary(fit1c)
+
+fit1d <- lm(data = natldata2, D_majorvote_pct ~ gen_avg_dem + H_incumbent_party_majorvote_pct + president_party + approval_rating)
+summary(fit1d)
+
+fit1e <- lm(data = natldata2, D_majorvote_pct ~ gen_avg_dem + H_incumbent_party_majorvote_pct + president_party + approval_rating + president_party*H_incumbent_party_majorvote_pct)
+summary(fit1e)
+
+fit1f <- lm(data = natldata2, D_majorvote_pct ~ gen_avg_dem + H_incumbent_party_majorvote_pct + president_party + approval_rating + president_party*H_incumbent_party_majorvote_pct + midterm*president_party)
+summary(fit1f)
+
+fit1f <- lm(data = natldata2, D_majorvote_pct ~ gen_avg_dem + H_incumbent_party_majorvote_pct + president_party + approval_rating + president_party*H_incumbent_party_majorvote_pct + midterm*president_party)
+summary(fit1f)
+
 ```
 
 
+```{r}
+fit12a <- lm(data = natldata2, DemSeatShare ~ gen_avg_dem)
+summary(fit1a) 
+
+fit2b <- lm(data = natldata2, DemSeatShare ~ gen_avg_dem + H_incumbent_party_majorvote_pct)
+summary(fit1b)
+
+fit2c <- lm(data = natldata2, DemSeatShare ~ gen_avg_dem + H_incumbent_party_majorvote_pct + CPI_pct_change)
+summary(fit1c)
+
+fit2d <- lm(data = natldata2, DemSeatShare ~ gen_avg_dem + H_incumbent_party_majorvote_pct + CPI_pct_change + approval_rating)
+summary(fit2d)
+```
 
 
 
