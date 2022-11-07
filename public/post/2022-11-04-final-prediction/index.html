@@ -84,12 +84,11 @@
 </div>
 <div id="formulas" class="section level3">
 <h3>Formulas</h3>
-<p>Given all the data we have considered using this semester, and after many rounds of trial and error, I have created two final models:</p>
+<p>Given all the data we have considered using this semester, and after many rounds of trial and error, I have created two final models. Below are the model equations and their corresponding regression tables using the national data that we are working with.</p>
+<div id="democratic-vote-share" class="section level4">
+<h4>Democratic Vote Share</h4>
 <p><span class="math display">\[
 Democratic Vote Share = \beta_0 + Generic Ballot Democrat\beta_1 + Lag House Dem Vote Share\beta_2 + President Party R\beta_3 + President Approval\beta_4 + Midterm\beta_5 + Unemployment Rate\beta_6 + President Party R * Midterm\beta_7 + President Party R * Unemployment\beta_8
-\]</span></p>
-<p><span class="math display">\[
-Democratic Seat Share = \beta_0 + Generic Ballot Democrat\beta_1 + Lag House Dem Seat Share\beta_2 + President Party R\beta_3 + President Approval\beta_4 + Midterm\beta_5 + Unemployment Rate\beta_6 + President Party R * Midterm\beta_7 + President Party R * Unemployment\beta_8
 \]</span></p>
 <table style="text-align:center">
 <tr>
@@ -775,6 +774,40 @@ F Statistic
 </td>
 </tr>
 </table>
+<pre><code>## 
+## Call:
+## lm(formula = D_majorvote_pct ~ gen_avg_dem + DemVS_prev + president_party + 
+##     approval_rating + midterm * president_party + unrate + unrate * 
+##     president_party, data = natldata2)
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -4.0603 -1.0010  0.2003  1.0220  2.8136 
+## 
+## Coefficients:
+##                          Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept)               27.2380     7.0419   3.868 0.000832 ***
+## gen_avg_dem                0.2286     0.0821   2.784 0.010813 *  
+## DemVS_prev                 0.4259     0.1185   3.593 0.001617 ** 
+## president_partyR          -6.3394     2.8795  -2.202 0.038480 *  
+## approval_rating           -5.4353     3.1550  -1.723 0.098965 .  
+## midterm                   -4.6436     1.0531  -4.409 0.000222 ***
+## unrate                    -0.6904     0.3072  -2.248 0.034952 *  
+## president_partyR:midterm   6.7931     1.5652   4.340 0.000263 ***
+## president_partyR:unrate    0.7929     0.4240   1.870 0.074872 .  
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 1.83 on 22 degrees of freedom
+## Multiple R-squared:  0.767,  Adjusted R-squared:  0.6822 
+## F-statistic: 9.051 on 8 and 22 DF,  p-value: 1.95e-05</code></pre>
+<p>Model 6 is my final model for the Democratic Vote Share, the other models in this regression table simply show how each variable impacts and improves the model one step at a time. In this model, we see that all the variables are significant at the 0.1 significance level, and most at the 0.05 level. While approval rating and the lag of the House democratic vote share are the only variables that were not immediately significant when first added to the model, they both increased the R-squared and adjusted R-squared values, and eventually found a level of significance by the final model. Model 6 has an R-squared of 0.767 and an adjusted R-squared of 0.6822. I did some testing with other variables, but adding any of the other variables I was considering (such as percent change RDI) ended up decreasing the adjusted R-squared. The most significant variables in this model are the indicator variable for whether the election is a midterm election and the interaction between this indicator and the president’s party.</p>
+</div>
+<div id="deomcratic-seat-share" class="section level4">
+<h4>Deomcratic Seat Share</h4>
+<p><span class="math display">\[
+Democratic Seat Share = \beta_0 + Generic Ballot Democrat\beta_1 + Lag House Dem Seat Share\beta_2 + President Party R\beta_3 + President Approval\beta_4 + Midterm\beta_5 + Unemployment Rate\beta_6 + President Party R * Midterm\beta_7 + President Party R * Unemployment\beta_8
+\]</span></p>
 <table style="text-align:center">
 <tr>
 <td colspan="7" style="border-bottom: 1px solid black">
@@ -894,19 +927,19 @@ Lag House Dem Seat Share
 <td>
 </td>
 <td>
-51.248<sup>***</sup>
+0.512<sup>***</sup>
 </td>
 <td>
-55.966<sup>***</sup>
+0.560<sup>***</sup>
 </td>
 <td>
-54.969<sup>***</sup>
+0.550<sup>***</sup>
 </td>
 <td>
-62.422<sup>***</sup>
+0.624<sup>***</sup>
 </td>
 <td>
-63.277<sup>***</sup>
+0.633<sup>***</sup>
 </td>
 </tr>
 <tr>
@@ -915,19 +948,19 @@ Lag House Dem Seat Share
 <td>
 </td>
 <td>
-(12.071)
+(0.121)
 </td>
 <td>
-(11.585)
+(0.116)
 </td>
 <td>
-(11.496)
+(0.115)
 </td>
 <td>
-(10.776)
+(0.108)
 </td>
 <td>
-(11.204)
+(0.112)
 </td>
 </tr>
 <tr>
@@ -1459,6 +1492,7 @@ F Statistic
 </td>
 </tr>
 </table>
+<p>Running the same regression again, but replacing vote share with seat share for both the dependent variable as well as the lagged independent variable, I found similar results. However, there were a couple of variables whose significance did not hold in the seat share model. We see that the variable for the president’s approval rating does not have any significance across any of the three models it is incorporated into and has very high standard errors. Additionally, the interaction between the President’s party and the unemployment rate do not hold significance in this model either. Despite these insignificant variables, their presence improves the adjusted R-squared so I have decided to leave them in. Similar to the vote share model, we again find the most significant variables to be the indicator variable for whether the election is a midterm election and the interaction between this indicator and the president’s party. In addition, this model also shows the lag of seat share to be a highly significant variable.</p>
 <table style="text-align:center">
 <tr>
 <td colspan="4" style="border-bottom: 1px solid black">
@@ -1853,7 +1887,7 @@ Lag House Dem Seat Share
 <td>
 </td>
 <td>
-49.348<sup>***</sup>
+0.493<sup>***</sup>
 </td>
 </tr>
 <tr>
@@ -1864,7 +1898,7 @@ Lag House Dem Seat Share
 <td>
 </td>
 <td>
-(14.171)
+(0.142)
 </td>
 </tr>
 <tr>
@@ -2003,16 +2037,17 @@ F Statistic
 </table>
 <pre><code>##        fit      lwr     upr
 ## 1 50.20221 47.86202 52.5424</code></pre>
-<pre><code>##        fit      lwr      upr
-## 1 3254.871 2079.485 4430.256</code></pre>
+<pre><code>##        fit     lwr      upr
+## 1 50.50952 45.7082 55.31085</code></pre>
 <pre><code>##        fit      lwr      upr
 ## 1 47.85624 45.81439 49.89809</code></pre>
-<pre><code>##       fit      lwr      upr
-## 1 2545.38 967.6134 4123.146</code></pre>
-<p><img src="http://example.org/post/2022-11-04-final-prediction/index_files/figure-html/unnamed-chunk-10-1.png" width="672" /></p>
+<pre><code>##        fit      lwr      upr
+## 1 46.38345 42.94734 49.81955</code></pre>
 <p><img src="http://example.org/post/2022-11-04-final-prediction/index_files/figure-html/unnamed-chunk-11-1.png" width="672" /></p>
 <p><img src="http://example.org/post/2022-11-04-final-prediction/index_files/figure-html/unnamed-chunk-12-1.png" width="672" /></p>
 <p><img src="http://example.org/post/2022-11-04-final-prediction/index_files/figure-html/unnamed-chunk-13-1.png" width="672" /></p>
+<p><img src="http://example.org/post/2022-11-04-final-prediction/index_files/figure-html/unnamed-chunk-14-1.png" width="672" /></p>
+</div>
 </div>
 
 
@@ -2030,7 +2065,7 @@ F Statistic
         		<footer>
 			
 			<span>
-			&copy; <time datetime="2022-11-07 15:01:12.41352 -0500 EST m=&#43;2.024779365">2022</time> . Made with <a href='https://gohugo.io'>Hugo</a> using the <a href='https://github.com/EmielH/tale-hugo/'>Tale</a> theme.
+			&copy; <time datetime="2022-11-07 16:21:14.458935 -0500 EST m=&#43;1.569494832">2022</time> . Made with <a href='https://gohugo.io'>Hugo</a> using the <a href='https://github.com/EmielH/tale-hugo/'>Tale</a> theme.
 			</span>
 		</footer>
 
