@@ -136,46 +136,62 @@ natldata2 <- left_join(natldata2, gallup_approval, by = c("year" = "year"))
 
 ```
 
-```{r}
+```{r, results='asis'}
 
 # modelling Democratic vote share
 
 fit1a <- lm(data = natldata2, D_majorvote_pct ~ gen_avg_dem)
-summary(fit1a) 
+#summary(fit1a) 
 
 fit1b <- lm(data = natldata2, D_majorvote_pct ~ gen_avg_dem + H_incumbent_party_majorvote_pct)
-summary(fit1b)
+#summary(fit1b)
 
 fit1c <- lm(data = natldata2, D_majorvote_pct ~ gen_avg_dem + H_incumbent_party_majorvote_pct + president_party)
-summary(fit1c)
+#summary(fit1c)
 
 fit1d <- lm(data = natldata2, D_majorvote_pct ~ gen_avg_dem + H_incumbent_party_majorvote_pct + president_party + approval_rating)
-summary(fit1d)
+#summary(fit1d)
 
 fit1e <- lm(data = natldata2, D_majorvote_pct ~ gen_avg_dem + H_incumbent_party_majorvote_pct + president_party + approval_rating + president_party*H_incumbent_party_majorvote_pct)
-summary(fit1e)
+#summary(fit1e)
 
 fit1f <- lm(data = natldata2, D_majorvote_pct ~ gen_avg_dem + H_incumbent_party_majorvote_pct + president_party + approval_rating + president_party*H_incumbent_party_majorvote_pct + midterm*president_party)
-summary(fit1f)
+#summary(fit1f)
 
-fit1f <- lm(data = natldata2, D_majorvote_pct ~ gen_avg_dem + H_incumbent_party_majorvote_pct + president_party + approval_rating + president_party*H_incumbent_party_majorvote_pct + midterm*president_party)
-summary(fit1f)
+fit1g <- lm(data = natldata2, D_majorvote_pct ~ gen_avg_dem + H_incumbent_party_majorvote_pct + president_party + approval_rating + president_party*H_incumbent_party_majorvote_pct + midterm*president_party + pct_rdi_election)
+#summary(fit1g)
+
+stargazer(fit1a, fit1b, fit1c, fit1d, fit1e, fit1f, fit1g)
 
 ```
 
 
-```{r}
-fit12a <- lm(data = natldata2, DemSeatShare ~ gen_avg_dem)
-summary(fit1a) 
+```{r, results = 'asis'}
+# modelling Democratic seat share
+
+fit2a <- lm(data = natldata2, DemSeatShare ~ gen_avg_dem)
+#summary(fit2a) 
 
 fit2b <- lm(data = natldata2, DemSeatShare ~ gen_avg_dem + H_incumbent_party_majorvote_pct)
-summary(fit1b)
+#summary(fit2b)
 
-fit2c <- lm(data = natldata2, DemSeatShare ~ gen_avg_dem + H_incumbent_party_majorvote_pct + CPI_pct_change)
-summary(fit1c)
+fit2c <- lm(data = natldata2, DemSeatShare ~ gen_avg_dem + H_incumbent_party_majorvote_pct + president_party)
+#summary(fit2c)
 
-fit2d <- lm(data = natldata2, DemSeatShare ~ gen_avg_dem + H_incumbent_party_majorvote_pct + CPI_pct_change + approval_rating)
-summary(fit2d)
+fit2d <- lm(data = natldata2, DemSeatShare ~ gen_avg_dem + H_incumbent_party_majorvote_pct + president_party + approval_rating)
+#summary(fit2d)
+
+fit2e <- lm(data = natldata2, DemSeatShare ~ gen_avg_dem + H_incumbent_party_majorvote_pct + president_party + approval_rating + president_party*H_incumbent_party_majorvote_pct)
+#summary(fit2e)
+
+fit2f <- lm(data = natldata2, DemSeatShare ~ gen_avg_dem + H_incumbent_party_majorvote_pct + president_party + approval_rating + president_party*H_incumbent_party_majorvote_pct + midterm*president_party)
+#summary(fit2f)
+
+fit2g <- lm(data = natldata2, DemSeatShare ~ gen_avg_dem + H_incumbent_party_majorvote_pct + president_party + approval_rating + president_party*H_incumbent_party_majorvote_pct + midterm*president_party + pct_rdi_election)
+#summary(fit2g)
+
+stargazer(fit2a, fit2b, fit2c, fit2d, fit2e, fit2f, fit2g)
+
 ```
 
 
