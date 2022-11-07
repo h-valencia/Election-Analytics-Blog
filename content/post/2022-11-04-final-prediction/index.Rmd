@@ -26,6 +26,7 @@ library(haven)
 library(stringr)
 library(sjlabelled)
 library(usdata)
+library(ggpubr)
 library(stargazer)
 
 ```
@@ -39,8 +40,11 @@ In the first week of class, we looked at the fundamentals of election forecastin
 We continued on from the fundamentals and economic variables onto polling, looking at the generic ballot as well as district-level polls. 
 
 ```{r}
-distdata <- read_csv("fulldata.csv")
-natldata <- read_csv("data2.csv", skip = 1)
+
+# reading in data
+
+distdata <- read_csv("fulldata.csv") # master df by district
+natldata <- read_csv("data2.csv", skip = 1) # master df 
 popvote_df <- read_csv("popvote_df.csv", skip = 1, col_types = cols(...1 = col_skip(), ...2 = col_skip()))
 rdi_df <- read_csv("RDI_quarterly.csv") %>% select(!`...1`)
 qtnatl <- read_csv("data1.csv") %>% select(!c(`...1`, `...2`))
@@ -266,14 +270,109 @@ data2022 <- data.frame(gen_avg_dem = 45.5, # fivethirtyeight
                        midterm = 1,
                        unrate = 3.7) # bls
 
+# predicting the 2022 election using each model
+
+predict(fit1f, data2022, interval = "confidence") # Democratic Vote Share using all years
+predict(fit2f, data2022, interval = "confidence") # Democratic Seat Share using all years
+predict(fit3c, data2022, interval = "confidence") # Democratic Vote Share using midterm years
+predict(fit4c, data2022, interval = "confidence") # Democratic Seat Share using midterm years
 ```
 
 ```{r}
-predict(fit1f, data2022, interval = "confidence")
-predict(fit2f, data2022, interval = "confidence")
-predict(fit3c, data2022, interval = "confidence")
-predict(fit4c, data2022, interval = "confidence")
+# in sample testing
+# creating empty columns for the predictions of each of my four final models
+
+natldata2$prediction1 <- NA
+natldata2$prediction2 <- NA
+natldata2$prediction3 <- NA
+natldata2$prediction4 <- NA
+
+# creating a for loop that fills in the data frame with the predictions for each model for every year
+
+for (i in 1960:2020){
+  x <- natldata2 %>%
+    filter(year == i) %>%
+    select(gen_avg_dem,DemVS_prev,DemSeatShare_prev, president_party, approval_rating, midterm, unrate)
+  
+  natldata2$prediction1[natldata2$year == i] <- predict(fit1f, x, interval = "confidence")[1]
+  natldata2$prediction2[natldata2$year == i] <- predict(fit2f, x, interval = "confidence")[1] 
+  natldata2$prediction3[natldata2$year == i] <- predict(fit3c, x, interval = "confidence")[1] 
+  natldata2$prediction4[natldata2$year == i] <- predict(fit4c, x, interval = "confidence")[1] 
+}
+
 ```
+
+```{r}
+
+# Dem VS all years plot
+
+natldata2 %>%
+  ggplot(aes(x = prediction1, y = D_majorvote_pct, label = year)) +
+  geom_point() +
+  geom_abline(y = x, color = "red") +
+  geom_text(hjust=0, vjust=0, size = 3) +
+  labs(x = "Precited Democratic Vote Share (all years)",
+       y = "Actual Democratic Vote Share",
+       title = "Actual vs. Predicted Democratic Vote Share (all years)") +
+  stat_cor(method="pearson")
+
+```
+
+```{r}
+# Dem Seat Share all years plot
+
+natldata2 %>%
+  ggplot(aes(x = prediction2, y = DemSeatShare, label = year)) +
+  geom_point() +
+  geom_abline(y = x, color = "red") +
+  geom_text(hjust=0, vjust=0, size = 3) +
+  labs(x = "Precited Democratic Seat Share (all years)",
+       y = "Actual Democratic Seat Share",
+       title = "Actual vs. Predicted Democratic Seat Share (all years)") +
+  stat_cor(method="pearson")
+```
+
+```{r}
+
+# Dem VS midterm years plot
+
+natldata2 %>%
+  filter(midterm == 1) %>%
+  ggplot(aes(x = prediction3, y = D_majorvote_pct, label = year)) +
+  geom_point() +
+  geom_abline(y = x, color = "red") +
+  geom_text(hjust=0, vjust=0, size = 3) +
+  labs(x = "Precited Democratic Vote Share (midterm years)",
+       y = "Actual Democratic Vote Share",
+       title = "Actual vs. Predicted Democratic Vote Share (midterm years)") +
+  stat_cor(method="pearson")
+
+```
+
+```{r}
+
+# Dem Seat Share midterm years plot
+
+natldata2 %>%
+  filter(midterm == 1) %>%
+  ggplot(aes(x = prediction4, y = D_majorvote_pct, label = year)) +
+  geom_point() +
+  geom_abline(y = x, color = "red") +
+  geom_text(hjust=0, vjust=0, size = 3) +
+  labs(x = "Precited Democratic Seat Share (midterm years)",
+       y = "Actual Democratic Seat Share",
+       title = "Actual vs. Predicted Democratic Seat Share (midterm years)") +
+  stat_cor(method="pearson")
+
+```
+
+
+
+
+
+
+
+
 
 
 
