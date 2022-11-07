@@ -161,7 +161,7 @@ fit1f <- lm(data = natldata2, D_majorvote_pct ~ gen_avg_dem + H_incumbent_party_
 fit1g <- lm(data = natldata2, D_majorvote_pct ~ gen_avg_dem + H_incumbent_party_majorvote_pct + president_party + approval_rating + president_party*H_incumbent_party_majorvote_pct + midterm*president_party + pct_rdi_election)
 #summary(fit1g)
 
-stargazer(fit1a, fit1b, fit1c, fit1d, fit1e, fit1f, fit1g)
+stargazer(fit1a, fit1b, fit1c, fit1d, fit1e, fit1f, fit1g, type = "html")
 
 ```
 
@@ -190,7 +190,7 @@ fit2f <- lm(data = natldata2, DemSeatShare ~ gen_avg_dem + H_incumbent_party_maj
 fit2g <- lm(data = natldata2, DemSeatShare ~ gen_avg_dem + H_incumbent_party_majorvote_pct + president_party + approval_rating + president_party*H_incumbent_party_majorvote_pct + midterm*president_party + pct_rdi_election)
 #summary(fit2g)
 
-stargazer(fit2a, fit2b, fit2c, fit2d, fit2e, fit2f, fit2g)
+stargazer(fit2a, fit2b, fit2c, fit2d, fit2e, fit2f, fit2g, type = "html")
 
 ```
 
