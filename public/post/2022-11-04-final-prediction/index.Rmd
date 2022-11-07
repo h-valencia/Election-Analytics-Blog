@@ -373,6 +373,10 @@ The predictions for the first two models that used data across all years are sli
 
 The model of Democratic Seat Share using midterm years predicts that Democrats will win 202 seats in the House, thus losing their majority, compared to the 219 that are predicted in the model that goes across all years.
 
+#### In-Sample Testing
+
+To validate this model, I conducted in-sample testing, predicting the vote and seat shares for each year within the model. I took these predictions and plotted them against the actual vote and seat shares in those years, producing the following graphs. The R-squared value of each model is also reflected on the plot. An R-squared of 1 would mean the model perfectly predicts the outcome.
+
 ```{r}
 # in sample testing
 # creating empty columns for the predictions of each of my four final models
@@ -406,7 +410,7 @@ natldata2 %>%
   geom_point() +
   geom_abline(y = x, color = "red") +
   geom_text(hjust=0, vjust=0, size = 3) +
-  labs(x = "Precited Democratic Vote Share (all years)",
+  labs(x = "Predicted Democratic Vote Share (all years)",
        y = "Actual Democratic Vote Share",
        title = "Actual vs. Predicted Democratic Vote Share (all years)") +
   stat_cor(method="pearson")
@@ -421,7 +425,7 @@ natldata2 %>%
   geom_point() +
   geom_abline(y = x, color = "red") +
   geom_text(hjust=0, vjust=0, size = 3) +
-  labs(x = "Precited Democratic Seat Share (all years)",
+  labs(x = "Predicted Democratic Seat Share (all years)",
        y = "Actual Democratic Seat Share",
        title = "Actual vs. Predicted Democratic Seat Share (all years)") +
   stat_cor(method="pearson")
@@ -437,7 +441,7 @@ natldata2 %>%
   geom_point() +
   geom_abline(y = x, color = "red") +
   geom_text(hjust=0, vjust=0, size = 3) +
-  labs(x = "Precited Democratic Vote Share (midterm years)",
+  labs(x = "Predicted Democratic Vote Share (midterm years)",
        y = "Actual Democratic Vote Share",
        title = "Actual vs. Predicted Democratic Vote Share (midterm years)") +
   stat_cor(method="pearson")
@@ -454,12 +458,14 @@ natldata2 %>%
   geom_point() +
   geom_abline(y = x, color = "red") +
   geom_text(hjust=0, vjust=0, size = 3) +
-  labs(x = "Precited Democratic Seat Share (midterm years)",
+  labs(x = "Predicted Democratic Seat Share (midterm years)",
        y = "Actual Democratic Seat Share",
        title = "Actual vs. Predicted Democratic Seat Share (midterm years)") +
   stat_cor(method="pearson")
 
 ```
+
+Looking at these plots, they all have fairly high R-squareds, which instills confidence into our predictions. Surprisingly, the seat share across all years has the highest R-squared of 0.9, when its prediciton of the democrats winning 220 seats seemed very off. Both vote share models have similar accuracy, with the midterm years one having an R-squared of 0.88 and the all years one having an R-squared of 0.89. The midterm years seat share model has the lowest accuracy, with an R-squared of 0.83, which is still high, but relative to the others, low.
 
 ```{r}
 

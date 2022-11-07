@@ -1984,9 +1984,14 @@ F Statistic
 ## 1 46.38345 42.94734 49.81955</code></pre>
 <p>The predictions for the first two models that used data across all years are slightly higher than I would expect, specifically for the seat share. The seat share here is predicted to be split just about 50/50, which most experts do <em>not</em> believe will be the case this year. The models using data only from midterm elections, however, seem like they will more accurately predict this years election, at least in terms of being closer to what the experts are saying.</p>
 <p>The model of Democratic Seat Share using midterm years predicts that Democrats will win 202 seats in the House, thus losing their majority, compared to the 219 that are predicted in the model that goes across all years.</p>
+</div>
+<div id="in-sample-testing" class="section level4">
+<h4>In-Sample Testing</h4>
+<p>To validate this model, I conducted in-sample testing, predicting the vote and seat shares for each year within the model. I took these predictions and plotted them against the actual vote and seat shares in those years, producing the following graphs. The R-squared value of each model is also reflected on the plot. An R-squared of 1 would mean the model perfectly predicts the outcome.</p>
 <p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-13-1.png" width="672" /></p>
 <p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-14-1.png" width="672" /></p>
 <p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-15-1.png" width="672" /></p>
 <p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-16-1.png" width="672" /></p>
+<p>Looking at these plots, they all have fairly high R-squareds, which instills confidence into our predictions. Surprisingly, the seat share across all years has the highest R-squared of 0.9, when its prediciton of the democrats winning 220 seats seemed very off. Both vote share models have similar accuracy, with the midterm years one having an R-squared of 0.88 and the all years one having an R-squared of 0.89. The midterm years seat share model has the lowest accuracy, with an R-squared of 0.83, which is still high, but relative to the others, low.</p>
 </div>
 </div>
