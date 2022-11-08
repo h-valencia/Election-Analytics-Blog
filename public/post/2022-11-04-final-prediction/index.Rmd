@@ -333,7 +333,7 @@ The lag of Democratic house vote share in the vote share model is insignificant,
 
 #### 2022 Predictions
 
-Using generic ballot data from FiveThirtyEight, Biden approval ratings from Gallup, and the 2022 Q3 unemployment rate from the BLS, I have predictions for each of the four models:
+Using generic ballot data from FiveThirtyEight, Biden approval ratings from Gallup, and the 2022 Q3 unemployment rate from the BLS, I have predictions for each of the four models, including their 95% confidence interval, as noted by "lwr" and "upr":
 
 Democratic Vote Share using all years
 ```{r}
@@ -371,11 +371,16 @@ predict(fit4c, data2022, interval = "confidence") # Democratic Seat Share using 
 
 The predictions for the first two models that used data across all years are slightly higher than I would expect, specifically for the seat share. The seat share here is predicted to be split just about 50/50, which most experts do *not* believe will be the case this year. The models using data only from midterm elections, however, seem like they will more accurately predict this years election, at least in terms of being closer to what the experts are saying.
 
+The two midterm-only models also have confidence intervals that do not cross 50%, meaning that they are 95% confident that the Democrats will not have more than 50% of the two-party vote share nor the seat share, meaning Republicans will win the house.
+
 The model of Democratic Seat Share using midterm years predicts that Democrats will win 202 seats in the House, thus losing their majority, compared to the 219 that are predicted in the model that goes across all years.
 
 #### In-Sample Testing
 
 To validate this model, I conducted in-sample testing, predicting the vote and seat shares for each year within the model. I took these predictions and plotted them against the actual vote and seat shares in those years, producing the following graphs. The R-squared value of each model is also reflected on the plot. An R-squared of 1 would mean the model perfectly predicts the outcome.
+
+In each graph I also added the 2022 predictions from the regression models. While the second model had the highest R-squared in its in-sample validation, based on what we know about the expert forecasts for this year's election it seems a bit too high of a prediction. This prediction of a 50.50952 seat share for democrats is equivalent to 220 seats for Democrats. The fourth model had the lowest R-squared for its validation, but it had the *highest* R-squared out of all four regressions.
+
 
 ```{r}
 # in sample testing
@@ -413,7 +418,9 @@ natldata2 %>%
   labs(x = "Predicted Democratic Vote Share (all years)",
        y = "Actual Democratic Vote Share",
        title = "Actual vs. Predicted Democratic Vote Share (all years)") +
-  stat_cor(method="pearson")
+  stat_cor(method="pearson") +
+  geom_point(aes(x=50.20221, y=50.20221, label = "2022"), colour="dodgerblue3") +
+  geom_text(aes(x=50.20221, y=50.7, label = "2022"), color = "dodgerblue3", size = 3.5)
 
 ```
 
@@ -428,7 +435,10 @@ natldata2 %>%
   labs(x = "Predicted Democratic Seat Share (all years)",
        y = "Actual Democratic Seat Share",
        title = "Actual vs. Predicted Democratic Seat Share (all years)") +
-  stat_cor(method="pearson")
+  stat_cor(method="pearson") +
+  geom_point(aes(x=50.50952, y=50.50952, label = "2022"), colour="dodgerblue3") +
+  geom_text(aes(x=50.25, y=51.25, label = "2022"), color = "dodgerblue3", size = 3.5)
+
 ```
 
 ```{r}
@@ -444,7 +454,9 @@ natldata2 %>%
   labs(x = "Predicted Democratic Vote Share (midterm years)",
        y = "Actual Democratic Vote Share",
        title = "Actual vs. Predicted Democratic Vote Share (midterm years)") +
-  stat_cor(method="pearson")
+  stat_cor(method="pearson") +
+  geom_point(aes(x=47.85624, y=47.85624, label = "2022"), colour="dodgerblue3") +
+  geom_text(aes(x=47.75, y=48.25, label = "2022"), color = "dodgerblue3", size = 3.5)
 
 ```
 
@@ -461,11 +473,14 @@ natldata2 %>%
   labs(x = "Predicted Democratic Seat Share (midterm years)",
        y = "Actual Democratic Seat Share",
        title = "Actual vs. Predicted Democratic Seat Share (midterm years)") +
-  stat_cor(method="pearson")
+  stat_cor(method="pearson") +
+  geom_point(aes(x=46.38345, y=46.38345, label = "2022"), colour="dodgerblue3") +
+  geom_text(aes(x=45.9, y=46.8, label = "2022"), color = "dodgerblue3", size = 3.5)
 
 ```
 
 Looking at these plots, they all have fairly high R-squareds, which instills confidence into our predictions. Surprisingly, the seat share across all years has the highest R-squared of 0.9, when its prediciton of the democrats winning 220 seats seemed very off. Both vote share models have similar accuracy, with the midterm years one having an R-squared of 0.88 and the all years one having an R-squared of 0.89. The midterm years seat share model has the lowest accuracy, with an R-squared of 0.83, which is still high, but relative to the others, low.
+
 
 ```{r}
 

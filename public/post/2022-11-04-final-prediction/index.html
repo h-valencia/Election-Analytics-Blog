@@ -2023,7 +2023,7 @@ F Statistic
 <p>The lag of Democratic house vote share in the vote share model is insignificant, but improves the R-squared and adjusted r-squared so I kept it in - as well as for consistency.</p>
 <div id="predictions" class="section level4">
 <h4>2022 Predictions</h4>
-<p>Using generic ballot data from FiveThirtyEight, Biden approval ratings from Gallup, and the 2022 Q3 unemployment rate from the BLS, I have predictions for each of the four models:</p>
+<p>Using generic ballot data from FiveThirtyEight, Biden approval ratings from Gallup, and the 2022 Q3 unemployment rate from the BLS, I have predictions for each of the four models, including their 95% confidence interval, as noted by “lwr” and “upr”:</p>
 <p>Democratic Vote Share using all years</p>
 <pre><code>##        fit      lwr     upr
 ## 1 50.20221 47.86202 52.5424</code></pre>
@@ -2037,11 +2037,13 @@ F Statistic
 <pre><code>##        fit      lwr      upr
 ## 1 46.38345 42.94734 49.81955</code></pre>
 <p>The predictions for the first two models that used data across all years are slightly higher than I would expect, specifically for the seat share. The seat share here is predicted to be split just about 50/50, which most experts do <em>not</em> believe will be the case this year. The models using data only from midterm elections, however, seem like they will more accurately predict this years election, at least in terms of being closer to what the experts are saying.</p>
+<p>The two midterm-only models also have confidence intervals that do not cross 50%, meaning that they are 95% confident that the Democrats will not have more than 50% of the two-party vote share nor the seat share, meaning Republicans will win the house.</p>
 <p>The model of Democratic Seat Share using midterm years predicts that Democrats will win 202 seats in the House, thus losing their majority, compared to the 219 that are predicted in the model that goes across all years.</p>
 </div>
 <div id="in-sample-testing" class="section level4">
 <h4>In-Sample Testing</h4>
 <p>To validate this model, I conducted in-sample testing, predicting the vote and seat shares for each year within the model. I took these predictions and plotted them against the actual vote and seat shares in those years, producing the following graphs. The R-squared value of each model is also reflected on the plot. An R-squared of 1 would mean the model perfectly predicts the outcome.</p>
+<p>In each graph I also added the 2022 predictions from the regression models. While the second model had the highest R-squared in its in-sample validation, based on what we know about the expert forecasts for this year’s election it seems a bit too high of a prediction. This prediction of a 50.50952 seat share for democrats is equivalent to 220 seats for Democrats. The fourth model had the lowest R-squared for its validation, but it had the <em>highest</em> R-squared out of all four regressions.</p>
 <p><img src="http://example.org/post/2022-11-04-final-prediction/index_files/figure-html/unnamed-chunk-13-1.png" width="672" /></p>
 <p><img src="http://example.org/post/2022-11-04-final-prediction/index_files/figure-html/unnamed-chunk-14-1.png" width="672" /></p>
 <p><img src="http://example.org/post/2022-11-04-final-prediction/index_files/figure-html/unnamed-chunk-15-1.png" width="672" /></p>
@@ -2065,7 +2067,7 @@ F Statistic
         		<footer>
 			
 			<span>
-			&copy; <time datetime="2022-11-07 17:47:54.968456 -0500 EST m=&#43;2.460602415">2022</time> . Made with <a href='https://gohugo.io'>Hugo</a> using the <a href='https://github.com/EmielH/tale-hugo/'>Tale</a> theme.
+			&copy; <time datetime="2022-11-07 22:23:39.662272 -0500 EST m=&#43;2.439549703">2022</time> . Made with <a href='https://gohugo.io'>Hugo</a> using the <a href='https://github.com/EmielH/tale-hugo/'>Tale</a> theme.
 			</span>
 		</footer>
 
