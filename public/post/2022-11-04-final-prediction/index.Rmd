@@ -481,6 +481,37 @@ natldata2 %>%
 
 Looking at these plots, they all have fairly high R-squareds, which instills confidence into our predictions. Surprisingly, the seat share across all years has the highest R-squared of 0.9, when its prediciton of the democrats winning 220 seats seemed very off. Both vote share models have similar accuracy, with the midterm years one having an R-squared of 0.88 and the all years one having an R-squared of 0.89. The midterm years seat share model has the lowest accuracy, with an R-squared of 0.83, which is still high, but relative to the others, low.
 
+#### Conclusion
+
+The chart below shows my results from the seat share models and compares it to the current house make-up.
+
+```{r}
+plot <- data.frame(seats = c(220, 3, 212, 202, 0, 233, 220, 0, 215),
+                   party = c("dem","other", "rep", "dem","other", "rep", "dem","other", "rep"),
+                   cond = c("current house", "current house", "current house", "midterm-only seat share prediction", "midterm-only seat share prediction", "midterm-only seat share prediction", "all-elections seat share prediction", "all-elections seat share prediction", "all-elections seat share prediction"))
+
+plot$party <- factor(plot$party, levels=c('rep', 'other', 'dem'))
+plot$cond <- factor(plot$cond, levels=c('midterm-only seat share prediction', 'all-elections seat share prediction', 'current house'))
+
+ggplot(plot, aes(x=cond, y = seats, fill = party)) +
+  geom_col(stat='identity', position = position_stack(vjust = 0.5), fill = c("dodgerblue2", "grey", "firebrick", "dodgerblue2", "grey", "firebrick", "dodgerblue2", "grey", "firebrick")) +
+  geom_text(aes(label = ifelse(party == "other", "", seats)), size = 5, hjust = 4, vjust = 0, position = "stack", color = "white") +
+  coord_flip() +
+  labs(x = "",
+       y = "seats") +
+  theme_bw() +
+  theme(axis.line = element_line(colour = "black"),
+    panel.grid.major = element_blank(),
+    panel.grid.minor = element_blank(),
+    panel.border = element_blank(),
+    panel.background = element_blank()) +
+  labs(title = "Current House Make-Up and Model Predictions")
+  
+  
+
+```
+
+
 
 ```{r}
 
