@@ -82,7 +82,7 @@ Throughout our time this semester, we have also worked with multiple other distr
 
 Given all the data we have considered using this semester, and after many rounds of trial and error, I have created two final models. Below are the model equations and their corresponding regression tables using the national data that we are working with.
 
-#### Democratic Vote Share
+##### Democratic Vote Share
 
 $$
 Democratic Vote Share = \beta_0 + Generic Ballot Democrat\beta_1 + Lag House Dem Vote Share\beta_2 + President Party R\beta_3 + President Approval\beta_4 + Midterm\beta_5 + Unemployment Rate\beta_6 + President Party R * Midterm\beta_7 + President Party R * Unemployment\beta_8
@@ -246,7 +246,7 @@ While Presidential approval rating was not significant in either Model 4 or 5, i
 Looking at the unemployment rate coefficient and the interaction between it and the president's party there are a few things to note. First, it is important to know that the variable is coded as the unemployment rate in Quarter 3 (July to September) as reported by the Bureau of Labor Statistics. The unemployment rate coefficient is -0.690, telling us that for every percentage point increase in the unemployment rate, the democratic vote share percentage declines by 0.69 when the president is a Democrat. When the President is a Republican, however, the interaction term of 0.793 comes into play and creates a 0.103 percentage point *increase* in democratic vote share. This tells us that when unemployment is high, people likely blame the party of the president in power, and thus vote in opposition to that party.
 
 
-#### Deomcratic Seat Share
+##### Deomcratic Seat Share
 
 $$
 Democratic Seat Share = \beta_0 + Generic Ballot Democrat\beta_1 + Lag House Dem Seat Share\beta_2 + President Party R\beta_3 + President Approval\beta_4 + Midterm\beta_5 + Unemployment Rate\beta_6 + President Party R * Midterm\beta_7 + President Party R * Unemployment\beta_8
@@ -287,7 +287,7 @@ Running the same regression again, but replacing vote share with seat share for 
 In changing the dependent variable, we do not see any changes in the signs of the final model coefficients. Even though the magnitudes of the coefficients vary slightly, the overall effects of each variable on the democratic seat share percentage remain. 
 
 
-# Midterm Models
+### Midterm Models
 
 After looking at both of those models that use data across all elections from 1960-2020, I wanted to see how these models would change if I limited the data to only midterm election years. As previously discussed, there is a different voting body in midterm elections versus presidential elections. In limiting the years I model on, I am hoping to improve their predictive power.
 
@@ -331,7 +331,7 @@ Both of these models have higher R-squared and adjusted R-squared values than th
 
 The lag of Democratic house vote share in the vote share model is insignificant, but improves the R-squared and adjusted r-squared so I kept it in - as well as for consistency.
 
-#### 2022 Predictions
+### 2022 Predictions
 
 Using generic ballot data from FiveThirtyEight, Biden approval ratings from Gallup, and the 2022 Q3 unemployment rate from the BLS, I have predictions for each of the four models, including their 95% confidence interval, as noted by "lwr" and "upr":
 
@@ -375,7 +375,7 @@ The two midterm-only models also have confidence intervals that do not cross 50%
 
 The model of Democratic Seat Share using midterm years predicts that Democrats will win 202 seats in the House, thus losing their majority, compared to the 219 that are predicted in the model that goes across all years.
 
-#### In-Sample Testing
+### In-Sample Testing
 
 To validate this model, I conducted in-sample testing, predicting the vote and seat shares for each year within the model. I took these predictions and plotted them against the actual vote and seat shares in those years, producing the following graphs. The R-squared value of each model is also reflected on the plot. An R-squared of 1 would mean the model perfectly predicts the outcome.
 
@@ -481,7 +481,7 @@ natldata2 %>%
 
 Looking at these plots, they all have fairly high R-squareds, which instills confidence into our predictions. Surprisingly, the seat share across all years has the highest R-squared of 0.9, when its prediciton of the democrats winning 220 seats seemed very off. Both vote share models have similar accuracy, with the midterm years one having an R-squared of 0.88 and the all years one having an R-squared of 0.89. The midterm years seat share model has the lowest accuracy, with an R-squared of 0.83, which is still high, but relative to the others, low.
 
-#### Conclusion
+### Conclusion
 
 The chart below shows my results from the seat share models and compares it to the current house make-up.
 
@@ -511,7 +511,9 @@ ggplot(plot, aes(x=cond, y = seats, fill = party)) +
 
 ```
 
+In conclusion, these models seem to suggest a close race. The models that use data across all elections predict a near equal 50/50 split in both vote share and seat share, while the midterm-only models slightly favor Republicans and predict them winning the house with 202 seats. 
 
+Throughout this class we have learned all sorts of modelling techniques and taken close looks at various independent variables to include. While it is impossible to know what will certainly happen on election day and predict exactly how everyone will vote, these forecasting methods will hopefully get us close. I look forward to reflecting on these models and methods after seeing how they performed.
 
 ```{r}
 
