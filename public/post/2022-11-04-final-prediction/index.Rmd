@@ -481,6 +481,7 @@ natldata2 %>%
 
 Looking at these plots, they all have fairly high R-squareds, which instills confidence into our predictions. Surprisingly, the seat share across all years has the highest R-squared of 0.9, when its prediciton of the democrats winning 220 seats seemed very off. Both vote share models have similar accuracy, with the midterm years one having an R-squared of 0.88 and the all years one having an R-squared of 0.89. The midterm years seat share model has the lowest accuracy, with an R-squared of 0.83, which is still high, but relative to the others, low.
 
+
 ### Conclusion
 
 The chart below shows my results from the seat share models and compares it to the current house make-up.

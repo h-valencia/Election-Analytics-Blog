@@ -6,7 +6,16 @@
     <description>Recent content on My New Hugo Site</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Fri, 04 Nov 2022 00:00:00 +0000</lastBuildDate><atom:link href="http://example.org/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Fri, 18 Nov 2022 00:00:00 +0000</lastBuildDate><atom:link href="http://example.org/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Post-Election Reflection</title>
+      <link>http://example.org/post/2022-11-18-post-election-reflection/</link>
+      <pubDate>Fri, 18 Nov 2022 00:00:00 +0000</pubDate>
+      
+      <guid>http://example.org/post/2022-11-18-post-election-reflection/</guid>
+      <description>On Tuesday, November 8th, eligible Americans voted in the midterm elections for candidates who will make up the 118th Congress. Prior to the election, we had created forecasting models in an attempt to determine who would win the House of Representatives, at the district-level, national-level, or both. In this post I will refelct on the predictions made, my model&amp;rsquo;s performance, and comment on the election overall.</description>
+    </item>
+    
     <item>
       <title>Final Prediction</title>
       <link>http://example.org/post/2022-11-04-final-prediction/</link>

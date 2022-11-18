@@ -1,0 +1,44 @@
+---
+title: Post-Election Reflection
+author: Hannah Valencia
+date: '2022-11-18'
+slug: []
+categories: []
+tags: []
+summary: "On Tuesday, November 8th, eligible Americans voted in the midterm elections for candidates who will make up the 118th Congress. Prior to the election, we had created forecasting models in an attempt to determine who would win the House of Representatives, at the district-level, national-level, or both. In this post I will refelct on the predictions made, my model's performance, and comment on the election overall."
+---
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
