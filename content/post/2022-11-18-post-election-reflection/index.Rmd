@@ -8,9 +8,115 @@ tags: []
 summary: "On Tuesday, November 8th, eligible Americans voted in the midterm elections for candidates who will make up the 118th Congress. Prior to the election, we had created forecasting models in an attempt to determine who would win the House of Representatives, at the district-level, national-level, or both. In this post I will refelct on the predictions made, my model's performance, and comment on the election overall."
 ---
 
+*This blog is part of a series related to Gov 1347: Election Analytics, a course at [Harvard University](https://www.harvard.edu/) taught by Professor [Ryan D. Enos](http://ryandenos.com/)*.
 
+*On Tuesday, November 8th, eligible Americans voted in the midterm elections for candidates who will make up the 118th Congress. Prior to the election, we had created forecasting models in an attempt to determine who would win the House of Representatives, at the district-level, national-level, or both. In this post I will refelct on the predictions made, my model's performance, and comment on the election overall.*
 
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE)
 
+# load libraries
+
+library(tidyverse)
+library(usmap)
+library(plotly)
+library(rmapshaper)
+library(sf)
+library(haven)
+library(stringr)
+library(sjlabelled)
+library(usdata)
+library(ggpubr)
+library(stargazer)
+
+```
+
+```{r}
+natldata <- read_csv("natldata2.csv")
+```
+
+```{r}
+# prediction vs actual 2022
+# Dem VS all years plot
+
+natldata %>%
+  ggplot(aes(x = prediction1, y = D_majorvote_pct, label = year)) +
+  geom_point() +
+  geom_abline(intercept = 0, slope = 1, color = "red") +
+  geom_text(hjust=0, vjust=0, size = 3) +
+  labs(x = "Predicted Democratic Vote Share (all years)",
+       y = "Actual Democratic Vote Share",
+       title = "Actual vs. Predicted Democratic Vote Share (all years)",
+       caption = "Results from Cook Political Report as of 11/18/2022.") +
+  stat_cor(method="pearson") +
+  geom_point(aes(x=50.20221, y=50.20221, label = "Prediction"), colour="grey75") +
+  geom_text(aes(x=50.20221, y=50.7, label = "Prediction"), color = "grey75", size = 3.5) +
+  geom_point(aes(x=50.20221, y=47.4, label = "2022 Results"), colour="dodgerblue3") +
+  geom_text(aes(x=50.20221, y=48, label = "2022 Results"), color = "dodgerblue3", size = 3.5)
+```
+
+```{r}
+# Dem Seat Share all years plot
+
+natldata %>%
+  ggplot(aes(x = prediction2, y = DemSeatShare, label = year)) +
+  geom_point() +
+  geom_abline(intercept = 0, slope = 1, color = "red") +
+  geom_text(hjust=0, vjust=0, size = 3) +
+  labs(x = "Predicted Democratic Seat Share (all years)",
+       y = "Actual Democratic Seat Share",
+       title = "Actual vs. Predicted Democratic Seat Share (all years)",
+       caption = "Results from Cook Political Report as of 11/18/2022 when 430 seats have been decided") +
+  stat_cor(method="pearson") +
+  geom_point(aes(x=50.50952, y=50.50952, label = "Prediction"), colour="grey75") +
+  geom_text(aes(x=50.25, y=51.25, label = "Prediction"), color = "grey75", size = 3.5) +
+  geom_point(aes(x=50.50952, y=49.30232558, label = "2022 Results"), colour="dodgerblue3") +
+  geom_text(aes(x=50.25, y=48.5, label = "2022 Results"), color = "dodgerblue3", size = 3.5)
+
+```
+
+```{r}
+# Dem VS midterm years plot
+
+natldata %>%
+  filter(midterm == 1) %>%
+  ggplot(aes(x = prediction3, y = D_majorvote_pct, label = year)) +
+  geom_point() +
+  geom_abline(intercept = 0, slope = 1, color = "red") +
+  geom_text(hjust=0, vjust=0, size = 3) +
+  labs(x = "Predicted Democratic Vote Share (midterm years)",
+       y = "Actual Democratic Vote Share",
+       title = "Actual vs. Predicted Democratic Vote Share (midterm years)",
+       caption = "Results from Cook Political Report as of 11/18/2022.") +
+  stat_cor(method="pearson") +
+  geom_point(aes(x=47.85624, y=47.85624, label = "Prediction"), colour="grey75") +
+  geom_text(aes(x=47.75, y=48.25, label = "Prediction"), color = "grey75", size = 3.5) +
+  geom_point(aes(x=47.85624, y=47.4, label = "2022 Results"), colour="dodgerblue3") +
+  geom_text(aes(x=48.8, y=47.4, label = "2022 Results"), color = "dodgerblue3", size = 3.5)
+
+```
+
+```{r}
+
+# Dem Seat Share midterm years plot
+
+natldata %>%
+  filter(midterm == 1) %>%
+  ggplot(aes(x = prediction4, y = D_majorvote_pct, label = year)) +
+  geom_point() +
+  geom_abline(intercept = 0, slope = 1, color = "red") +
+  geom_text(hjust=0, vjust=0, size = 3) +
+  labs(x = "Predicted Democratic Seat Share (midterm years)",
+       y = "Actual Democratic Seat Share",
+       title = "Actual vs. Predicted Democratic Seat Share (midterm years)",
+       caption = "Results from Cook Political Report as of 11/18/2022 when 430 seats have been decided") +
+  stat_cor(method="pearson") +
+  geom_point(aes(x=46.38345, y=46.38345, label = "Prediction"), colour="grey75") +
+  geom_text(aes(x=45.9, y=46.8, label = "Prediction"), color = "grey75", size = 3.5) +
+  geom_point(aes(x=46.38345, y=49.30232558, label = "2022 Results"), colour="dodgerblue3") +
+  geom_text(aes(x=47.5, y=49.8, label = "2022 Results"), color = "dodgerblue3", size = 3.5)
+
+```
 
 
 
