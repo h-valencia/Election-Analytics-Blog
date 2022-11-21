@@ -5,12 +5,17 @@ date: '2022-11-18'
 slug: []
 categories: []
 tags: []
-summary: "On Tuesday, November 8th, eligible Americans voted in the midterm elections for candidates who will make up the 118th Congress. Prior to the election, we had created forecasting models in an attempt to determine who would win the House of Representatives, at the district-level, national-level, or both. In this post I will refelct on the predictions made, my model's performance, and comment on the election overall."
+summary: "On Tuesday, November 8th, eligible Americans voted in the midterm elections for candidates who will make up the 118th Congress. Prior to the election, we had created forecasting models in an attempt to determine who would win the House of Representatives, at the district-level, national-level, or both. In this post I will reflect on the predictions made, my model's performance, and comment on the election overall."
 ---
 
 *This blog is part of a series related to Gov 1347: Election Analytics, a course at [Harvard University](https://www.harvard.edu/) taught by Professor [Ryan D. Enos](http://ryandenos.com/)*.
 
-*On Tuesday, November 8th, eligible Americans voted in the midterm elections for candidates who will make up the 118th Congress. Prior to the election, we had created forecasting models in an attempt to determine who would win the House of Representatives, at the district-level, national-level, or both. In this post I will refelct on the predictions made, my model's performance, and comment on the election overall.*
+*On Tuesday, November 8th, eligible Americans voted in the midterm elections for candidates who will make up the 118th Congress. Prior to the election, we had created forecasting models in an attempt to determine who would win the House of Representatives, at the district-level, national-level, or both. In this post I will reflect on the predictions made, my model's performance, and comment on the election overall.*
+
+Using the knowledge I gained this semester about election forecasting, I created multiple models to predict the outcome of the 2022 House of Representatives election. I looked at both seat share and vote share, and created two models for each: one using data across all election years, and one using the data for only midterm years. We had the opportunity to work with both national-level and seat-level data, but all of my final models used the data at the national-level for reasons I outlined in my [Final Prediction Blog](https://h-valencia.github.io/Election-Analytics-Blog/post/2022-11-04-final-prediction/).
+
+To start assessing the post-election accuracy of these models and reflect on their prediction capabilities, I have created four graphs below with the actual versus predicted results each year. In my Final Prediction Blog, these graphs had the 2022 predictions as a point along the regression line of the model with both the x and y value equaling the model's prediction for the 2022 election. If its prediction had been completely accurate, this point would have stayed along the regression line. In the plots below, I have added a blue point that represents the actual election results as of November 21st, 2022, when 430 of the House seats have been decided. According to the Cook Political Report, Democrats have won 212 seats at this point, and Republicans have won 218 - a democratic seat share of 49.30%. The Cook Political Report also has counted a total of 50,464,746 votes for Democrats versus 53,948,354 for Republicans - giving a democratic vote share of 47.59%. In the graphs below, our predicted values have not changed since the models have not been adjusted at all from the final prediction, however the new y-value of the point shows the actual outcome. The distance between this point and the regression line shows the accuracy of our prediction, with a point closer to the line representing results that came very close to our prediction, and points further from the line representing a less-accurate prediciton. 
+
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE)
@@ -47,13 +52,15 @@ natldata %>%
   labs(x = "Predicted Democratic Vote Share (all years)",
        y = "Actual Democratic Vote Share",
        title = "Actual vs. Predicted Democratic Vote Share (all years)",
-       caption = "Results from Cook Political Report as of 11/18/2022.") +
+       caption = "Results from Cook Political Report as of 11/21/2022.") +
   stat_cor(method="pearson") +
   geom_point(aes(x=50.20221, y=50.20221, label = "Prediction"), colour="grey75") +
   geom_text(aes(x=50.20221, y=50.7, label = "Prediction"), color = "grey75", size = 3.5) +
-  geom_point(aes(x=50.20221, y=47.4, label = "2022 Results"), colour="dodgerblue3") +
-  geom_text(aes(x=50.20221, y=48, label = "2022 Results"), color = "dodgerblue3", size = 3.5)
+  geom_point(aes(x=50.20221, y=47.58511605, label = "2022 Results"), colour="dodgerblue3") +
+  geom_text(aes(x=50.20221, y=48.1, label = "2022 Results"), color = "dodgerblue3", size = 3.5)
 ```
+
+The graph above shows the model for vote share across all election years, both midterm and presidential. As we can see, the predicted vote share for the 2022 House was 50.2022%, or practically a tie between the Democrats and Republicans. We know that in recent history it is not uncommon for the vote share to be relatively close, even if one party comes away winning the majority of the seats -- or in the case of a presidential election, the electoral votes -- so this prediction seemed reasonable prior to the election. The actual democratic vote share was around 47.6%, which fell just outside of my prediction's 95% Confidence Interval of (47.8, 52.54). The fact that the actual vote share was *not* in the 95% confidence interval may indicate that this model was not the best predictor of the election, as we would have hoped the error margins would be wide enough to capture this result.
 
 ```{r}
 # Dem Seat Share all years plot
@@ -66,7 +73,7 @@ natldata %>%
   labs(x = "Predicted Democratic Seat Share (all years)",
        y = "Actual Democratic Seat Share",
        title = "Actual vs. Predicted Democratic Seat Share (all years)",
-       caption = "Results from Cook Political Report as of 11/18/2022 when 430 seats have been decided") +
+       caption = "Results from Cook Political Report as of 11/21/2022 when 430 seats have been decided") +
   stat_cor(method="pearson") +
   geom_point(aes(x=50.50952, y=50.50952, label = "Prediction"), colour="grey75") +
   geom_text(aes(x=50.25, y=51.25, label = "Prediction"), color = "grey75", size = 3.5) +
@@ -87,12 +94,12 @@ natldata %>%
   labs(x = "Predicted Democratic Vote Share (midterm years)",
        y = "Actual Democratic Vote Share",
        title = "Actual vs. Predicted Democratic Vote Share (midterm years)",
-       caption = "Results from Cook Political Report as of 11/18/2022.") +
+       caption = "Results from Cook Political Report as of 11/21/2022.") +
   stat_cor(method="pearson") +
   geom_point(aes(x=47.85624, y=47.85624, label = "Prediction"), colour="grey75") +
   geom_text(aes(x=47.75, y=48.25, label = "Prediction"), color = "grey75", size = 3.5) +
-  geom_point(aes(x=47.85624, y=47.4, label = "2022 Results"), colour="dodgerblue3") +
-  geom_text(aes(x=48.8, y=47.4, label = "2022 Results"), color = "dodgerblue3", size = 3.5)
+  geom_point(aes(x=47.85624, y=47.58511605, label = "2022 Results"), colour="dodgerblue3") +
+  geom_text(aes(x=48.8, y=47.6, label = "2022 Results"), color = "dodgerblue3", size = 3.5)
 
 ```
 
@@ -109,7 +116,7 @@ natldata %>%
   labs(x = "Predicted Democratic Seat Share (midterm years)",
        y = "Actual Democratic Seat Share",
        title = "Actual vs. Predicted Democratic Seat Share (midterm years)",
-       caption = "Results from Cook Political Report as of 11/18/2022 when 430 seats have been decided") +
+       caption = "Results from Cook Political Report as of 11/21/2022 when 430 seats have been decided") +
   stat_cor(method="pearson") +
   geom_point(aes(x=46.38345, y=46.38345, label = "Prediction"), colour="grey75") +
   geom_text(aes(x=45.9, y=46.8, label = "Prediction"), color = "grey75", size = 3.5) +
