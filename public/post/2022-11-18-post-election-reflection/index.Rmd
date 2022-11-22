@@ -56,15 +56,16 @@ library(stargazer)
 
 ```{r}
 natldata <- read_csv("natldata2.csv")
+fulldata <- read_csv("fulldata.csv")
 ```
 
 
 #### Model 1
 
 
-`$$
+$$
 Democratic Vote Share = \beta_0 + Generic Ballot Democrat\beta_1 + Lag House Dem Vote Share\beta_2 + President Party R\beta_3 + President Approval\beta_4 + Midterm\beta_5 + Unemployment Rate\beta_6 + President Party R * Midterm\beta_7 + President Party R * Unemployment\beta_8
-$$`
+$$
 
 ```{r}
 # prediction vs actual 2022
@@ -105,9 +106,9 @@ The graph above shows the model for vote share across all election years, both m
 
 #### Model 2
 
-`$$
+$$
 Democratic Seat Share = \beta_0 + Generic Ballot Democrat\beta_1 + Lag House Dem Seat Share\beta_2 + President Party R\beta_3 + President Approval\beta_4 + Midterm\beta_5 + Unemployment Rate\beta_6 + President Party R * Midterm\beta_7 + President Party R * Unemployment\beta_8
-$$`
+$$
 
 ```{r}
 # Dem Seat Share all years plot
@@ -134,9 +135,9 @@ This model of seat share using data across all the election years fared much bet
 
 #### Model 3
 
-`$$
+$$
 Democratic Vote Share = \beta_0 + Generic Ballot Democrat\beta_1 + Lag House Dem Vote Share\beta_2 + President Party R\beta_3
-$$`
+$$
 
 ```{r}
 # Dem VS midterm years plot
@@ -164,9 +165,9 @@ In the graph above, this model used only the midterm election years to regress o
 
 #### Model 4
 
-`$$
+$$
 Democratic Seat Share = \beta_0 + Generic Ballot Democrat\beta_1 + Lag House Dem Seat Share\beta_2 + President Party R\beta_3
-$$`
+$$
 
 ```{r}
 
@@ -197,6 +198,40 @@ Looking at the results across all four models, it seems that using only the midt
 
 ```{r}
 
+# adding turnout data from across all elections as sourced from U.S. Elections Project (electproject.org) which takes its numbers from the Vital Statistics of American Politics (CQ Press, Stanley and Niemi, eds.).
+
+turnout <- c(63.8, 47.7,62.8,48.7,62.5,47.3,56.2,39.1,54.8,39.0,54.2,42.0,55.2,38.1,52.8,38.4,58.1,41.1,51.7,38.1,54.2,39.5,60.1,40.4,61.6,41.0,58.6,36.7,60.1,50.0,66.9)
+natldata2 <- cbind(natldata, turnout)
+
+fit1 <- lm(data = natldata2, D_majorvote_pct ~ gen_avg_dem + DemVS_prev + president_party + approval_rating + midterm*president_party + unrate + unrate*president_party)
+
+fit1_turnout <- lm(data = natldata2, D_majorvote_pct ~ gen_avg_dem + DemVS_prev + president_party + approval_rating + midterm*president_party + unrate + unrate*president_party + turnout)
+
+stargazer(fit1, fit1_turnout, type = "html", covariate.labels = c("Generic Ballot Support - D", "Lag House Dem VS", "President Party - R", "President Approval Rating", "Midterm Year", "Unemployment Rate", "President Party - R * Midterm Year", "President Party - R * Unemployment", "Constant"))
+
+```
+
+Adding turnout to the model decreases the adjusted R-squared. In order to make a prediction using the turnout model, I have estimated turnout for 2022 using the estimated 2021 CVAP and the number of counted votes for 2022 as reported by the Cook Political Report on November 21st, 2022. This estimates the turnout to be around 41%, which falls in line with our typical midterm election turnout numbers.
+
+```{r}
+
+data2022 <- data.frame(gen_avg_dem = 45.5, # fivethirtyeight
+                       DemVS_prev = natldata2$D_majorvote_pct[natldata2$year == 2020],
+                       DemSeatShare_prev = natldata2$DemSeatShare[natldata2$year == 2020],
+                       president_party = "D",
+                       approval_rating = 0.40, # gallup
+                       midterm = 1,
+                       unrate = 3.7, # bls
+                       turnout = (106051535/258327312)) # estimated turnout
+
+predict(fit1_turnout, data2022, interval = "confidence")
+```
+
+Looking at the prediction using this model, we see that the point estimate comes up with a democratic vote share of 52.36%, compared to the 50.20% we predicted in the model *without* turnout. This is even farther away from the actual results of the 2022 election, and therefore discredits my hypothesis that turnout could account for the difference in the voteshare across all years model versus the model that only looks at midterm years.
+
+```{r}
+summary(fit1)
+summary(fit1_turnout)
 ```
 
 

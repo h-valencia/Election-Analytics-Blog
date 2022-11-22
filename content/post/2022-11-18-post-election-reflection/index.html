@@ -29,26 +29,135 @@ y = 49.30%</p>
 <p>To start assessing the post-election accuracy of these models and reflect on their prediction capabilities, I have created four graphs below with the actual versus predicted results each year. In my Final Prediction Blog, these graphs had the 2022 predictions as a point along the regression line of the model with both the x and y value equaling the model’s prediction for the 2022 election. If its prediction had been completely accurate, this point would have stayed along the regression line. In the plots below, I have added a blue point that represents the actual election results as of November 21st, 2022, when 430 of the House seats have been decided. According to the Cook Political Report, Democrats have won 212 seats at this point, and Republicans have won 218 - a democratic seat share of 49.30%. The Cook Political Report also has counted a total of 50,464,746 votes for Democrats versus 53,948,354 for Republicans - giving a democratic vote share of 47.59%. In the graphs below, our predicted values have not changed since the models have not been adjusted at all from the final prediction, however the new y-value of the point shows the actual outcome. The distance between this point and the regression line shows the accuracy of our prediction, with a point closer to the line representing results that came very close to our prediction, and points further from the line representing a less-accurate prediction.</p>
 <div id="model-1" class="section level4">
 <h4>Model 1</h4>
-<p><code>$$ Democratic Vote Share = \beta_0 + Generic Ballot Democrat\beta_1 + Lag House Dem Vote Share\beta_2 + President Party R\beta_3 + President Approval\beta_4 + Midterm\beta_5 + Unemployment Rate\beta_6 + President Party R * Midterm\beta_7 + President Party R * Unemployment\beta_8 $$</code></p>
+<p><span class="math display">\[
+Democratic Vote Share = \beta_0 + Generic Ballot Democrat\beta_1 + Lag House Dem Vote Share\beta_2 + President Party R\beta_3 + President Approval\beta_4 + Midterm\beta_5 + Unemployment Rate\beta_6 + President Party R * Midterm\beta_7 + President Party R * Unemployment\beta_8
+\]</span></p>
 <p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-2-1.png" width="672" /></p>
 <p>The graph above shows the model for vote share across all election years, both midterm and presidential. As we can see, the predicted vote share for the 2022 House was 50.2022%, or practically a tie between the Democrats and Republicans. We know that in recent history it is not uncommon for the vote share to be relatively close, even if one party comes away winning the majority of the seats – or in the case of a presidential election, the electoral votes – so this prediction seemed reasonable prior to the election. The actual democratic vote share was around 47.6%, which fell just outside of my prediction’s 95% Confidence Interval of (47.8, 52.54) that is represented by the grey dotted line on the plot. The fact that the actual vote share was <em>not</em> in the 95% confidence interval puzzles me a bit, as it makes me question whether this election fell to an extreme, or if this model was not the best predictor of the election since we would have hoped the error margins would be wide enough to capture this result. Despite these questions and falling outside of the confidence interval, my prediction is actually not that far off from the actual results, overestimating the vote share by 2.6122 percentage points.</p>
 </div>
 <div id="model-2" class="section level4">
 <h4>Model 2</h4>
-<p><code>$$ Democratic Seat Share = \beta_0 + Generic Ballot Democrat\beta_1 + Lag House Dem Seat Share\beta_2 + President Party R\beta_3 + President Approval\beta_4 + Midterm\beta_5 + Unemployment Rate\beta_6 + President Party R * Midterm\beta_7 + President Party R * Unemployment\beta_8 $$</code></p>
+<p><span class="math display">\[
+Democratic Seat Share = \beta_0 + Generic Ballot Democrat\beta_1 + Lag House Dem Seat Share\beta_2 + President Party R\beta_3 + President Approval\beta_4 + Midterm\beta_5 + Unemployment Rate\beta_6 + President Party R * Midterm\beta_7 + President Party R * Unemployment\beta_8
+\]</span></p>
 <p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-4-1.png" width="672" />
 This model of seat share using data across all the election years fared much better than the one above, and produced a prediction that was very close to the results we actually saw, with the model overestimating the seat share by just 1.21 percentage points. In this model, the results also fell within the 95% confidence interval, unlike above. In my final election prediction blog, I noted that this model had the highest R-squared value, and these results resemble that accuracy.</p>
 </div>
 <div id="model-3" class="section level4">
 <h4>Model 3</h4>
-<p><code>$$ Democratic Vote Share = \beta_0 + Generic Ballot Democrat\beta_1 + Lag House Dem Vote Share\beta_2 + President Party R\beta_3 $$</code></p>
+<p><span class="math display">\[
+Democratic Vote Share = \beta_0 + Generic Ballot Democrat\beta_1 + Lag House Dem Vote Share\beta_2 + President Party R\beta_3
+\]</span></p>
 <p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-5-1.png" width="672" /></p>
 <p>In the graph above, this model used only the midterm election years to regress on Democratic vote share and the results were extremely accurate. This model also had a high R-squared of 0.89, and it only overestimated the results by 0.27 percentage points. This was the most accurate prediction out of all four models, which surprised me a bit. In my initial predictions, I thought that these midterm year models would be less predictive, as they have fewer data points to work off of, and included fewer independent variables. While this midterm model was an accurate predictor, the other midterm model did not perform as well.</p>
 </div>
 <div id="model-4" class="section level4">
 <h4>Model 4</h4>
-<p><code>$$ Democratic Seat Share = \beta_0 + Generic Ballot Democrat\beta_1 + Lag House Dem Seat Share\beta_2 + President Party R\beta_3 $$</code></p>
+<p><span class="math display">\[
+Democratic Seat Share = \beta_0 + Generic Ballot Democrat\beta_1 + Lag House Dem Seat Share\beta_2 + President Party R\beta_3
+\]</span></p>
 <p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-6-1.png" width="672" /></p>
 <p>This midterm model underestimated the actual democratic seat share of the election by 2.92 percentage points. This was the only model that <em>underestimated</em> the dependent variable, however the prediction did still fall within the 95% confidence interval. This was the largest percentage-point difference between the prediction and the result across all four of the models, but I did expect this as the R-squared value is also the lowest of the four.</p>
 <p>Looking at the results across all four models, it seems that using only the midterm years’ model for democratic vote share is more predictive than if we had used the model that spans all elections, while we see the opposite for democratic seat share - with the more predictive model being the one that uses all the elections. One reason I speculate this may be is because there is a different voter population during midterm years than election years, which has a strong affect on the vote share while the seats are more representative of the areas demographics. The number of voters in midterm years differs dramatically from the number that vote in election years - with presidential election years generating turnouts of around 50-60% and midterm elections only generating about 40% turnout. Since the number of voters participating differs between the two, it may be harder for the models that use all the years’ data to accurately predict the vote share down to a hundredth of a percentage point, as we are looking at here. If this speculation is somewhat correct, this would mean that incorporating voter turnout in to the model may have improved the accuracy. I will check this below by running the vote share model across all years and adding turnout as an independent variable to see if this improves the accuracy of the model.</p>
+<pre><code>## 
+## &lt;table style=&quot;text-align:center&quot;&gt;&lt;tr&gt;&lt;td colspan=&quot;3&quot; style=&quot;border-bottom: 1px solid black&quot;&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td style=&quot;text-align:left&quot;&gt;&lt;/td&gt;&lt;td colspan=&quot;2&quot;&gt;&lt;em&gt;Dependent variable:&lt;/em&gt;&lt;/td&gt;&lt;/tr&gt;
+## &lt;tr&gt;&lt;td&gt;&lt;/td&gt;&lt;td colspan=&quot;2&quot; style=&quot;border-bottom: 1px solid black&quot;&gt;&lt;/td&gt;&lt;/tr&gt;
+## &lt;tr&gt;&lt;td style=&quot;text-align:left&quot;&gt;&lt;/td&gt;&lt;td colspan=&quot;2&quot;&gt;D_majorvote_pct&lt;/td&gt;&lt;/tr&gt;
+## &lt;tr&gt;&lt;td style=&quot;text-align:left&quot;&gt;&lt;/td&gt;&lt;td&gt;(1)&lt;/td&gt;&lt;td&gt;(2)&lt;/td&gt;&lt;/tr&gt;
+## &lt;tr&gt;&lt;td colspan=&quot;3&quot; style=&quot;border-bottom: 1px solid black&quot;&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td style=&quot;text-align:left&quot;&gt;Generic Ballot Support - D&lt;/td&gt;&lt;td&gt;0.229&lt;sup&gt;**&lt;/sup&gt;&lt;/td&gt;&lt;td&gt;0.246&lt;sup&gt;**&lt;/sup&gt;&lt;/td&gt;&lt;/tr&gt;
+## &lt;tr&gt;&lt;td style=&quot;text-align:left&quot;&gt;&lt;/td&gt;&lt;td&gt;(0.082)&lt;/td&gt;&lt;td&gt;(0.088)&lt;/td&gt;&lt;/tr&gt;
+## &lt;tr&gt;&lt;td style=&quot;text-align:left&quot;&gt;&lt;/td&gt;&lt;td&gt;&lt;/td&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;
+## &lt;tr&gt;&lt;td style=&quot;text-align:left&quot;&gt;Lag House Dem VS&lt;/td&gt;&lt;td&gt;0.426&lt;sup&gt;***&lt;/sup&gt;&lt;/td&gt;&lt;td&gt;0.427&lt;sup&gt;***&lt;/sup&gt;&lt;/td&gt;&lt;/tr&gt;
+## &lt;tr&gt;&lt;td style=&quot;text-align:left&quot;&gt;&lt;/td&gt;&lt;td&gt;(0.119)&lt;/td&gt;&lt;td&gt;(0.120)&lt;/td&gt;&lt;/tr&gt;
+## &lt;tr&gt;&lt;td style=&quot;text-align:left&quot;&gt;&lt;/td&gt;&lt;td&gt;&lt;/td&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;
+## &lt;tr&gt;&lt;td style=&quot;text-align:left&quot;&gt;President Party - R&lt;/td&gt;&lt;td&gt;-6.339&lt;sup&gt;**&lt;/sup&gt;&lt;/td&gt;&lt;td&gt;-6.054&lt;sup&gt;*&lt;/sup&gt;&lt;/td&gt;&lt;/tr&gt;
+## &lt;tr&gt;&lt;td style=&quot;text-align:left&quot;&gt;&lt;/td&gt;&lt;td&gt;(2.879)&lt;/td&gt;&lt;td&gt;(2.961)&lt;/td&gt;&lt;/tr&gt;
+## &lt;tr&gt;&lt;td style=&quot;text-align:left&quot;&gt;&lt;/td&gt;&lt;td&gt;&lt;/td&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;
+## &lt;tr&gt;&lt;td style=&quot;text-align:left&quot;&gt;President Approval Rating&lt;/td&gt;&lt;td&gt;-5.435&lt;sup&gt;*&lt;/sup&gt;&lt;/td&gt;&lt;td&gt;-5.485&lt;/td&gt;&lt;/tr&gt;
+## &lt;tr&gt;&lt;td style=&quot;text-align:left&quot;&gt;&lt;/td&gt;&lt;td&gt;(3.155)&lt;/td&gt;&lt;td&gt;(3.203)&lt;/td&gt;&lt;/tr&gt;
+## &lt;tr&gt;&lt;td style=&quot;text-align:left&quot;&gt;&lt;/td&gt;&lt;td&gt;&lt;/td&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;
+## &lt;tr&gt;&lt;td style=&quot;text-align:left&quot;&gt;Midterm Year&lt;/td&gt;&lt;td&gt;-4.644&lt;sup&gt;***&lt;/sup&gt;&lt;/td&gt;&lt;td&gt;-5.561&lt;sup&gt;***&lt;/sup&gt;&lt;/td&gt;&lt;/tr&gt;
+## &lt;tr&gt;&lt;td style=&quot;text-align:left&quot;&gt;&lt;/td&gt;&lt;td&gt;(1.053)&lt;/td&gt;&lt;td&gt;(1.866)&lt;/td&gt;&lt;/tr&gt;
+## &lt;tr&gt;&lt;td style=&quot;text-align:left&quot;&gt;&lt;/td&gt;&lt;td&gt;&lt;/td&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;
+## &lt;tr&gt;&lt;td style=&quot;text-align:left&quot;&gt;Unemployment Rate&lt;/td&gt;&lt;td&gt;-0.690&lt;sup&gt;**&lt;/sup&gt;&lt;/td&gt;&lt;td&gt;-0.678&lt;sup&gt;**&lt;/sup&gt;&lt;/td&gt;&lt;/tr&gt;
+## &lt;tr&gt;&lt;td style=&quot;text-align:left&quot;&gt;&lt;/td&gt;&lt;td&gt;(0.307)&lt;/td&gt;&lt;td&gt;(0.312)&lt;/td&gt;&lt;/tr&gt;
+## &lt;tr&gt;&lt;td style=&quot;text-align:left&quot;&gt;&lt;/td&gt;&lt;td&gt;&lt;/td&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;
+## &lt;tr&gt;&lt;td style=&quot;text-align:left&quot;&gt;President Party - R * Midterm Year&lt;/td&gt;&lt;td&gt;&lt;/td&gt;&lt;td&gt;-0.054&lt;/td&gt;&lt;/tr&gt;
+## &lt;tr&gt;&lt;td style=&quot;text-align:left&quot;&gt;&lt;/td&gt;&lt;td&gt;&lt;/td&gt;&lt;td&gt;(0.090)&lt;/td&gt;&lt;/tr&gt;
+## &lt;tr&gt;&lt;td style=&quot;text-align:left&quot;&gt;&lt;/td&gt;&lt;td&gt;&lt;/td&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;
+## &lt;tr&gt;&lt;td style=&quot;text-align:left&quot;&gt;President Party - R * Unemployment&lt;/td&gt;&lt;td&gt;6.793&lt;sup&gt;***&lt;/sup&gt;&lt;/td&gt;&lt;td&gt;6.839&lt;sup&gt;***&lt;/sup&gt;&lt;/td&gt;&lt;/tr&gt;
+## &lt;tr&gt;&lt;td style=&quot;text-align:left&quot;&gt;&lt;/td&gt;&lt;td&gt;(1.565)&lt;/td&gt;&lt;td&gt;(1.590)&lt;/td&gt;&lt;/tr&gt;
+## &lt;tr&gt;&lt;td style=&quot;text-align:left&quot;&gt;&lt;/td&gt;&lt;td&gt;&lt;/td&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;
+## &lt;tr&gt;&lt;td style=&quot;text-align:left&quot;&gt;Constant&lt;/td&gt;&lt;td&gt;0.793&lt;sup&gt;*&lt;/sup&gt;&lt;/td&gt;&lt;td&gt;0.731&lt;/td&gt;&lt;/tr&gt;
+## &lt;tr&gt;&lt;td style=&quot;text-align:left&quot;&gt;&lt;/td&gt;&lt;td&gt;(0.424)&lt;/td&gt;&lt;td&gt;(0.443)&lt;/td&gt;&lt;/tr&gt;
+## &lt;tr&gt;&lt;td style=&quot;text-align:left&quot;&gt;&lt;/td&gt;&lt;td&gt;&lt;/td&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;
+## &lt;tr&gt;&lt;td style=&quot;text-align:left&quot;&gt;Constant&lt;/td&gt;&lt;td&gt;27.238&lt;sup&gt;***&lt;/sup&gt;&lt;/td&gt;&lt;td&gt;29.460&lt;sup&gt;***&lt;/sup&gt;&lt;/td&gt;&lt;/tr&gt;
+## &lt;tr&gt;&lt;td style=&quot;text-align:left&quot;&gt;&lt;/td&gt;&lt;td&gt;(7.042)&lt;/td&gt;&lt;td&gt;(8.049)&lt;/td&gt;&lt;/tr&gt;
+## &lt;tr&gt;&lt;td style=&quot;text-align:left&quot;&gt;&lt;/td&gt;&lt;td&gt;&lt;/td&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;
+## &lt;tr&gt;&lt;td colspan=&quot;3&quot; style=&quot;border-bottom: 1px solid black&quot;&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td style=&quot;text-align:left&quot;&gt;Observations&lt;/td&gt;&lt;td&gt;31&lt;/td&gt;&lt;td&gt;31&lt;/td&gt;&lt;/tr&gt;
+## &lt;tr&gt;&lt;td style=&quot;text-align:left&quot;&gt;R&lt;sup&gt;2&lt;/sup&gt;&lt;/td&gt;&lt;td&gt;0.767&lt;/td&gt;&lt;td&gt;0.771&lt;/td&gt;&lt;/tr&gt;
+## &lt;tr&gt;&lt;td style=&quot;text-align:left&quot;&gt;Adjusted R&lt;sup&gt;2&lt;/sup&gt;&lt;/td&gt;&lt;td&gt;0.682&lt;/td&gt;&lt;td&gt;0.673&lt;/td&gt;&lt;/tr&gt;
+## &lt;tr&gt;&lt;td style=&quot;text-align:left&quot;&gt;Residual Std. Error&lt;/td&gt;&lt;td&gt;1.830 (df = 22)&lt;/td&gt;&lt;td&gt;1.857 (df = 21)&lt;/td&gt;&lt;/tr&gt;
+## &lt;tr&gt;&lt;td style=&quot;text-align:left&quot;&gt;F Statistic&lt;/td&gt;&lt;td&gt;9.051&lt;sup&gt;***&lt;/sup&gt; (df = 8; 22)&lt;/td&gt;&lt;td&gt;7.852&lt;sup&gt;***&lt;/sup&gt; (df = 9; 21)&lt;/td&gt;&lt;/tr&gt;
+## &lt;tr&gt;&lt;td colspan=&quot;3&quot; style=&quot;border-bottom: 1px solid black&quot;&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td style=&quot;text-align:left&quot;&gt;&lt;em&gt;Note:&lt;/em&gt;&lt;/td&gt;&lt;td colspan=&quot;2&quot; style=&quot;text-align:right&quot;&gt;&lt;sup&gt;*&lt;/sup&gt;p&lt;0.1; &lt;sup&gt;**&lt;/sup&gt;p&lt;0.05; &lt;sup&gt;***&lt;/sup&gt;p&lt;0.01&lt;/td&gt;&lt;/tr&gt;
+## &lt;/table&gt;</code></pre>
+<p>Adding turnout to the model decreases the adjusted R-squared. In order to make a prediction using the turnout model, I have estimated turnout for 2022 using the estimated 2021 CVAP and the number of counted votes for 2022 as reported by the Cook Political Report on November 21st, 2022. This estimates the turnout to be around 41%, which falls in line with our typical midterm election turnout numbers.</p>
+<pre><code>##        fit      lwr      upr
+## 1 52.36448 44.50132 60.22765</code></pre>
+<p>Looking at the prediction using this model, we see that the point estimate comes up with a democratic vote share of 52.36%, compared to the 50.20% we predicted in the model <em>without</em> turnout. This is even farther away from the actual results of the 2022 election, and therefore discredits my hypothesis that turnout could account for the difference in the voteshare across all years model versus the model that only looks at midterm years.</p>
+<pre><code>## 
+## Call:
+## lm(formula = D_majorvote_pct ~ gen_avg_dem + DemVS_prev + president_party + 
+##     approval_rating + midterm * president_party + unrate + unrate * 
+##     president_party, data = natldata2)
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -4.0603 -1.0010  0.2003  1.0220  2.8136 
+## 
+## Coefficients:
+##                          Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept)               27.2380     7.0419   3.868 0.000832 ***
+## gen_avg_dem                0.2286     0.0821   2.784 0.010813 *  
+## DemVS_prev                 0.4259     0.1185   3.593 0.001617 ** 
+## president_partyR          -6.3394     2.8795  -2.202 0.038480 *  
+## approval_rating           -5.4353     3.1550  -1.723 0.098965 .  
+## midterm                   -4.6436     1.0531  -4.409 0.000222 ***
+## unrate                    -0.6904     0.3072  -2.248 0.034952 *  
+## president_partyR:midterm   6.7931     1.5652   4.340 0.000263 ***
+## president_partyR:unrate    0.7929     0.4240   1.870 0.074872 .  
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 1.83 on 22 degrees of freedom
+## Multiple R-squared:  0.767,  Adjusted R-squared:  0.6822 
+## F-statistic: 9.051 on 8 and 22 DF,  p-value: 1.95e-05</code></pre>
+<pre><code>## 
+## Call:
+## lm(formula = D_majorvote_pct ~ gen_avg_dem + DemVS_prev + president_party + 
+##     approval_rating + midterm * president_party + unrate + unrate * 
+##     president_party + turnout, data = natldata2)
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -4.0948 -0.9153  0.1865  1.2667  2.6124 
+## 
+## Coefficients:
+##                          Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept)              29.46003    8.04904   3.660 0.001460 ** 
+## gen_avg_dem               0.24601    0.08823   2.788 0.011016 *  
+## DemVS_prev                0.42716    0.12031   3.550 0.001893 ** 
+## president_partyR         -6.05355    2.96086  -2.045 0.053641 .  
+## approval_rating          -5.48452    3.20298  -1.712 0.101567    
+## midterm                  -5.56134    1.86586  -2.981 0.007131 ** 
+## unrate                   -0.67846    0.31236  -2.172 0.041454 *  
+## turnout                  -0.05380    0.08966  -0.600 0.554892    
+## president_partyR:midterm  6.83905    1.59031   4.300 0.000317 ***
+## president_partyR:unrate   0.73088    0.44255   1.652 0.113506    
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 1.857 on 21 degrees of freedom
+## Multiple R-squared:  0.7709, Adjusted R-squared:  0.6727 
+## F-statistic: 7.852 on 9 and 21 DF,  p-value: 5.294e-05</code></pre>
 </div>
