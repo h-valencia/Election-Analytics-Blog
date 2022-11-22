@@ -68,24 +68,31 @@
 <p><em>On Tuesday, November 8th, eligible Americans voted in the midterm elections for candidates who will make up the 118th Congress. Prior to the election, we had created forecasting models in an attempt to determine who would win the House of Representatives, at the district-level, national-level, or both. In this post I will reflect on the predictions made, my model’s performance, and comment on the election overall.</em></p>
 <p>Using the knowledge I gained this semester about election forecasting, I created multiple models to predict the outcome of the 2022 House of Representatives election. I looked at both seat share and vote share, and created two models for each: one using data across all election years, and one using the data for only midterm years. We had the opportunity to work with both national-level and seat-level data, but all of my final models used the data at the national-level for reasons I outlined in my <a href="https://h-valencia.github.io/Election-Analytics-Blog/post/2022-11-04-final-prediction/">Final Prediction Blog</a>.</p>
 <p>As a refresher, here are the predictions from my four models and the actual results of the election as of November 21st, 2022:
-<em>Democratic Vote Share using all years</em>
+<strong>Model 1:</strong> Democratic Vote Share using all years
 <span class="math inline">\(\hat{y}\)</span> = 50.20% , 95% CI (47.86, 52.54)
 <span class="math inline">\(y\)</span> = 47.59%</p>
-<p><em>Democratic Seat Share using all years</em>
+<p><strong>Model 2:</strong> Democratic Seat Share using all years
 <span class="math inline">\(\hat{y}\)</span> = 50.51% , 95% CI (45.71, 55.31)
 <span class="math inline">\(y\)</span> = 49.30%</p>
-<p><em>Democratic Vote Share using midterm years</em>
+<p><strong>Model 3:</strong> Democratic Vote Share using midterm years
 <span class="math inline">\(\hat{y}\)</span> = 47.86% , 95% CI (45.81, 49.90)
 <span class="math inline">\(y\)</span> = 47.59%</p>
-<p><em>Democratic Seat Share using midterm years</em>
+<p><strong>Model 4:</strong> Democratic Seat Share using midterm years
 <span class="math inline">\(\hat{y}\)</span> = 46.38% , 95% CI (42.95, 49.82)
 <span class="math inline">\(y\)</span> = 49.30%</p>
-<p>To start assessing the post-election accuracy of these models and reflect on their prediction capabilities, I have created four graphs below with the actual versus predicted results each year. In my Final Prediction Blog, these graphs had the 2022 predictions as a point along the regression line of the model with both the x and y value equaling the model’s prediction for the 2022 election. If its prediction had been completely accurate, this point would have stayed along the regression line. In the plots below, I have added a blue point that represents the actual election results as of November 21st, 2022, when 430 of the House seats have been decided. According to the Cook Political Report, Democrats have won 212 seats at this point, and Republicans have won 218 - a democratic seat share of 49.30%. The Cook Political Report also has counted a total of 50,464,746 votes for Democrats versus 53,948,354 for Republicans - giving a democratic vote share of 47.59%. In the graphs below, our predicted values have not changed since the models have not been adjusted at all from the final prediction, however the new y-value of the point shows the actual outcome. The distance between this point and the regression line shows the accuracy of our prediction, with a point closer to the line representing results that came very close to our prediction, and points further from the line representing a less-accurate prediciton.</p>
+<p>To start assessing the post-election accuracy of these models and reflect on their prediction capabilities, I have created four graphs below with the actual versus predicted results each year. In my Final Prediction Blog, these graphs had the 2022 predictions as a point along the regression line of the model with both the x and y value equaling the model’s prediction for the 2022 election. If its prediction had been completely accurate, this point would have stayed along the regression line. In the plots below, I have added a blue point that represents the actual election results as of November 21st, 2022, when 430 of the House seats have been decided. According to the Cook Political Report, Democrats have won 212 seats at this point, and Republicans have won 218 - a democratic seat share of 49.30%. The Cook Political Report also has counted a total of 50,464,746 votes for Democrats versus 53,948,354 for Republicans - giving a democratic vote share of 47.59%. In the graphs below, our predicted values have not changed since the models have not been adjusted at all from the final prediction, however the new y-value of the point shows the actual outcome. The distance between this point and the regression line shows the accuracy of our prediction, with a point closer to the line representing results that came very close to our prediction, and points further from the line representing a less-accurate prediction.</p>
+<div id="model-1" class="section level4">
+<h4>Model 1</h4>
 <p><img src="http://example.org/post/2022-11-18-post-election-reflection/index_files/figure-html/unnamed-chunk-2-1.png" width="672" /></p>
-<p>The graph above shows the model for vote share across all election years, both midterm and presidential. As we can see, the predicted vote share for the 2022 House was 50.2022%, or practically a tie between the Democrats and Republicans. We know that in recent history it is not uncommon for the vote share to be relatively close, even if one party comes away winning the majority of the seats – or in the case of a presidential election, the electoral votes – so this prediction seemed reasonable prior to the election. The actual democratic vote share was around 47.6%, which fell just outside of my prediction’s 95% Confidence Interval of (47.8, 52.54) that is represented by the grey dotted line on the plot. The fact that the actual vote share was <em>not</em> in the 95% confidence interval puzzles me a bit, as it makes me question whether this election fell to an extreme, or if this model was not the best predictor of the election since we would have hoped the error margins would be wide enough to capture this result. Despite these questions,</p>
-<p><img src="http://example.org/post/2022-11-18-post-election-reflection/index_files/figure-html/unnamed-chunk-4-1.png" width="672" /></p>
+<p>The graph above shows the model for vote share across all election years, both midterm and presidential. As we can see, the predicted vote share for the 2022 House was 50.2022%, or practically a tie between the Democrats and Republicans. We know that in recent history it is not uncommon for the vote share to be relatively close, even if one party comes away winning the majority of the seats – or in the case of a presidential election, the electoral votes – so this prediction seemed reasonable prior to the election. The actual democratic vote share was around 47.6%, which fell just outside of my prediction’s 95% Confidence Interval of (47.8, 52.54) that is represented by the grey dotted line on the plot. The fact that the actual vote share was <em>not</em> in the 95% confidence interval puzzles me a bit, as it makes me question whether this election fell to an extreme, or if this model was not the best predictor of the election since we would have hoped the error margins would be wide enough to capture this result. Despite these questions and falling outside of the confidence interval, my prediction is actually not that far off from the actual results, overestimating the vote share by 2.6122 percentage points.</p>
+</div>
+<div id="model-2" class="section level4">
+<h4>Model 2</h4>
+<p><img src="http://example.org/post/2022-11-18-post-election-reflection/index_files/figure-html/unnamed-chunk-4-1.png" width="672" />
+This model of seat share using data across all the election years fared much better than the one above, and produced a prediction that was very close to the results we actually saw, with the model overestimating the seat share by just 1.21 percentage points. In this model, the results also fell within the 95% confidence interval, unlike above. In my final election prediction blog, I noted that this model had the highest R-squared value, and these results resemble that accuracy.</p>
 <p><img src="http://example.org/post/2022-11-18-post-election-reflection/index_files/figure-html/unnamed-chunk-5-1.png" width="672" /></p>
 <p><img src="http://example.org/post/2022-11-18-post-election-reflection/index_files/figure-html/unnamed-chunk-6-1.png" width="672" /></p>
+</div>
 
 
 		
@@ -102,7 +109,7 @@
         		<footer>
 			
 			<span>
-			&copy; <time datetime="2022-11-21 17:53:06.809806 -0500 EST m=&#43;3.135143396">2022</time> . Made with <a href='https://gohugo.io'>Hugo</a> using the <a href='https://github.com/EmielH/tale-hugo/'>Tale</a> theme.
+			&copy; <time datetime="2022-11-21 21:24:52.173602 -0500 EST m=&#43;2.548970206">2022</time> . Made with <a href='https://gohugo.io'>Hugo</a> using the <a href='https://github.com/EmielH/tale-hugo/'>Tale</a> theme.
 			</span>
 		</footer>
 
