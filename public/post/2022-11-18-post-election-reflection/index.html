@@ -38,6 +38,29 @@
 			</div>
 		</nav>
 
+
+
+
+    <script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_HTML"></script>
+    
+    <script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+        tex2jax: {
+            inlineMath: [ ['$','$'], ["\\(","\\)"] ],
+            displayMath: [ ['$$','$$'], ["\\[","\\]"] ],
+            processEscapes: true,
+            processEnvironments: true
+        },
+        // Center justify equations in code and markdown cells. Elsewhere
+        // we use CSS to left justify single line equations in code cells.
+        displayAlign: 'center',
+        "HTML-CSS": {
+            styles: {'.MathJax_Display': {"margin": 0}},
+            linebreaks: { automatic: true }
+        }
+    });
+    </script>
+    
         <div id="darkModeToggle" onclick="toggleDarkMode()">
   &#9680; 
 </div>
@@ -104,7 +127,7 @@ This model of seat share using data across all the election years fared much bet
 <p><code>$$ Democratic Seat Share = \beta_0 + Generic Ballot Democrat\beta_1 + Lag House Dem Seat Share\beta_2 + President Party R\beta_3 $$</code></p>
 <p><img src="http://example.org/post/2022-11-18-post-election-reflection/index_files/figure-html/unnamed-chunk-6-1.png" width="672" /></p>
 <p>This midterm model underestimated the actual democratic seat share of the election by 2.92 percentage points. This was the only model that <em>underestimated</em> the dependent variable, however the prediction did still fall within the 95% confidence interval. This was the largest percentage-point difference between the prediction and the result across all four of the models, but I did expect this as the R-squared value is also the lowest of the four.</p>
-<p>Looking at the results across all four models, it seems that using only the midterm years’ model for democratic vote share is more predictive than if we had used the model that spans all elections, while we see the opposite for democratic seat share - with the more predictive model being the one that uses all the elections. One reason I speculate this may be is because there is a different voter population during midterm years than election years, which has a strong affect on the vote share while the seats are more representative of the areas demographics. The number of voters in midterm years differs dramatically from the number that vote in election years - with presidential election years generating turnouts of around 50-60% and midterm elections only generating about 40% turnout. Since the number of voters participating differs between the two, it may be harder for the models that use all the years’ data to predict</p>
+<p>Looking at the results across all four models, it seems that using only the midterm years’ model for democratic vote share is more predictive than if we had used the model that spans all elections, while we see the opposite for democratic seat share - with the more predictive model being the one that uses all the elections. One reason I speculate this may be is because there is a different voter population during midterm years than election years, which has a strong affect on the vote share while the seats are more representative of the areas demographics. The number of voters in midterm years differs dramatically from the number that vote in election years - with presidential election years generating turnouts of around 50-60% and midterm elections only generating about 40% turnout. Since the number of voters participating differs between the two, it may be harder for the models that use all the years’ data to accurately predict the vote share down to a hundredth of a percentage point, as we are looking at here. If this speculation is somewhat correct, this would mean that incorporating voter turnout in to the model may have improved the accuracy. I will check this below by running the vote share model across all years and adding turnout as an independent variable to see if this improves the accuracy of the model.</p>
 </div>
 
 
@@ -122,7 +145,7 @@ This model of seat share using data across all the election years fared much bet
         		<footer>
 			
 			<span>
-			&copy; <time datetime="2022-11-21 23:14:45.942084 -0500 EST m=&#43;2.203264876">2022</time> . Made with <a href='https://gohugo.io'>Hugo</a> using the <a href='https://github.com/EmielH/tale-hugo/'>Tale</a> theme.
+			&copy; <time datetime="2022-11-21 23:37:48.377064 -0500 EST m=&#43;2.160726853">2022</time> . Made with <a href='https://gohugo.io'>Hugo</a> using the <a href='https://github.com/EmielH/tale-hugo/'>Tale</a> theme.
 			</span>
 		</footer>
 
