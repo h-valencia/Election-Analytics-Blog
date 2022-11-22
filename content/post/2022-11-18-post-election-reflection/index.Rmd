@@ -15,21 +15,22 @@ summary: "On Tuesday, November 8th, eligible Americans voted in the midterm elec
 Using the knowledge I gained this semester about election forecasting, I created multiple models to predict the outcome of the 2022 House of Representatives election. I looked at both seat share and vote share, and created two models for each: one using data across all election years, and one using the data for only midterm years. We had the opportunity to work with both national-level and seat-level data, but all of my final models used the data at the national-level for reasons I outlined in my [Final Prediction Blog](https://h-valencia.github.io/Election-Analytics-Blog/post/2022-11-04-final-prediction/).
 
 As a refresher, here are the predictions from my four models and the actual results of the election as of November 21st, 2022:
+
 **Model 1:** Democratic Vote Share using all years
-$\hat{y}$ = 50.20% , 95% CI (47.86, 52.54)
-$y$ = 47.59%
+yhat = 50.20% , 95% CI (47.86, 52.54)
+y = 47.59%
 
 **Model 2:** Democratic Seat Share using all years
-$\hat{y}$ = 50.51% , 95% CI (45.71, 55.31)
-$y$ = 49.30%
+yhat = 50.51% , 95% CI (45.71, 55.31)
+y = 49.30%
 
 **Model 3:** Democratic Vote Share using midterm years
-$\hat{y}$ = 47.86% , 95% CI (45.81, 49.90)
-$y$ = 47.59%
+yhat = 47.86% , 95% CI (45.81, 49.90)
+y = 47.59%
 
 **Model 4:** Democratic Seat Share using midterm years
-$\hat{y}$ = 46.38% , 95% CI (42.95, 49.82)
-$y$ = 49.30%
+yhat = 46.38% , 95% CI (42.95, 49.82)
+y = 49.30%
 
 To start assessing the post-election accuracy of these models and reflect on their prediction capabilities, I have created four graphs below with the actual versus predicted results each year. In my Final Prediction Blog, these graphs had the 2022 predictions as a point along the regression line of the model with both the x and y value equaling the model's prediction for the 2022 election. If its prediction had been completely accurate, this point would have stayed along the regression line. In the plots below, I have added a blue point that represents the actual election results as of November 21st, 2022, when 430 of the House seats have been decided. According to the Cook Political Report, Democrats have won 212 seats at this point, and Republicans have won 218 - a democratic seat share of 49.30%. The Cook Political Report also has counted a total of 50,464,746 votes for Democrats versus 53,948,354 for Republicans - giving a democratic vote share of 47.59%. In the graphs below, our predicted values have not changed since the models have not been adjusted at all from the final prediction, however the new y-value of the point shows the actual outcome. The distance between this point and the regression line shows the accuracy of our prediction, with a point closer to the line representing results that came very close to our prediction, and points further from the line representing a less-accurate prediction. 
 
@@ -59,6 +60,12 @@ natldata <- read_csv("natldata2.csv")
 
 
 #### Model 1
+
+
+`$$
+Democratic Vote Share = \beta_0 + Generic Ballot Democrat\beta_1 + Lag House Dem Vote Share\beta_2 + President Party R\beta_3 + President Approval\beta_4 + Midterm\beta_5 + Unemployment Rate\beta_6 + President Party R * Midterm\beta_7 + President Party R * Unemployment\beta_8
+$$`
+
 ```{r}
 # prediction vs actual 2022
 # Dem VS all years plot
@@ -97,6 +104,11 @@ The graph above shows the model for vote share across all election years, both m
 
 
 #### Model 2
+
+`$$
+Democratic Seat Share = \beta_0 + Generic Ballot Democrat\beta_1 + Lag House Dem Seat Share\beta_2 + President Party R\beta_3 + President Approval\beta_4 + Midterm\beta_5 + Unemployment Rate\beta_6 + President Party R * Midterm\beta_7 + President Party R * Unemployment\beta_8
+$$`
+
 ```{r}
 # Dem Seat Share all years plot
 
@@ -120,6 +132,11 @@ natldata %>%
 This model of seat share using data across all the election years fared much better than the one above, and produced a prediction that was very close to the results we actually saw, with the model overestimating the seat share by just 1.21 percentage points. In this model, the results also fell within the 95% confidence interval, unlike above. In my final election prediction blog, I noted that this model had the highest R-squared value, and these results resemble that accuracy. 
 
 
+#### Model 3
+
+`$$
+Democratic Vote Share = \beta_0 + Generic Ballot Democrat\beta_1 + Lag House Dem Vote Share\beta_2 + President Party R\beta_3
+$$`
 
 ```{r}
 # Dem VS midterm years plot
@@ -138,9 +155,18 @@ natldata %>%
   geom_point(aes(x=47.85624, y=47.85624, label = "Prediction"), colour="grey75") +
   geom_text(aes(x=47.75, y=48.25, label = "Prediction"), color = "grey75", size = 3.5) +
   geom_point(aes(x=47.85624, y=47.58511605, label = "2022 Results"), colour="dodgerblue3") +
-  geom_text(aes(x=48.8, y=47.6, label = "2022 Results"), color = "dodgerblue3", size = 3.5)
+  geom_text(aes(x=48.8, y=47.6, label = "2022 Results"), color = "dodgerblue3", size = 3.5) +
+  geom_segment(aes(x=47.85624,y=45.81439,xend=47.85624,yend=49.89809), color = "grey80", linetype = "dotted")
 
 ```
+
+In the graph above, this model used only the midterm election years to regress on Democratic vote share and the results were extremely accurate. This model also had a high R-squared of 0.89, and it only overestimated the results by 0.27 percentage points. This was the most accurate prediction out of all four models, which surprised me a bit. In my initial predictions, I thought that these midterm year models would be less predictive, as they have fewer data points to work off of, and included fewer independent variables. While this midterm model was an accurate predictor, the other midterm model did not perform as well. 
+
+#### Model 4
+
+`$$
+Democratic Seat Share = \beta_0 + Generic Ballot Democrat\beta_1 + Lag House Dem Seat Share\beta_2 + President Party R\beta_3
+$$`
 
 ```{r}
 
@@ -160,11 +186,14 @@ natldata %>%
   geom_point(aes(x=46.38345, y=46.38345, label = "Prediction"), colour="grey75") +
   geom_text(aes(x=45.9, y=46.8, label = "Prediction"), color = "grey75", size = 3.5) +
   geom_point(aes(x=46.38345, y=49.30232558, label = "2022 Results"), colour="dodgerblue3") +
-  geom_text(aes(x=47.5, y=49.8, label = "2022 Results"), color = "dodgerblue3", size = 3.5)
+  geom_text(aes(x=47.5, y=49.8, label = "2022 Results"), color = "dodgerblue3", size = 3.5) +
+  geom_segment(aes(x=46.38345,y=42.94734,xend=46.38345,yend=49.81955), color = "grey80", linetype = "dotted")
 
 ```
 
+This midterm model underestimated the actual democratic seat share of the election by 2.92 percentage points. This was the only model that *underestimated* the dependent variable, however the prediction did still fall within the 95% confidence interval. This was the largest percentage-point difference between the prediction and the result across all four of the models, but I did expect this as the R-squared value is also the lowest of the four.
 
+Looking at the results across all four models, it seems that using only the midterm years' model for democratic vote share is more predictive than if we had used the model that spans all elections, while we see the opposite for democratic seat share - with the more predictive model being the one that uses all the elections. One reason I speculate this may be is because there is a different voter population during midterm years than election years, which has a strong affect on the vote share while the seats are more representative of the areas demographics. The number of voters in midterm years differs dramatically from the number that vote in election years - with presidential election years generating turnouts of around 50-60% and midterm elections only generating about 40% turnout. Since the number of voters participating differs between the two, it may be harder for the models that use all the years' data to predict 
 
 
 
