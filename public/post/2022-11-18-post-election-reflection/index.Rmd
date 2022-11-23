@@ -234,7 +234,7 @@ Another hypothesis that I have as to how these models could be improved upon is 
 
 While we cannot access this demographic turnout data at this point in the election, we can try to analyze this election more like a presidential election year than a midterm one. We learned that in most midterm years, the President's party will lose a lot of seats in the House of Representatives, and receive less vote share, and this was expected to happen again this year. However, as mentioned, this trend did not persist this year. While the limitations and difficulties with trying to measure the effect of a shock on an election remain, I will try to test the more general hypothesis that this year behaved less like a midterm year by removing the midterm year indicator variable and its interaction with the President's party variable. I will repeat the steps from above and re-evaluate the performance of the model.
 
-```{r}
+```{r, results = 'asis'}
 fit2 <- lm(data = natldata2, D_majorvote_pct ~ gen_avg_dem + DemVS_prev + president_party + approval_rating + midterm*president_party + unrate + unrate*president_party)
 
 fit2_midterm <- lm(data = natldata2, D_majorvote_pct ~ gen_avg_dem + DemVS_prev + president_party + approval_rating + unrate + unrate*president_party + turnout)
