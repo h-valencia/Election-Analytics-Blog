@@ -37,6 +37,8 @@
   </url><url>
     <loc>http://example.org/categories/</loc>
   </url><url>
+    <loc>http://example.org/post/post-election-campaign-narrative/</loc>
+  </url><url>
     <loc>http://example.org/tags/</loc>
   </url>
 </urlset>

@@ -1,0 +1,53 @@
+---
+title: Post-Election Campaign Narrative
+author: Hannah Valencia
+date: ''
+slug: []
+categories: []
+tags: []
+summary: "In every election, expert predictions and district forecasts do not always align with the true results that we see. There could be numerous reasons for these discrepancies and in examining these types of districts, we can learn a lot about the campaigns run. I will be looking at Maine's 2nd Congressional District in hopes of understanding some important influences on this election and speculate where the forecasts may have gotten it wrong."
+---
+
+*This blog is part of a series related to Gov 1347: Election Analytics, a course at [Harvard University](https://www.harvard.edu/) taught by Professor [Ryan D. Enos](http://ryandenos.com/)*.
+
+*In every election, expert predictions and district forecasts do not always align with the true results that we see. There could be numerous reasons for these discrepancies and in examining these types of districts, we can learn a lot about the campaigns run. I will be looking at Maine's 2nd Congressional District in hopes of understanding some important influences on this election and speculate where the forecasts may have gotten it wrong.*
+
+# Maine's 2nd Congressional District
+
+During this election cycle, there were many toss-up districts across the US. One that I was following somewhat closely was Maine's 2nd Congressional District. Back in September, this particular district caught my eye because of the wide range of predictions that experts were making about it. In September, FiveThirtyEight predicted it to be a "Lean Democrat" winner, while The Economist had listed it as a "Very Likely Republican" district. Other sites such as Politico listed it as a toss-up. When so many other districts had similar predictions across all models and forecasting websites, this district was an anomaly. As the election day drew closer, the margins on some of these forecasts shrunk and reflected that it was a closer race than they initially predicted. However, up until the very end, they were still predicting different parties to win the district. Democratic candidate Jared Golden won the House race in this district, receiving 48.2% of the votes, compared to Republican Bruce Poliquin's 44.9%. I aim to examine this race more closely and uncover why some of these forecasts did not align with the actual race. 
+
+### Demographics
+
+Maine's Second Congressional District is the largest district east of the Mississippi River, and encompasses about 80% of the state's total land, occupying the northern area. While this district does not include Maine's largest city of Portland, it does include Bangor, Lewiston, and Auburn. It is the second-most rural district in the U.S. and the district with the second highest proportion of non-Hispanic White residents, as 72% of the population within the district live in rural areas and 94% of residents identify as non-Hispanic Whites. As of the 2020 Census, this district represents about 680,000 individuals, with a population that is 49.3% male and 50.7% female. The medium household income in this district is $51,585, making it poorer than most other New England districts. While the high school graduation rate is relatively high at 92.1%, the college graduation rate in the district falls on the lower end at around 25.3%. Another interesting characteristic about Maine's 2nd district is that it is the *only* district in all of New England that voted for Donald Trump in 2020, and only one of eight districts that voted for Trump in 2020 while being held by a Democrat. Ballotpedia also recognizes it as a battleground district in the 2016 election when incumbent Republican Bruce Poliquin defeated former State Senator Emily Ann Cain. New England is known as a rather liberal area, often going blue in most elections, but the makeup of this district in terms of its lack of diversity and rural population set it apart from other New England areas.
+
+In Presidential elections prior to 1992, Maine as a state voted for Republican candidates. From 1992 until Trump in 2016, Maine voted for Democratic candidates every presidential election. In terms of the District's Congressional history, its representatives have shifted back and forth between Republican and Democratic for much of recent history. Jared Golden is the current representative, after having first been elected to the position in 2019. His Republican opponent in 2022's race, Bruce Poliquin, was the district's representative from 2015 until 2019, and prior to him, a Democratic representative held the position from 2003-2015. The district does not seem to have a strong voting pattern across Congresses. 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
