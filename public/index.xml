@@ -6,7 +6,16 @@
     <description>Recent content on My New Hugo Site</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Fri, 18 Nov 2022 00:00:00 +0000</lastBuildDate><atom:link href="http://example.org/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Fri, 02 Dec 2022 00:00:00 +0000</lastBuildDate><atom:link href="http://example.org/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Post-Election Campaign Narrative</title>
+      <link>http://example.org/post/post-election-campaign-narrative/</link>
+      <pubDate>Fri, 02 Dec 2022 00:00:00 +0000</pubDate>
+      
+      <guid>http://example.org/post/post-election-campaign-narrative/</guid>
+      <description>In every election, expert predictions and district forecasts do not always align with the true results that we see. There could be numerous reasons for these discrepancies and in examining these types of districts, we can learn a lot about the campaigns run. I will be looking at Maine&amp;rsquo;s 2nd Congressional District in hopes of understanding some important influences on this election and speculate where the forecasts may have gotten it wrong.</description>
+    </item>
+    
     <item>
       <title>Post-Election Reflection</title>
       <link>http://example.org/post/2022-11-18-post-election-reflection/</link>
@@ -86,15 +95,6 @@
       
       <guid>http://example.org/post/2022-09-12-mapping-voteshare-margin/</guid>
       <description>From now until November 3, I will be updating this weekly blog series with my &lt;strong&gt;2022 US midterm election prediction model&lt;/strong&gt;. In this first blog, I&amp;rsquo;ll be comparing the voteshare margin by party to the seat share by party in each state to hopefully explore the effects of gerrymandering.</description>
-    </item>
-    
-    <item>
-      <title>Post-Election Campaign Narrative</title>
-      <link>http://example.org/post/post-election-campaign-narrative/</link>
-      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      
-      <guid>http://example.org/post/post-election-campaign-narrative/</guid>
-      <description>In every election, expert predictions and district forecasts do not always align with the true results that we see. There could be numerous reasons for these discrepancies and in examining these types of districts, we can learn a lot about the campaigns run. I will be looking at Maine&amp;rsquo;s 2nd Congressional District in hopes of understanding some important influences on this election and speculate where the forecasts may have gotten it wrong.</description>
     </item>
     
   </channel>
